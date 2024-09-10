@@ -1,0 +1,34 @@
+---
+
+data_path: "./data/consumer.csv"
+
+train_ratio: 0.8
+val_ratio: 0.1
+
+num_rounds: 10
+num_clients: 2
+batch_size: 20
+num_classes: 2
+num_clients_per_round_fit: 2
+num_clients_per_round_eval: 2
+config_fit:
+  lr: 0.01
+  momentum: 0.9
+  local_epochs: 1
+
+defaults:
+  - model: net
+  - strategy: fedavg 
+
+
+prepare_dataset:
+  _target_: data.prepare_dataset
+  _partial_: true
+  num_partitions: ${num_clients}
+  batch_size: ${batch_size}
+  val_ratio: ${val_ratio}
+
+load_dataset: 
+  _target_: data.load_dataset
+  data_path: ${data_path}
+  train_ratio: ${train_ratio}
