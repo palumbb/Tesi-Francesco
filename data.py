@@ -3,8 +3,6 @@ import torch
 from torch.utils.data import DataLoader, random_split
 from torchvision.transforms import Compose, Normalize, ToTensor
 from torch.utils.data import TensorDataset
-from sklearn.preprocessing import OneHotEncoder
-from sklearn.model_selection import train_test_split
 
 #data_path = "./data/mv.csv"
 #train_ratio = 0.8
@@ -20,12 +18,15 @@ def load_dataset(data_path, train_ratio):
     target = dataset[target_name]
     features = list(dataset.columns)
     features.remove(target_name) 
+    features.remove("ProductID")
     # OneHotEncoding
     
     dataset = encoding_categorical_variables(dataset[features])
     dataset[target_name] = target
     features_ohe = list(dataset.columns)
     features_ohe.remove(target_name) 
+
+    dataset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
 
     train_samples = int(len(dataset)*train_ratio)
     train = dataset.iloc[0:train_samples,]

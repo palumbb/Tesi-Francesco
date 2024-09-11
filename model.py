@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import torch.optim as optim
 from flwr.common.parameter import ndarrays_to_parameters
+import torch.optim as optim
 
 class BinaryNet(nn.Module):
     def __init__(self, input_dim, num_classes):

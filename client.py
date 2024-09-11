@@ -34,15 +34,13 @@ class FlowerClient(fl.client.NumPyClient):
         self.set_parameters(parameters)
 
         lr = config["lr"]
-        momentum = config["momentum"]
         epochs = config["local_epochs"]
 
         #can set this optimiser from a config file
-        optim = torch.optim.SGD(self.model.parameters(), lr=lr, momentum=momentum)
+        optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)
 
         #can set this via a config
-        train(self.model, self.trainloader, optim, epochs, self.device)
-
+        train(self.model, self.trainloader, optimizer, epochs, self.device)
         return self.get_parameters({}), len(self.trainloader), {}
     
     def evaluate(self, parameters: NDArrays, config: Dict[str, Scalar]):

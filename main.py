@@ -5,14 +5,13 @@ from omegaconf import DictConfig, OmegaConf
 from hydra.utils import call, instantiate
 from hydra.core.hydra_config import HydraConfig
 from client import generate_client_fn
-from server import get_evalulate_fn, get_on_fit_config
-import pickle
+from server import get_evalulate_fn, weighted_average
 
 
 @hydra.main(config_path="./conf", config_name="base", version_base=None)
 
 def main(cfg: DictConfig):
-    print(OmegaConf.to_yaml(cfg))
+    # print(OmegaConf.to_yaml(cfg))
     save_path = HydraConfig.get().runtime.output_dir
 
     ## DATASET PREPARATION
@@ -26,7 +25,9 @@ def main(cfg: DictConfig):
     #print("Clients generated")
 
     strategy = instantiate(
-        cfg.strategy, evaluate_fn=get_evalulate_fn(cfg.model, testloader)
+        cfg.strategy, 
+        evaluate_fn=get_evalulate_fn(cfg.model, testloader), 
+        evaluate_metrics_aggregation_fn=weighted_average
     )
 
     ## START SIMULATION
