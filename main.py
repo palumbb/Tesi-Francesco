@@ -9,7 +9,7 @@ from server import get_evalulate_fn, get_on_fit_config
 import pickle
 
 
-@hydra.main(config_path="../conf", config_name="base", version_base=None)
+@hydra.main(config_path="./conf", config_name="base", version_base=None)
 
 def main(cfg: DictConfig):
     print(OmegaConf.to_yaml(cfg))
@@ -23,7 +23,7 @@ def main(cfg: DictConfig):
 
     ## CLIENTS INSTANTIATION
     client_fn = generate_client_fn(trainloaders, validationloaders, cfg.model)
-    print("Clients generated")
+    #print("Clients generated")
 
     strategy = instantiate(
         cfg.strategy, evaluate_fn=get_evalulate_fn(cfg.model, testloader)
@@ -37,6 +37,7 @@ def main(cfg: DictConfig):
         strategy=strategy,
         client_resources={"num_cpus": 2, "num_gpus": 0.0},
     )
+
 
 
 if __name__ == "__main__":

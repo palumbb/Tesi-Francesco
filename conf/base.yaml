@@ -1,6 +1,7 @@
 ---
 
 data_path: "./data/consumer.csv"
+input_dim: 17
 
 train_ratio: 0.8
 val_ratio: 0.1

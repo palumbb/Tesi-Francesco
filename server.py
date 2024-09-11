@@ -18,7 +18,7 @@ def get_on_fit_config(config: DictConfig):
 
     return fit_config_fn
 
-def get_evalulate_fn(model_cfg: int, testloader):
+def get_evalulate_fn(model_cfg, testloader):
 
     def evaluate_fn(server_round: int, parameters, config):
         model = instantiate(model_cfg)

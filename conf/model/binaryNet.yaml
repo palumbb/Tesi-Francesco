@@ -1,3 +1,4 @@
 ---
 _target_: model.BinaryNet
+input_dim: 17
 num_classes: ${num_classes}

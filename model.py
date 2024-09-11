@@ -5,7 +5,7 @@ import torch.optim as optim
 from flwr.common.parameter import ndarrays_to_parameters
 
 class BinaryNet(nn.Module):
-    def __init__(self, input_dim):
+    def __init__(self, input_dim, num_classes):
         super(BinaryNet, self).__init__()
         self.fc1 = nn.Linear(input_dim, 64)
         self.fc2 = nn.Linear(64, 32)
@@ -32,8 +32,9 @@ def train(model, train_loader, optimizer, num_epochs, device):
             optimizer.step()
 
 
-def evaluate(model, test_loader):
+def evaluate(model, test_loader, device):
     model.eval()
+    model.to(device)
     criterion = nn.BCELoss()
     loss = 0.0
     correct = 0
