@@ -6,7 +6,7 @@ import torch
 from flwr.common import NDArrays, Scalar
 from hydra.utils import instantiate
 
-from model import test, train
+from model import evaluate, train
 
 
 class FlowerClient(fl.client.NumPyClient):
@@ -48,17 +48,17 @@ class FlowerClient(fl.client.NumPyClient):
     def evaluate(self, parameters: NDArrays, config: Dict[str, Scalar]):
         self.set_parameters(parameters)
 
-        loss, accuracy = test(self.model, self.valloader, self.device)
+        loss, accuracy = evaluate(self.model, self.valloader, self.device)
 
         return float(loss), len(self.valloader), {"accuracy": accuracy}
     
-    def generate_client_fn(trainloaders, valloaders, model_cfg):
+def generate_client_fn(trainloaders, valloaders, model_cfg):
 
-        def client_fn(cid: str):
-            return FlowerClient(
-                trainloader=trainloaders[int(cid)],
-                vallodaer=valloaders[int(cid)],
-                model_cfg=model_cfg,
-            ).to_client()
+    def client_fn(cid: str):
+        return FlowerClient(
+            trainloader=trainloaders[int(cid)],
+            vallodaer=valloaders[int(cid)],
+            model_cfg=model_cfg,
+        ).to_client()
 
-        return client_fn
+    return client_fn

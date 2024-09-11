@@ -13,10 +13,10 @@ def load_dataset(data_path, train_ratio):
     train_samples = int(len(dataset)*train_ratio)
     train = dataset.iloc[0:train_samples,]
     test = dataset.iloc[train_samples:,]
-    print("Train: " + str(train.shape))
-    print("Test: " + str(test.shape))
-    print(train.head)
-    print(test.head)
+    #print("Train: " + str(train.shape))
+    #print("Test: " + str(test.shape))
+    #print(train.head)
+    #print(test.head)
     return train, test
     
 
