@@ -17,10 +17,11 @@ def get_on_fit_config(config: DictConfig):
 
     return fit_config_fn
 
-def get_evalulate_fn(model_cfg, testloader):
+def get_evalulate_fn(model_cfg, optimizer_cfg, testloader):
 
     def evaluate_fn(server_round: int, parameters, config):
         model = instantiate(model_cfg)
+        optimizer = instantiate(optimizer_cfg)
 
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
         params_dict = zip(model.state_dict().keys(), parameters)

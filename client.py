@@ -11,13 +11,14 @@ from model import evaluate, train
 
 class FlowerClient(fl.client.NumPyClient):
 
-    def __init__(self, trainloader, valloader, model_cfg) -> None:
+    def __init__(self, trainloader, valloader, model_cfg, optimizer_cfg) -> None:
         super().__init__()
 
         self.trainloader = trainloader
         self.valloader = valloader
 
         self.model = instantiate(model_cfg)
+        self.optimizer = instantiate(optimizer_cfg)
 
         self.device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
@@ -37,7 +38,8 @@ class FlowerClient(fl.client.NumPyClient):
         epochs = config["local_epochs"]
 
         #can set this optimiser from a config file
-        optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)
+        #optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)
+        optimizer = self.optimizer(self.model.parameters())
 
         #can set this via a config
         train(self.model, self.trainloader, optimizer, epochs, self.device)
@@ -50,13 +52,14 @@ class FlowerClient(fl.client.NumPyClient):
 
         return float(loss), len(self.valloader), {"accuracy": accuracy}
     
-def generate_client_fn(trainloaders, valloaders, model_cfg):
+def generate_client_fn(trainloaders, valloaders, model_cfg, optimizer_cfg):
 
     def client_fn(cid: str):
         return FlowerClient(
             trainloader=trainloaders[int(cid)],
             valloader=valloaders[int(cid)],
             model_cfg=model_cfg,
+            optimizer_cfg=optimizer_cfg,
         )
 
     return client_fn

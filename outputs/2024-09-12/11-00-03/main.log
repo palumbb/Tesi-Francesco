@@ -1,0 +1,36 @@
+[2024-09-12 11:00:06,715][flwr][INFO] - Starting Flower simulation, config: ServerConfig(num_rounds=10, round_timeout=None)
+[2024-09-12 11:00:22,612][flwr][INFO] - Flower VCE: Ray initialized with resources: {'memory': 1642328064.0, 'node:127.0.0.1': 1.0, 'node:__internal_head__': 1.0, 'CPU': 8.0, 'object_store_memory': 821164032.0}
+[2024-09-12 11:00:22,613][flwr][INFO] - Initializing global parameters
+[2024-09-12 11:00:22,613][flwr][INFO] - Requesting initial parameters from one random client
+[2024-09-12 11:00:28,734][flwr][INFO] - Received initial parameters from one random client
+[2024-09-12 11:00:28,735][flwr][INFO] - Evaluating initial parameters
+[2024-09-12 11:00:28,794][flwr][INFO] - initial parameters (loss, other metrics): 31.779118982950845, {'accuracy': 0.5616666666666666}
+[2024-09-12 11:00:28,796][flwr][INFO] - FL starting
+[2024-09-12 11:00:28,797][flwr][DEBUG] - fit_round 1: strategy sampled 2 clients (out of 2)
+[2024-09-12 11:00:28,852][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=7680, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: FlowerClient.fit() missing 1 required positional argument: 'optimizer_cfg'
+[2024-09-12 11:00:35,507][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=13452, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+TypeError: FlowerClient.fit() missing 1 required positional argument: 'optimizer_cfg'
+[2024-09-12 11:00:35,512][flwr][DEBUG] - fit_round 1 received 0 results and 2 failures
+[2024-09-12 11:00:35,581][flwr][INFO] - fit progress: (1, 31.779118982950845, {'accuracy': 0.5616666666666666}, 6.784545400000752)
+[2024-09-12 11:00:35,583][flwr][DEBUG] - evaluate_round 1: strategy sampled 2 clients (out of 2)

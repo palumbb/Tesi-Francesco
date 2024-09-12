@@ -21,12 +21,12 @@ def main(cfg: DictConfig):
     trainloaders, validationloaders, testloader = data_preparation(train=train,test=test)
 
     ## CLIENTS INSTANTIATION
-    client_fn = generate_client_fn(trainloaders, validationloaders, cfg.model)
+    client_fn = generate_client_fn(trainloaders, validationloaders, cfg.model, cfg.optimizer)
     #print("Clients generated")
 
     strategy = instantiate(
         cfg.strategy, 
-        evaluate_fn=get_evalulate_fn(cfg.model, testloader), 
+        evaluate_fn=get_evalulate_fn(cfg.model, cfg.optimizer, testloader), 
         evaluate_metrics_aggregation_fn=weighted_average
     )
 
