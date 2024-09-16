@@ -25,7 +25,7 @@ from omegaconf import DictConfig
 class FedNova(FedAvg):
     """FedNova."""
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, exp_config: DictConfig, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
         # Maintain a momentum buffer for the weight updates across rounds of training
@@ -35,9 +35,9 @@ class FedNova(FedAvg):
                 self.initial_parameters
             )
 
-        #self.exp_config = exp_config
-        optimizer = optim.adamax
-        self.lr = 0.01
+        self.exp_config = exp_config
+        optimizer = exp_config.optimizer
+        self.lr = 0.001
 
         # momentum parameter for the server/strategy side momentum buffer
         self.gmf = 0

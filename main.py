@@ -37,19 +37,19 @@ def main(cfg: DictConfig):
 
         client_fn = generate_client_fn(trainloaders, validationloaders, cfg.model, cfg.optimizer)
 
-        """if cfg.strategy.name == "fednova":
+        if cfg.strategy.name == "fednova":
             ndarrays = [
                         layer_param.cpu().numpy()
                         for _, layer_param in instantiate(cfg.model).state_dict().items()
                     ]
             init_parameters = ndarrays_to_parameters(ndarrays)
-            extra_args={"init_parameters" : init_parameters}"""
+            extra_args={"init_parameters" : init_parameters, "exp_config" : cfg}
 
         strategy = instantiate(
             cfg.strategy,
             evaluate_fn=get_evalulate_fn(cfg.model, cfg.optimizer, testloader), 
             evaluate_metrics_aggregation_fn=weighted_average,
-            #**extra_args,
+            **extra_args,
         )
 
         ## START SIMULATION
