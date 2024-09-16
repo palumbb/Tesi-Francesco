@@ -1,6 +1,7 @@
 ---
 
 data_path: "./data/consumer.csv"
+federated: true #true if you want to run the federated version, false if the centralized one
 input_dim: 16
 
 train_ratio: 0.8
@@ -12,6 +13,7 @@ batch_size: 20
 num_classes: 2
 num_clients_per_round_fit: 2
 num_clients_per_round_eval: 2
+num_epochs: 10
 config_fit:
   lr: 0.001
   local_epochs: 1
@@ -22,10 +24,9 @@ defaults:
   - strategy: fedavg 
   - optimizer: adam
 
-prepare_dataset:
-  _target_: data.prepare_dataset
+partition_dataset:
+  _target_: data.partition_dataset
   _partial_: true
-  num_partitions: ${num_clients}
   batch_size: ${batch_size}
   val_ratio: ${val_ratio}
 
@@ -33,3 +34,4 @@ load_dataset:
   _target_: data.load_dataset
   data_path: ${data_path}
   train_ratio: ${train_ratio}
+  federated: ${federated}

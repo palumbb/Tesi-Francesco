@@ -34,8 +34,8 @@ class FlowerClient(fl.client.NumPyClient):
         # copy parameters sent by the server into client's local model
         self.set_parameters(parameters)
 
-        lr = config["lr"]
-        epochs = config["local_epochs"]
+        lr = 0.001
+        epochs = 1
 
         #can set this optimiser from a config file
         #optimizer = torch.optim.Adam(self.model.parameters(), lr=0.001)

@@ -4,10 +4,7 @@ from torch.utils.data import DataLoader, random_split
 from torchvision.transforms import Compose, Normalize, ToTensor
 from torch.utils.data import TensorDataset
 
-#data_path = "./data/mv.csv"
-#train_ratio = 0.8
-
-def load_dataset(data_path, train_ratio):
+def load_dataset(data_path, train_ratio, federated: bool):
     types = {"ProductID":int, "ProductCategory":str, "ProductBrand":str, "ProductPrice":float,"CustomerAge":float,
              "CustomerGender":str,"PurchaseFrequency":float,"CustomerSatisfaction":float,"PurchaseIntent":int}
     dataset = pd.read_csv(data_path, dtype=types)
@@ -66,7 +63,7 @@ def encoding_categorical_variables(X):
             X = encode(X,col)
     return X
 
-def prepare_dataset(num_partitions: int, batch_size: int, val_ratio: float, train, test):
+def partition_dataset(num_partitions: int, batch_size: int, val_ratio: float, train, test):
     #train, test = load_dataset(data_path, train_ratio)
     
     num_instances_per_client = len(train) // num_partitions
@@ -109,3 +106,5 @@ def prepare_dataset(num_partitions: int, batch_size: int, val_ratio: float, trai
     #print("Partition done successfully")
 
     return trainloaders, valloaders, testloader
+
+
