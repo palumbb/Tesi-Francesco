@@ -28,8 +28,7 @@ def get_evalulate_fn(model_cfg, optimizer_cfg, testloader):
         state_dict = OrderedDict({k: torch.Tensor(v) for k, v in params_dict})
         model.load_state_dict(state_dict, strict=True)
         loss, accuracy = evaluate(model, testloader, device)
-        #print(f"Round {server_round}: Test Loss = {loss:.4f}, Test Accuracy = {accuracy:.4f}")
-        return loss, {"accuracy": accuracy}
+        return loss, {"global accuracy": accuracy}
 
     return evaluate_fn
 

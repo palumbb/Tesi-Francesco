@@ -1,6 +1,6 @@
 ---
 
-data_path: "./data/consumer.csv"
+data_path: "./data/consumer.csv" #if consumer.csv : input_dim = 16
 federated: true #true if you want to run the federated version, false if the centralized one
 input_dim: 16
 

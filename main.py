@@ -64,23 +64,19 @@ def main(cfg: DictConfig):
 
 
     else:
+
         train_loader = DataLoader(trainset, batch_size=batch_size, shuffle=True)
         test_loader = DataLoader(testset, batch_size=batch_size, shuffle=False)
 
-        # 4. Inizializzazione del modello
-        input_dim = trainset.tensors[0].shape[1]  # Ottieni il numero di input features
+        input_dim = trainset.tensors[0].shape[1]  
         model = BinaryNet(input_dim=input_dim, num_classes=1)
 
-        # 5. Definizione dell'optimizer
         optimizer = optimizer(model.parameters())
 
-        # 6. Training del modello
         train(model, train_loader, optimizer, num_epochs, device)
 
-        # 7. Valutazione del modello
         test_loss, test_accuracy = evaluate(model, test_loader, device)
 
-        # 8. Risultati
         print(f"Test Loss: {test_loss}")
         print(f"Test Accuracy: {test_accuracy}")
 
