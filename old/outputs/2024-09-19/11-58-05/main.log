@@ -1,0 +1,52 @@
+[2024-09-19 11:58:05,562][numexpr.utils][INFO] - NumExpr defaulting to 8 threads.
+[2024-09-19 11:58:07,683][flwr][INFO] - Starting Flower simulation, config: ServerConfig(num_rounds=10, round_timeout=None)
+[2024-09-19 11:58:15,625][flwr][INFO] - Flower VCE: Ray initialized with resources: {'node:127.0.0.1': 1.0, 'memory': 1357509428.0, 'CPU': 8.0, 'object_store_memory': 678754713.0, 'node:__internal_head__': 1.0}
+[2024-09-19 11:58:15,626][flwr][INFO] - Initializing global parameters
+[2024-09-19 11:58:15,626][flwr][INFO] - Requesting initial parameters from one random client
+[2024-09-19 11:58:18,771][flwr][INFO] - Received initial parameters from one random client
+[2024-09-19 11:58:18,772][flwr][INFO] - Evaluating initial parameters
+[2024-09-19 11:58:18,812][flwr][INFO] - initial parameters (loss, other metrics): 37.9249319712321, {'global accuracy': 0.5616666666666666}
+[2024-09-19 11:58:18,813][flwr][INFO] - FL starting
+[2024-09-19 11:58:18,814][flwr][DEBUG] - fit_round 1: strategy sampled 2 clients (out of 2)
+[2024-09-19 11:58:18,896][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=7096, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\PC\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\PC\anaconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\anaconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\VscodeProjects\Tesi-Francesco\clients\client_scaffold.py", line 49, in fit
+    self.set_parameters(parameters)
+  File "C:\Users\PC\VscodeProjects\Tesi-Francesco\clients\client_scaffold.py", line 39, in set_parameters
+    self.model.load_state_dict(state_dict, strict=True)
+  File "C:\Users\PC\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 2215, in load_state_dict
+    raise RuntimeError('Error(s) in loading state_dict for {}:\n\t{}'.format(
+RuntimeError: Error(s) in loading state_dict for BinaryNet:
+	Missing key(s) in state_dict: "fc2.bias", "fc3.weight", "fc3.bias".
+[2024-09-19 11:58:22,918][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=19092, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\PC\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\PC\anaconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\anaconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\PC\VscodeProjects\Tesi-Francesco\clients\client_scaffold.py", line 49, in fit
+    self.set_parameters(parameters)
+  File "C:\Users\PC\VscodeProjects\Tesi-Francesco\clients\client_scaffold.py", line 39, in set_parameters
+    self.model.load_state_dict(state_dict, strict=True)
+  File "C:\Users\PC\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 2215, in load_state_dict
+    raise RuntimeError('Error(s) in loading state_dict for {}:\n\t{}'.format(
+RuntimeError: Error(s) in loading state_dict for BinaryNet:
+	Missing key(s) in state_dict: "fc2.bias", "fc3.weight", "fc3.bias".
+[2024-09-19 11:58:22,931][flwr][DEBUG] - fit_round 1 received 0 results and 2 failures
+[2024-09-19 11:58:22,969][flwr][INFO] - fit progress: (1, 37.9249319712321, {'global accuracy': 0.5616666666666666}, 4.1549465999996755)
+[2024-09-19 11:58:22,970][flwr][DEBUG] - evaluate_round 1: strategy sampled 2 clients (out of 2)
+[2024-09-19 11:58:32,695][flwr][DEBUG] - evaluate_round 1 received 2 results and 0 failures

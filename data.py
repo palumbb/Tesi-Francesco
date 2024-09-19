@@ -1,23 +1,27 @@
 import pandas as pd
 import torch
 from torch.utils.data import DataLoader, random_split
-from torchvision.transforms import Compose, Normalize, ToTensor
 from torch.utils.data import TensorDataset
+from sklearn.preprocessing import StandardScaler
+import numpy as np
 
-def load_dataset(data_path, train_ratio, federated: bool):
+def load_dataset(data_cfg, num_clients, federated: bool):
     types = {"ProductID":int, "ProductCategory":str, "ProductBrand":str, "ProductPrice":float,"CustomerAge":float,
              "CustomerGender":str,"PurchaseFrequency":float,"CustomerSatisfaction":float,"PurchaseIntent":int}
+    data_path = data_cfg.path
     dataset = pd.read_csv(data_path, dtype=types)
-    #ENCODER CATEGORICAL TO INTEGER NON FEDERATED + NORMALIZATION FEDERATED
-    #tr = Compose([ToTensor(), Normalize((0.1307,), (0.3081,))])
-    #
+    
     target_name = "PurchaseIntent" # change to parameter of the function (from config file)
     target = dataset[target_name]
+
+    print(np.unique(target, return_counts=True))
     features = list(dataset.columns)
     features.remove(target_name) 
     features.remove("ProductID")
     # OneHotEncoding
-    
+    num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
+    print(num_columns)
+
     dataset = encoding_categorical_variables(dataset[features])
     dataset[target_name] = target
     features_ohe = list(dataset.columns)
@@ -25,14 +29,22 @@ def load_dataset(data_path, train_ratio, federated: bool):
 
     dataset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
 
-    train_samples = int(len(dataset)*train_ratio)
+    train_samples = int(len(dataset)*data_cfg.train_split)
     train = dataset.iloc[0:train_samples,]
     test = dataset.iloc[train_samples:,]
+    
+    scaler = StandardScaler()
+    train[num_columns] = scaler.fit_transform(train[num_columns])
+    test[num_columns] = scaler.transform(test[num_columns])
 
     x_train = train[features_ohe].to_numpy()
     y_train = train[target_name].to_numpy()
     x_test = test[features_ohe].to_numpy()
     y_test = test[target_name].to_numpy()
+    
+    print(np.unique(y_test, return_counts=True))
+    print(np.unique(y_train, return_counts=True))
+
     x_train_tensor = torch.tensor(x_train, dtype=torch.float32)
     x_test_tensor = torch.tensor(x_test, dtype=torch.float32)
     y_train_tensor = torch.tensor(y_train, dtype=torch.float32).view(-1, 1)
@@ -46,8 +58,18 @@ def load_dataset(data_path, train_ratio, federated: bool):
     #print(test.head)
     #print(dataset.columns)
     #print(dataset.shape)
-
-    return train_dataset, test_dataset
+    
+    if federated:
+        trainloaders, valloaders, testloader = partition_dataset(num_partitions=num_clients,
+                                                                 batch_size=data_cfg.batch_size,
+                                                                 val_ratio=data_cfg.val_split,
+                                                                 train = train_dataset,
+                                                                 test = test_dataset
+                                                                 )
+        return trainloaders, valloaders, testloader
+    
+    else:
+        return train_dataset, test_dataset
 
 def encoding_categorical_variables(X):
     def encode(original_dataframe, feature_to_encode):
@@ -100,11 +122,8 @@ def partition_dataset(num_partitions: int, batch_size: int, val_ratio: float, tr
         valloaders.append(
             DataLoader(for_val, batch_size=batch_size, shuffle=False, num_workers=2)
         )
-    
-    testloader = DataLoader(test, batch_size=128)
 
+    testloader = DataLoader(test, batch_size=128)
     #print("Partition done successfully")
 
     return trainloaders, valloaders, testloader
-
-

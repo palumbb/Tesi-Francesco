@@ -1,85 +1,105 @@
-import hydra
+"""Create and connect the building blocks for your experiments; start the simulation.
+
+It includes processioning the dataset, instantiate strategy, specify how the global
+model is going to be evaluated, etc. At the end, this script saves the results.
+"""
+
+import os
+import pickle
+
 import flwr as fl
-from omegaconf import DictConfig, OmegaConf
-from hydra.utils import call, instantiate
+import hydra
+from flwr.server.client_manager import SimpleClientManager
+from flwr.server.server import Server
 from hydra.core.hydra_config import HydraConfig
-from client import generate_client_fn
-from server import get_evalulate_fn, weighted_average
-from flwr.common import ndarrays_to_parameters
-import torch
-from torch.utils.data import DataLoader
-from model import BinaryNet, train, evaluate
+from hydra.utils import call, instantiate
+from omegaconf import DictConfig, OmegaConf
 
-@hydra.main(config_path="./conf", config_name="base", version_base=None)
+from data import load_dataset
+from server_fednova import FedNovaServer
+from server_scaffold import ScaffoldServer, gen_evaluate_fn
+from strategy import FedNovaStrategy, ScaffoldStrategy
 
-def main(cfg: DictConfig):
-    federated = cfg.federated
-    # print(OmegaConf.to_yaml(cfg))
-    save_path = HydraConfig.get().runtime.output_dir
 
-    num_clients=cfg.num_clients
-    lr=cfg.config_fit.lr
-    batch_size=cfg.batch_size
-    num_epochs=cfg.num_epochs
-    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-    optimizer = call(cfg.optimizer)
+@hydra.main(config_path="conf", config_name="fedprox_base", version_base=None)
+def main(cfg: DictConfig) -> None:
+    """Run the baseline.
 
-    trainset, testset = call(cfg.load_dataset)
+    Parameters
+    ----------
+    cfg : DictConfig
+        An omegaconf object that stores the hydra config.
+    """
 
-    if federated:
+    # 2. Prepare your dataset
+    trainloaders, valloaders, testloader = load_dataset(
+        data_cfg=cfg.dataset,
+        num_clients=cfg.num_clients,
+        federated=cfg.federated
+    )
 
-         ## DATASET PARTITION
-
-        data_preparation = call(cfg.partition_dataset)
-        trainloaders, validationloaders, testloader = data_preparation(train=trainset,test=testset,num_partitions=num_clients)
-
-        ## CLIENTS INSTANTIATION
-
-        client_fn = generate_client_fn(trainloaders, validationloaders, cfg.model, cfg.optimizer)
-
-        if cfg.strategy.name == "fednova":
-            ndarrays = [
-                        layer_param.cpu().numpy()
-                        for _, layer_param in instantiate(cfg.model).state_dict().items()
-                    ]
-            init_parameters = ndarrays_to_parameters(ndarrays)
-            extra_args={"init_parameters" : init_parameters, "exp_config" : cfg}
-
-        strategy = instantiate(
-            cfg.strategy,
-            evaluate_fn=get_evalulate_fn(cfg.model, cfg.optimizer, testloader), 
-            evaluate_metrics_aggregation_fn=weighted_average,
-            **extra_args,
+    # 3. Define your clients
+    client_fn = None
+    # pylint: disable=protected-access
+    if cfg.client_fn._target_ == "client_scaffold.gen_client_fn":
+        save_path = HydraConfig.get().runtime.output_dir
+        client_cv_dir = os.path.join(save_path, "client_cvs")
+        print("Local cvs for scaffold clients are saved to: ", client_cv_dir)
+        client_fn = call(
+            cfg.client_fn,
+            trainloaders,
+            valloaders,
+            model=cfg.model,
+            client_cv_dir=client_cv_dir,
         )
-
-        ## START SIMULATION
-
-        history = fl.simulation.start_simulation(
-            client_fn=client_fn,
-            num_clients=num_clients,
-            config=fl.server.ServerConfig(num_rounds=cfg.num_rounds),
-            strategy=strategy,
-            client_resources={"num_cpus": 2, "num_gpus": 0.0},
-        )
-
-
     else:
+        client_fn = call(
+            cfg.client_fn,
+            trainloaders,
+            valloaders,
+            model=cfg.model,
+        )
 
-        train_loader = DataLoader(trainset, batch_size=batch_size, shuffle=True)
-        test_loader = DataLoader(testset, batch_size=batch_size, shuffle=False)
+    device = cfg.server_device
+    evaluate_fn = gen_evaluate_fn(testloader, device=device, model=cfg.model)
 
-        input_dim = trainset.tensors[0].shape[1]  
-        model = BinaryNet(input_dim=input_dim, num_classes=1)
+    # 4. Define your strategy
+    strategy = instantiate(
+        cfg.strategy,
+        evaluate_fn=evaluate_fn,
+    )
 
-        optimizer = optimizer(model.parameters())
+    # 5. Define your server
+    server = Server(strategy=strategy, client_manager=SimpleClientManager())
+    if isinstance(strategy, FedNovaStrategy):
+        server = FedNovaServer(strategy=strategy, client_manager=SimpleClientManager())
+    elif isinstance(strategy, ScaffoldStrategy):
+        server = ScaffoldServer(
+            strategy=strategy, model=cfg.model, client_manager=SimpleClientManager()
+        )
 
-        train(model, train_loader, optimizer, num_epochs, device)
+    # 6. Start Simulation
+    history = fl.simulation.start_simulation(
+        server=server,
+        client_fn=client_fn,
+        num_clients=cfg.num_clients,
+        config=fl.server.ServerConfig(num_rounds=cfg.num_rounds),
+        client_resources={
+            "num_cpus": cfg.client_resources.num_cpus,
+            "num_gpus": cfg.client_resources.num_gpus,
+        },
+        strategy=strategy,
+    )
 
-        test_loss, test_accuracy = evaluate(model, test_loader, device)
+    print(history)
 
-        print(f"Test Loss: {test_loss}")
-        print(f"Test Accuracy: {test_accuracy}")
+    save_path = HydraConfig.get().runtime.output_dir
+    print(save_path)
 
-        
+    # 7. Save your results
+    with open(os.path.join(save_path, "history.pkl"), "wb") as f_ptr:
+        pickle.dump(history, f_ptr)
+
+
 if __name__ == "__main__":
     main()

@@ -1,0 +1,50 @@
+model:
+  _target_: model.BinaryNet
+  input_dim: ${input_dim}
+  num_classes: ${num_classes}
+strategy:
+  name: scaffold
+  _target_: strategy.scaffold.ScaffoldStrategy
+  fraction_fit: 1.0e-05
+  min_fit_clients: ${num_clients_per_round_fit}
+  fraction_evaluate: 1.0e-05
+  min_evaluate_clients: ${num_clients_per_round_eval}
+  min_available_clients: ${num_clients}
+  on_fit_config_fn:
+    _target_: server.get_on_fit_config
+    config: ${config_fit}
+optimizer:
+  _target_: optimizer.ScaffoldOptimizer
+  _partial_: true
+  lr: 0.001
+  momentum: 0.9
+  weight_decay: 0.1
+data_path: ./data/consumer.csv
+federated: true
+input_dim: 16
+train_ratio: 0.8
+val_ratio: 0.1
+num_rounds: 10
+num_clients: 2
+batch_size: 20
+num_classes: 2
+num_clients_per_round_fit: 2
+num_clients_per_round_eval: 2
+num_epochs: 10
+config_fit:
+  lr: 0.001
+  local_epochs: 1
+partition_dataset:
+  _target_: data.partition_dataset
+  _partial_: true
+  batch_size: ${batch_size}
+  val_ratio: ${val_ratio}
+generate_client_fn:
+  _target_: client_scaffold.generate_client_fn
+  _partial_: true
+  client_cv_dir: client_cvs
+load_dataset:
+  _target_: data.load_dataset
+  data_path: ${data_path}
+  train_ratio: ${train_ratio}
+  federated: ${federated}
