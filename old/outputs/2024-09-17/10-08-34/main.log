@@ -1,0 +1,4 @@
+[2024-09-17 10:08:35,096][numexpr.utils][INFO] - NumExpr defaulting to 8 threads.
+[2024-09-17 10:08:44,610][flwr][INFO] - Starting Flower simulation, config: ServerConfig(num_rounds=10, round_timeout=None)
+[2024-09-17 10:09:06,612][flwr][INFO] - Flower VCE: Ray initialized with resources: {'memory': 563943015.0, 'node:127.0.0.1': 1.0, 'object_store_memory': 281971507.0, 'CPU': 8.0, 'node:__internal_head__': 1.0}
+[2024-09-17 10:09:06,613][flwr][INFO] - Initializing global parameters
