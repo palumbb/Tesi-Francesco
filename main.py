@@ -14,18 +14,21 @@ from flwr.server.server import Server
 from hydra.core.hydra_config import HydraConfig
 from hydra.utils import call, instantiate
 from omegaconf import DictConfig, OmegaConf
-from model import train, evaluate
+from model import BinaryNet, train_centralized, test
 from data import load_dataset
 from server_fednova import FedNovaServer
 from server_scaffold import ScaffoldServer, gen_evaluate_fn
 from strategy import FedNovaStrategy, ScaffoldStrategy
 from torch.utils.data import DataLoader
+from torch.optim import SGD, Optimizer
 
 
-@hydra.main(config_path="conf", config_name="fedprox_base", version_base=None)
+
+@hydra.main(config_path="conf", config_name="fedavg_base", version_base=None)
 
 def main(cfg: DictConfig) -> None:
     
+    device = cfg.server_device
 
     # 2. Prepare your dataset
     if cfg.federated:
@@ -57,7 +60,6 @@ def main(cfg: DictConfig) -> None:
                 model=cfg.model,
             )
 
-        device = cfg.server_device
         evaluate_fn = gen_evaluate_fn(testloader, device=device, model=cfg.model)
 
         # 4. Define your strategy
@@ -89,6 +91,12 @@ def main(cfg: DictConfig) -> None:
         )
 
         print(history)
+        save_path = HydraConfig.get().runtime.output_dir
+        print(save_path)
+
+        # 7. Save your results
+        with open(os.path.join(save_path, "history.pkl"), "wb") as f_ptr:
+            pickle.dump(history, f_ptr)
     else:
         trainset, testset = load_dataset(
             data_cfg=cfg.dataset,
@@ -97,29 +105,30 @@ def main(cfg: DictConfig) -> None:
         )
         
         #input_dim = trainset.tensors[0].shape[1]  
-        model = cfg.model
         num_epochs = cfg.num_epochs
         batch_size = cfg.batch_size
+        learning_rate = cfg.learning_rate
+        momentum = cfg.momentum
+        weight_decay = cfg.weight_decay
+        input_dim = cfg.model.input_dim
 
         train_loader = DataLoader(trainset, batch_size=batch_size, shuffle=True)
         test_loader = DataLoader(testset, batch_size=batch_size, shuffle=False)
 
+        model = BinaryNet(input_dim=input_dim, num_classes=1)
+        #optimizer = call(cfg.optimizer)
+        #optimizer = optimizer(model.parameters())
+        optimizer = SGD(
+            model.parameters(), lr=learning_rate, momentum=momentum, weight_decay=weight_decay
+        )
 
-        optimizer = optimizer(model.parameters())
+        train_centralized(model, train_loader, optimizer, num_epochs, device)
 
-        train(model, train_loader, optimizer, num_epochs, device)
-
-        test_loss, test_accuracy = evaluate(model, test_loader, device)
+        test_loss, test_accuracy, f1_score = test(model, test_loader, device)
 
         print(f"Test Loss: {test_loss}")
         print(f"Test Accuracy: {test_accuracy}")
-
-    save_path = HydraConfig.get().runtime.output_dir
-    print(save_path)
-
-    # 7. Save your results
-    with open(os.path.join(save_path, "history.pkl"), "wb") as f_ptr:
-        pickle.dump(history, f_ptr)
+        print(f"F1-score: {f1_score}")
 
 
 if __name__ == "__main__":

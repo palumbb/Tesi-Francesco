@@ -42,7 +42,7 @@ dataset:
 model:
   # model config
   _target_: model.BinaryNet
-  input_dim: 14 #16 if consumer, 15 if mv
+  input_dim: 14 #16 if consumer, 14 if mv
   num_classes: 2
 
 strategy:

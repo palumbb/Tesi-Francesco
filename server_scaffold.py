@@ -262,7 +262,7 @@ def gen_evaluate_fn(
         net.load_state_dict(state_dict, strict=True)
         net.to(device)
 
-        loss, accuracy = test(net, testloader, device=device)
-        return loss, {"accuracy": accuracy}
+        loss, accuracy, f1_score = test(net, testloader, device=device)
+        return loss, {"accuracy": accuracy, "f1-score": f1_score}
 
     return evaluate

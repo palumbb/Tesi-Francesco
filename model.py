@@ -8,7 +8,7 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from torch.optim import SGD, Optimizer
 from torch.nn.parameter import Parameter
-
+from sklearn.metrics import f1_score
 import numpy as np
 
 class BinaryNet(nn.Module):
@@ -25,6 +25,19 @@ class BinaryNet(nn.Module):
         x = self.relu(self.fc2(x))
         x = self.sigmoid(self.fc3(x))
         return x
+
+def train_centralized(model, train_loader, optimizer, num_epochs, device):
+    criterion = nn.BCELoss()
+    model.train()
+    model.to(device)
+    for epoch in range(num_epochs):
+        for X_batch, y_batch in train_loader:
+            optimizer.zero_grad()
+            outputs = model(X_batch)
+            loss = criterion(outputs, y_batch)
+            loss.backward()
+            optimizer.step()
+
 
 class ScaffoldOptimizer(SGD):
     """Implements SGD optimizer step function as defined in the SCAFFOLD paper."""
@@ -326,7 +339,7 @@ def _train_one_epoch_fednova(
 
 def test(
     net: nn.Module, testloader: DataLoader, device: torch.device
-) -> Tuple[float, float]:
+) -> Tuple[float, float, float]:
     """Evaluate the network on the test set.
 
     Parameters
@@ -340,20 +353,37 @@ def test(
 
     Returns
     -------
-    Tuple[float, float]
-        The loss and accuracy of the network on the test set.
+    Tuple[float, float, float]
+        The loss, accuracy, and F1-score of the network on the test set.
     """
     criterion = nn.BCELoss()
     net.eval()
     correct, total, loss = 0, 0, 0.0
+    all_targets = []
+    all_predictions = []
+    
     with torch.no_grad():
         for data, target in testloader:
             data, target = data.to(device), target.to(device)
             output = net(data)
+            
             loss += criterion(output, target).item()
+            
+            # Predizioni binarie (threshold a 0.5)
             predicted = (output > 0.5).float()
+            
+            # Colleziona predizioni e target per il calcolo delle metriche
+            all_predictions.extend(predicted.cpu().numpy())
+            all_targets.extend(target.cpu().numpy())
+            
             total += target.size(0)
             correct += (predicted == target).sum().item()
+    
+    # Calcolo della loss e dell'accuracy
     loss = loss / total
     acc = correct / total
-    return loss, acc
+    
+    # Calcolo della F1-score
+    f1 = f1_score(all_targets, all_predictions, average='binary')
+
+    return loss, acc, f1
