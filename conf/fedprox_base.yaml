@@ -12,7 +12,7 @@ learning_rate: 0.01
 num_rounds: 50
 mu: 0.01
 partitioning: "uniform"
-dataset_path: "./data/consumer.csv"
+dataset_path: "./data/mv.csv"
 dataset_seed: 42
 alpha: 0.5
 labels_per_client: 2 # only used when partitioning is label quantity
@@ -42,7 +42,7 @@ dataset:
 model:
   # model config
   _target_: model.BinaryNet
-  input_dim: 16
+  input_dim: 14 #16 if consumer, 15 if mv
   num_classes: 2
 
 strategy:

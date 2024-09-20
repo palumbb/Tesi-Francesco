@@ -1,28 +1,18 @@
 import pandas as pd
 import torch
 from torch.utils.data import DataLoader, random_split
-from torchvision.transforms import Compose, Normalize, ToTensor
+#from torchvision.transforms import Compose, Normalize, ToTensor
 from torch.utils.data import TensorDataset
 
-def load_dataset(data_path, train_ratio, federated: bool):
-    types = {"ProductID":int, "ProductCategory":str, "ProductBrand":str, "ProductPrice":float,"CustomerAge":float,
-             "CustomerGender":str,"PurchaseFrequency":float,"CustomerSatisfaction":float,"PurchaseIntent":int}
-    dataset = pd.read_csv(data_path, dtype=types)
+def load_dataset(data_path, train_ratio):
     #ENCODER CATEGORICAL TO INTEGER NON FEDERATED + NORMALIZATION FEDERATED
     #tr = Compose([ToTensor(), Normalize((0.1307,), (0.3081,))])
     #
-    target_name = "PurchaseIntent" # change to parameter of the function (from config file)
-    target = dataset[target_name]
-    features = list(dataset.columns)
-    features.remove(target_name) 
-    features.remove("ProductID")
-    # OneHotEncoding
-    
-    dataset = encoding_categorical_variables(dataset[features])
-    dataset[target_name] = target
-    features_ohe = list(dataset.columns)
-    features_ohe.remove(target_name) 
-
+    if data_path=="./data/consumer.csv":
+        dataset, features_ohe, target_name, num_columns = load_consumer()
+    elif data_path=="./data/mv.csv":
+        dataset, features_ohe, target_name, num_columns = load_mv()
+      
     dataset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
 
     train_samples = int(len(dataset)*train_ratio)
@@ -108,3 +98,31 @@ def partition_dataset(num_partitions: int, batch_size: int, val_ratio: float, tr
     return trainloaders, valloaders, testloader
 
 
+
+def load_consumer():
+    types = {"ProductID":int, "ProductCategory":str, "ProductBrand":str, "ProductPrice":float,"CustomerAge":float,
+            "CustomerGender":str,"PurchaseFrequency":float,"CustomerSatisfaction":float,"PurchaseIntent":int}
+    dataset = pd.read_csv("./data/consumer.csv", dtype=types)
+    features = list(dataset.columns)
+    target_name = "PurchaseIntent"
+    features.remove("ProductID")
+    target = dataset[target_name]
+    features.remove(target_name)
+    num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
+    dataset = encoding_categorical_variables(dataset[features])
+    dataset[target_name] = target
+    features_ohe = list(dataset.columns)
+    features_ohe.remove(target_name)
+    return dataset, features_ohe, target_name, num_columns
+
+def load_mv():
+    types = {"x1":float, "x2":float, "x3":str, "x4":float,"x5":float,"x6":float,
+                 "x7":str,"x8":str,"x9":float,"x10":float,"binaryClass":str}
+    dataset = pd.read_csv("./data/mv.csv", dtype=types)
+    features = list(dataset.columns)
+    target_name = "binaryClass"
+    num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
+    dataset = encoding_categorical_variables(dataset[features])
+    features_ohe = list(dataset.columns)
+    features_ohe.remove(target_name)     
+    return dataset, features_ohe, target_name, num_columns
