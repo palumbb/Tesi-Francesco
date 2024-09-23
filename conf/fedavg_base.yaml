@@ -10,7 +10,7 @@ batch_size: 32
 clients_per_round: 2
 learning_rate: 0.01
 num_rounds: 50
-partitioning: "uniform"
+partitioning: "x3"
 dataset_path: "./data/mv.csv" #also change the input dim
 dataset_seed: 42
 alpha: 0.5
