@@ -5,15 +5,14 @@ from torch.utils.data import TensorDataset
 from sklearn.preprocessing import StandardScaler
 import numpy as np
 
-def load_dataset(data_cfg, num_clients, federated: bool):
+def load_dataset(data_cfg, num_clients, federated: bool, partitioning):
     data_path = data_cfg.path
     if data_path=="./data/consumer.csv":
         dataset, features_ohe, target_name, num_columns = load_consumer()
     elif data_path=="./data/mv.csv":
         dataset, features_ohe, target_name, num_columns = load_mv()
     
-    # OneHotEncoding
-
+    print(dataset)
     dataset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
 
     train_samples = int(len(dataset)*data_cfg.train_split)
@@ -79,16 +78,19 @@ def encoding_categorical_variables(X):
 def partition_dataset(num_partitions: int, batch_size: int, val_ratio: float, train, test):
     #train, test = load_dataset(data_path, train_ratio)
     
+    """
     num_instances_per_client = len(train) // num_partitions
-    partition_len = [num_instances_per_client] * num_partitions
+    partition_len = [num_instances_per_client] * num_partitions"""
 
+    # change proportions according to num_clients
+    # if 2 clients
+    #proportions = [.50, .50]
+    proportions = [.35, .35, .30]
+    lengths = [int(p * len(train)) for p in proportions]
+    lengths[-1] = len(train) - sum(lengths[:-1])
+    trainsets = random_split(train, lengths)
     #print(len(train))
     #print(partition_len)
-
-    
-    trainsets = random_split(
-        train, partition_len, torch.Generator().manual_seed(2023)
-    )
 
     trainloaders = []
     valloaders = []
@@ -149,7 +151,7 @@ def load_mv():
     num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
     dataset = encoding_categorical_variables(dataset[features])
     dataset[target_name] = target
-    print(dataset[target_name])
+    #print(dataset[target_name])
     features_ohe = list(dataset.columns)
     features_ohe.remove(target_name)     
     return dataset, features_ohe, target_name, num_columns

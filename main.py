@@ -35,7 +35,8 @@ def main(cfg: DictConfig) -> None:
         trainloaders, valloaders, testloader = load_dataset(
             data_cfg=cfg.dataset,
             num_clients=cfg.num_clients,
-            federated=cfg.federated
+            federated=cfg.federated,
+           partitioning = cfg.partitioning 
         )
 
         # 3. Define your clients
