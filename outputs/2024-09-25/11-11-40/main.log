@@ -1,0 +1,5 @@
+[2024-09-25 11:11:41,319][flwr][WARNING] - Both server and strategy were provided, ignoring strategy
+[2024-09-25 11:11:41,323][flwr][INFO] - Starting Flower simulation, config: ServerConfig(num_rounds=50, round_timeout=None)
+[2024-09-25 11:11:50,209][flwr][INFO] - Flower VCE: Ray initialized with resources: {'memory': 1130092955.0, 'node:__internal_head__': 1.0, 'CPU': 12.0, 'node:127.0.0.1': 1.0, 'object_store_memory': 565046476.0}
+[2024-09-25 11:11:50,210][flwr][INFO] - Initializing global parameters
+[2024-09-25 11:11:50,210][flwr][INFO] - Requesting initial parameters from one random client

@@ -1,0 +1,19 @@
+[2024-09-25 12:09:14,480][flwr][WARNING] - Both server and strategy were provided, ignoring strategy
+[2024-09-25 12:09:14,480][flwr][INFO] - Starting Flower simulation, config: ServerConfig(num_rounds=50, round_timeout=None)
+[2024-09-25 12:09:23,271][flwr][INFO] - Flower VCE: Ray initialized with resources: {'memory': 1550986446.0, 'node:__internal_head__': 1.0, 'CPU': 12.0, 'node:127.0.0.1': 1.0, 'object_store_memory': 775493222.0}
+[2024-09-25 12:09:23,271][flwr][INFO] - Initializing global parameters
+[2024-09-25 12:09:23,271][flwr][INFO] - Requesting initial parameters from one random client
+[2024-09-25 12:09:27,194][flwr][INFO] - Received initial parameters from one random client
+[2024-09-25 12:09:27,194][flwr][INFO] - Evaluating initial parameters
+[2024-09-25 12:09:27,345][flwr][INFO] - initial parameters (loss, other metrics): 0.00556806154569224, {'accuracy': 0.40777532499386804, 'f1-score': 0.5729194304413195}
+[2024-09-25 12:09:27,345][flwr][INFO] - FL starting
+[2024-09-25 12:09:27,352][flwr][DEBUG] - fit_round 1: strategy sampled 2 clients (out of 3)
+[2024-09-25 12:09:39,669][flwr][DEBUG] - fit_round 1 received 2 results and 0 failures
+[2024-09-25 12:09:39,678][flwr][WARNING] - No fit_metrics_aggregation_fn provided
+[2024-09-25 12:09:39,804][flwr][INFO] - fit progress: (1, 0.0004982276745862401, {'accuracy': 0.9838116261957321, 'f1-score': 0.9795221843003413}, 12.463260599999558)
+[2024-09-25 12:09:39,804][flwr][INFO] - evaluate_round 1: no clients selected, cancel
+[2024-09-25 12:09:39,804][flwr][DEBUG] - fit_round 2: strategy sampled 2 clients (out of 3)
+[2024-09-25 12:09:47,675][flwr][DEBUG] - fit_round 2 received 2 results and 0 failures
+[2024-09-25 12:09:47,823][flwr][INFO] - fit progress: (2, 0.0002543193157712034, {'accuracy': 0.9908020603384842, 'f1-score': 0.9886826618379357}, 20.470634099999188)
+[2024-09-25 12:09:47,824][flwr][INFO] - evaluate_round 2: no clients selected, cancel
+[2024-09-25 12:09:47,824][flwr][DEBUG] - fit_round 3: strategy sampled 2 clients (out of 3)

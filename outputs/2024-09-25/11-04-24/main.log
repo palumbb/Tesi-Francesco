@@ -1,0 +1,330 @@
+[2024-09-25 11:04:25,279][flwr][WARNING] - Both server and strategy were provided, ignoring strategy
+[2024-09-25 11:04:25,279][flwr][INFO] - Starting Flower simulation, config: ServerConfig(num_rounds=50, round_timeout=None)
+[2024-09-25 11:04:35,182][flwr][INFO] - Flower VCE: Ray initialized with resources: {'node:127.0.0.1': 1.0, 'CPU': 12.0, 'node:__internal_head__': 1.0, 'memory': 685373031.0, 'object_store_memory': 342686515.0}
+[2024-09-25 11:04:35,182][flwr][INFO] - Initializing global parameters
+[2024-09-25 11:04:35,182][flwr][INFO] - Requesting initial parameters from one random client
+[2024-09-25 11:04:39,293][flwr][INFO] - Received initial parameters from one random client
+[2024-09-25 11:04:39,293][flwr][INFO] - Evaluating initial parameters
+[2024-09-25 11:04:39,462][flwr][INFO] - initial parameters (loss, other metrics): 0.005532825025296954, {'accuracy': 0.40875643855776306, 'f1-score': 0.5749801639777836}
+[2024-09-25 11:04:39,462][flwr][INFO] - FL starting
+[2024-09-25 11:04:39,462][flwr][DEBUG] - fit_round 1: strategy sampled 2 clients (out of 3)
+[2024-09-25 11:04:47,871][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=1068, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 53, in fit
+    train_fedavg(
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 166, in train_fedavg
+    net = _train_one_epoch(net, trainloader, device, criterion, optimizer)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 180, in _train_one_epoch
+    output = net(data)
+             ^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 24, in forward
+    x = self.relu(self.fc1(x))
+                  ^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\linear.py", line 117, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (32x13 and 14x64)
+[2024-09-25 11:04:51,048][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=10160, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 53, in fit
+    train_fedavg(
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 166, in train_fedavg
+    net = _train_one_epoch(net, trainloader, device, criterion, optimizer)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 180, in _train_one_epoch
+    output = net(data)
+             ^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 24, in forward
+    x = self.relu(self.fc1(x))
+                  ^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\linear.py", line 117, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (32x13 and 14x64)
+[2024-09-25 11:04:51,055][flwr][DEBUG] - fit_round 1 received 0 results and 2 failures
+[2024-09-25 11:04:51,191][flwr][INFO] - fit progress: (1, 0.005532825025296954, {'accuracy': 0.40875643855776306, 'f1-score': 0.5749801639777836}, 11.716055200000028)
+[2024-09-25 11:04:51,193][flwr][INFO] - evaluate_round 1: no clients selected, cancel
+[2024-09-25 11:04:51,193][flwr][DEBUG] - fit_round 2: strategy sampled 2 clients (out of 3)
+[2024-09-25 11:04:57,917][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=10160, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 53, in fit
+    train_fedavg(
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 166, in train_fedavg
+    net = _train_one_epoch(net, trainloader, device, criterion, optimizer)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 180, in _train_one_epoch
+    output = net(data)
+             ^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 24, in forward
+    x = self.relu(self.fc1(x))
+                  ^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\linear.py", line 117, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (32x13 and 14x64)
+[2024-09-25 11:04:57,952][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=1068, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 53, in fit
+    train_fedavg(
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 166, in train_fedavg
+    net = _train_one_epoch(net, trainloader, device, criterion, optimizer)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 180, in _train_one_epoch
+    output = net(data)
+             ^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 24, in forward
+    x = self.relu(self.fc1(x))
+                  ^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\linear.py", line 117, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (32x13 and 14x64)
+[2024-09-25 11:04:57,971][flwr][DEBUG] - fit_round 2 received 0 results and 2 failures
+[2024-09-25 11:04:58,119][flwr][INFO] - fit progress: (2, 0.005532825025296954, {'accuracy': 0.40875643855776306, 'f1-score': 0.5749801639777836}, 18.644554599999992)
+[2024-09-25 11:04:58,119][flwr][INFO] - evaluate_round 2: no clients selected, cancel
+[2024-09-25 11:04:58,119][flwr][DEBUG] - fit_round 3: strategy sampled 2 clients (out of 3)
+[2024-09-25 11:05:04,852][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=1068, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 53, in fit
+    train_fedavg(
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 166, in train_fedavg
+    net = _train_one_epoch(net, trainloader, device, criterion, optimizer)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 180, in _train_one_epoch
+    output = net(data)
+             ^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 24, in forward
+    x = self.relu(self.fc1(x))
+                  ^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\linear.py", line 117, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (32x13 and 14x64)
+[2024-09-25 11:05:04,900][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=10160, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 53, in fit
+    train_fedavg(
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 166, in train_fedavg
+    net = _train_one_epoch(net, trainloader, device, criterion, optimizer)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 180, in _train_one_epoch
+    output = net(data)
+             ^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 24, in forward
+    x = self.relu(self.fc1(x))
+                  ^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\linear.py", line 117, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (32x13 and 14x64)
+[2024-09-25 11:05:04,911][flwr][DEBUG] - fit_round 3 received 0 results and 2 failures
+[2024-09-25 11:05:05,043][flwr][INFO] - fit progress: (3, 0.005532825025296954, {'accuracy': 0.40875643855776306, 'f1-score': 0.5749801639777836}, 25.573716300000115)
+[2024-09-25 11:05:05,043][flwr][INFO] - evaluate_round 3: no clients selected, cancel
+[2024-09-25 11:05:05,050][flwr][DEBUG] - fit_round 4: strategy sampled 2 clients (out of 3)
+[2024-09-25 11:05:11,566][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=10160, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 53, in fit
+    train_fedavg(
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 166, in train_fedavg
+    net = _train_one_epoch(net, trainloader, device, criterion, optimizer)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 180, in _train_one_epoch
+    output = net(data)
+             ^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 24, in forward
+    x = self.relu(self.fc1(x))
+                  ^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\linear.py", line 117, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (32x13 and 14x64)
+[2024-09-25 11:05:11,587][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=1068, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 53, in fit
+    train_fedavg(
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 166, in train_fedavg
+    net = _train_one_epoch(net, trainloader, device, criterion, optimizer)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 180, in _train_one_epoch
+    output = net(data)
+             ^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 24, in forward
+    x = self.relu(self.fc1(x))
+                  ^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\nn\modules\linear.py", line 117, in forward
+    return F.linear(input, self.weight, self.bias)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+RuntimeError: mat1 and mat2 shapes cannot be multiplied (32x13 and 14x64)
+[2024-09-25 11:05:11,596][flwr][DEBUG] - fit_round 4 received 0 results and 2 failures
+[2024-09-25 11:05:11,734][flwr][INFO] - fit progress: (4, 0.005532825025296954, {'accuracy': 0.40875643855776306, 'f1-score': 0.5749801639777836}, 32.26774690000002)
+[2024-09-25 11:05:11,734][flwr][INFO] - evaluate_round 4: no clients selected, cancel
+[2024-09-25 11:05:11,744][flwr][DEBUG] - fit_round 5: strategy sampled 2 clients (out of 3)

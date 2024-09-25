@@ -9,11 +9,14 @@ from torch.utils.data import DataLoader
 from torch.optim import SGD, Optimizer
 from torch.nn.parameter import Parameter
 from sklearn.metrics import f1_score
-import numpy as np
 
 class BinaryNet(nn.Module):
-    def __init__(self, input_dim, num_classes):
+    def __init__(self, data, partitioning, num_classes):
         super(BinaryNet, self).__init__()
+        if data=="./data/consumer.csv":
+            input_dim = 16
+        elif data == "./data/mv.csv":
+            input_dim = 14
         self.fc1 = nn.Linear(input_dim, 64)
         self.fc2 = nn.Linear(64, 32)
         self.fc3 = nn.Linear(32, 1)

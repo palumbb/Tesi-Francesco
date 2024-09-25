@@ -10,7 +10,7 @@ batch_size: 32
 clients_per_round: 2
 learning_rate: 0.01
 num_rounds: 50
-partitioning: "uniform"
+partitioning: "x3"
 dataset_path: "./data/mv.csv" #also change the input dim
 dataset_seed: 42
 alpha: 0.5
@@ -39,8 +39,10 @@ dataset:
 model:
   # model config
   _target_: model.BinaryNet #change model in the centralized setting
-  input_dim: 14 #16 if consumer, 14 if mv
+  #input_dim: 14 #16 if consumer, 14 if mv
   num_classes: 2
+  data: ${dataset_path}
+  partitioning: ${partitioning}
 
 strategy:
   _target_: flwr.server.strategy.FedAvg # points to your strategy (either custom or exiting in Flower)
