@@ -10,7 +10,7 @@ batch_size: 32
 clients_per_round: 2
 learning_rate: 0.01
 num_rounds: 50
-partitioning: "uniform"
+partitioning: "brand"
 dataset_path: "./data/consumer.csv"
 dataset_seed: 42
 alpha: 0.5
@@ -38,10 +38,12 @@ dataset:
   labels_per_client: ${labels_per_client}
 
 model:
-  # model config
-  _target_: model.BinaryNet
-  input_dim: 16
+   # model config
+  _target_: model.BinaryNet #change model in the centralized setting
+  #input_dim: 14 #16 if consumer, 14 if mv
   num_classes: 2
+  data: ${dataset_path}
+  partitioning: ${partitioning}
 
 strategy:
   _target_: strategy.ScaffoldStrategy # points to your strategy (either custom or exiting in Flower)

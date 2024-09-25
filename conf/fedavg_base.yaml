@@ -10,14 +10,13 @@ batch_size: 32
 clients_per_round: 2
 learning_rate: 0.01
 num_rounds: 50
-partitioning: "x3"
-dataset_path: "./data/mv.csv" #also change the input dim
+partitioning: "brand"
+dataset_path: "./data/consumer.csv" #also change the input dim
 dataset_seed: 42
 alpha: 0.5
 labels_per_client: 2 # only used when partitioning is label quantity
 momentum: 0.9
 weight_decay: 0.00001
-optimizer: sgd
 
 client_fn:
   _target_: client_fedavg.gen_client_fn

@@ -11,37 +11,13 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning):
         dataset, features_ohe, target_name, num_columns = load_consumer()
     elif data_path=="./data/mv.csv":
         dataset, features_ohe, target_name, num_columns = load_mv()
+
     dataset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
     #print(dataset)
     #print(features_ohe)
 
     if partitioning=="uniform":
-        train_samples = int(len(dataset)*data_cfg.train_split)
-        train = dataset.iloc[0:train_samples,]
-        test = dataset.iloc[train_samples:,]
-
-        scaler = StandardScaler()
-        train[num_columns] = scaler.fit_transform(train[num_columns])
-        test[num_columns] = scaler.transform(test[num_columns])
-
-        x_train = train[features_ohe].to_numpy()
-        x_train = np.vstack(x_train).astype(np.float32)
-        y_train = train[target_name].to_numpy()
-        y_train = np.vstack(y_train).astype(np.float32)
-        x_test = test[features_ohe].to_numpy()
-        x_test = np.vstack(x_test).astype(np.float32)
-        y_test = test[target_name].to_numpy()
-        y_test = np.vstack(y_test).astype(np.float32)
-
-        #print(np.unique(y_test, return_counts=True))
-        #print(np.unique(y_train, return_counts=True))
-        x_train_tensor = torch.tensor(x_train, dtype=torch.float32)
-        x_test_tensor = torch.tensor(x_test, dtype=torch.float32)
-        y_train_tensor = torch.tensor(y_train, dtype=torch.float32).view(-1, 1)
-        y_test_tensor = torch.tensor(y_test, dtype=torch.float32).view(-1, 1)
-
-        train_dataset = TensorDataset(x_train_tensor, y_train_tensor)
-        test_dataset = TensorDataset(x_test_tensor, y_test_tensor)
+        train_dataset, test_dataset = uniform_split(dataset, data_cfg, num_columns, features_ohe, target_name)
 
         if num_clients == 2:
             proportions = [.50, .50]
@@ -52,8 +28,9 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning):
         lengths[-1] = len(train_dataset) - sum(lengths[:-1])
         trainsets = random_split(train_dataset, lengths)
     
-    elif partitioning=="x3":
+    else:
         trainsets, test_dataset = split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_ohe, target_name)
+    
 
     if federated:
             trainloaders, valloaders, testloader = data_loaders(num_partitions=num_clients,
@@ -142,10 +119,37 @@ def load_mv():
     num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
     dataset = encoding_categorical_variables(dataset[features])
     dataset[target_name] = target
-    #print(dataset[target_name])
     features_ohe = list(dataset.columns)
     features_ohe.remove(target_name)     
     return dataset, features_ohe, target_name, num_columns
+
+def uniform_split(dataset, data_cfg, num_columns, features_ohe, target_name):
+    train_samples = int(len(dataset)*data_cfg.train_split)
+    train = dataset.iloc[0:train_samples,]
+    test = dataset.iloc[train_samples:,]
+
+    scaler = StandardScaler()
+    train[num_columns] = scaler.fit_transform(train[num_columns])
+    test[num_columns] = scaler.transform(test[num_columns])
+
+    x_train = train[features_ohe].to_numpy()
+    x_train = np.vstack(x_train).astype(np.float32)
+    y_train = train[target_name].to_numpy()
+    y_train = np.vstack(y_train).astype(np.float32)
+    x_test = test[features_ohe].to_numpy()
+    x_test = np.vstack(x_test).astype(np.float32)
+    y_test = test[target_name].to_numpy()
+    y_test = np.vstack(y_test).astype(np.float32)
+
+    x_train_tensor = torch.tensor(x_train, dtype=torch.float32)
+    x_test_tensor = torch.tensor(x_test, dtype=torch.float32)
+    y_train_tensor = torch.tensor(y_train, dtype=torch.float32).view(-1, 1)
+    y_test_tensor = torch.tensor(y_test, dtype=torch.float32).view(-1, 1)
+
+    train_dataset = TensorDataset(x_train_tensor, y_train_tensor)
+    test_dataset = TensorDataset(x_test_tensor, y_test_tensor)
+
+    return train_dataset, test_dataset
 
 def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_ohe, target_name):
     train_samples = int(len(dataset)*data_cfg.train_split)
@@ -157,19 +161,15 @@ def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_oh
     test[num_columns] = scaler.transform(test[num_columns])
 
     if partitioning == "x3":
-        train_list, brown_ohe, red_ohe,  green_ohe = split_by_x3(train)
-    
+        train_list = split_by_x3(train)
+    elif partitioning == "brand":
+        train_list = split_by_brand(train)
+
     x_train_list = []
     y_train_list = []
 
     for train_df in train_list:
-        if "x3_brown" in train_df.columns:
-            client_features = brown_ohe
-        elif "x3_red" in train_df.columns:
-            client_features = red_ohe
-        elif "x3_green" in train_df.columns:
-            client_features = green_ohe
-        x_train = train_df[client_features].to_numpy()
+        x_train = train_df[features_ohe].to_numpy()
         x_train = np.vstack(x_train).astype(np.float32)
         y_train = train_df[target_name].to_numpy()
         y_train = np.vstack(y_train).astype(np.float32)
@@ -179,11 +179,6 @@ def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_oh
         
         x_train_list.append(x_train_tensor)
         y_train_list.append(y_train_tensor)
-
-    #print(features)
-    print(len(client_features))
-    #print(features_ohe)
-    print(len(features_ohe))
     
     x_test = test[features_ohe].to_numpy()
     x_test = np.vstack(x_test).astype(np.float32)
@@ -199,20 +194,28 @@ def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_oh
     return train_datasets, test_dataset
 
 def split_by_x3(df):
-
-    subset_brown = df[df['x3_brown'] == 1][['x1', 'x2', 'x4', 'x5', 'x6', 'x9', 'x10', 'x3_brown', 'x3_green',
-       'x3_red', 'x7_no', 'x7_yes', 'x8_large', 'x8_normal', 'binaryClass']]
-    brown_ohe = ['x1', 'x2', 'x4', 'x5', 'x6', 'x9', 'x10', 'x3_brown', 'x3_green',
-       'x3_red', 'x7_no', 'x7_yes', 'x8_large', 'x8_normal']
-    subset_red = df[df['x3_red'] == 1][['x1', 'x2', 'x4', 'x5', 'x6', 'x9', 'x10', 'x3_brown', 'x3_green',
-       'x3_red', 'x7_no', 'x7_yes', 'x8_large', 'x8_normal', 'binaryClass']]
-    red_ohe = ['x1', 'x2', 'x4', 'x5', 'x6', 'x9', 'x10', 'x3_brown', 'x3_green',
-       'x3_red', 'x7_no', 'x7_yes', 'x8_large', 'x8_normal']
-    subset_green = df[df['x3_green'] == 1][['x1', 'x2', 'x4', 'x5', 'x6', 'x9', 'x10', 'x3_brown', 'x3_green',
-       'x3_red', 'x7_no', 'x7_yes', 'x8_large', 'x8_normal', 'binaryClass']]
-    green_ohe = ['x1', 'x2', 'x4', 'x5', 'x6', 'x9', 'x10', 'x3_brown', 'x3_green',
-       'x3_red', 'x7_no', 'x7_yes', 'x8_large', 'x8_normal']
-
+    cols = ['x1', 'x2', 'x4', 'x5', 'x6', 'x9', 'x10', 'x3_brown', 'x3_green',
+       'x3_red', 'x7_no', 'x7_yes', 'x8_large', 'x8_normal', 'binaryClass']
+    subset_brown = df[df['x3_brown'] == 1][cols]
+    subset_red = df[df['x3_red'] == 1][cols]
+    subset_green = df[df['x3_green'] == 1][cols]
+    
     subsets = [subset_brown, subset_red, subset_green]
+    return subsets
 
-    return subsets, brown_ohe, red_ohe, green_ohe
+def split_by_brand(df):
+    cols = ['ProductPrice', 'CustomerAge', 'PurchaseFrequency', 'CustomerSatisfaction',
+                                                          'ProductCategory_Headphones', 'ProductCategory_Laptops', 
+                                                          'ProductCategory_Smart Watches', 'ProductCategory_Smartphones', 
+                                                          'ProductCategory_Tablets', 'ProductBrand_Apple', 'ProductBrand_HP', 
+                                                          'ProductBrand_Other Brands', 'ProductBrand_Samsung', 'ProductBrand_Sony', 
+                                                          'CustomerGender_0', 'CustomerGender_1', 'PurchaseIntent']
+    subset_samsung = df[df['ProductBrand_Samsung'] == 1][cols]
+    subset_apple = df[df['ProductBrand_Apple'] == 1][cols]
+    subset_hp = df[df['ProductBrand_HP'] == 1][cols]
+    subset_sony = df[df['ProductBrand_Sony'] == 1][cols]
+    subset_others = df[df['ProductBrand_Other Brands'] == 1][cols]
+
+    subsets = [subset_samsung, subset_apple, subset_hp, subset_sony, subset_others]
+    return subsets
+   
