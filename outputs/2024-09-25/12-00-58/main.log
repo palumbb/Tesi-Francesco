@@ -1,0 +1,382 @@
+[2024-09-25 12:00:58,448][flwr][WARNING] - Both server and strategy were provided, ignoring strategy
+[2024-09-25 12:00:58,448][flwr][INFO] - Starting Flower simulation, config: ServerConfig(num_rounds=50, round_timeout=None)
+[2024-09-25 12:01:07,006][flwr][INFO] - Flower VCE: Ray initialized with resources: {'node:127.0.0.1': 1.0, 'object_store_memory': 651171840.0, 'node:__internal_head__': 1.0, 'CPU': 12.0, 'memory': 1302343680.0}
+[2024-09-25 12:01:07,008][flwr][INFO] - Initializing global parameters
+[2024-09-25 12:01:07,008][flwr][INFO] - Requesting initial parameters from one random client
+[2024-09-25 12:01:11,357][flwr][INFO] - Received initial parameters from one random client
+[2024-09-25 12:01:11,358][flwr][INFO] - Evaluating initial parameters
+[2024-09-25 12:01:11,495][flwr][INFO] - initial parameters (loss, other metrics): 0.005503485008054485, {'accuracy': 0.4078979641893549, 'f1-score': 0.5552689756816507}
+[2024-09-25 12:01:11,495][flwr][INFO] - FL starting
+[2024-09-25 12:01:11,495][flwr][DEBUG] - fit_round 1: strategy sampled 2 clients (out of 3)
+[2024-09-25 12:01:22,016][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=13652, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 53, in fit
+    train_fedavg(
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 169, in train_fedavg
+    net = _train_one_epoch(net, trainloader, device, criterion, optimizer)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 180, in _train_one_epoch
+    for data, target in trainloader:
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataloader.py", line 630, in __next__
+    data = self._next_data()
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataloader.py", line 1344, in _next_data
+    return self._process_data(data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataloader.py", line 1370, in _process_data
+    data.reraise()
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\_utils.py", line 706, in reraise
+    raise exception
+KeyError: Caught KeyError in DataLoader worker process 0.
+Original Traceback (most recent call last):
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\pandas\core\indexes\base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 9199
+
+The above exception was the direct cause of the following exception:
+
+[36mray::launch_and_fit()[39m (pid=13652, ip=127.0.0.1)
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\_utils\worker.py", line 309, in _worker_loop
+    data = fetcher.fetch(index)  # type: ignore[possibly-undefined]
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\_utils\fetch.py", line 50, in fetch
+    data = self.dataset.__getitems__(possibly_batched_index)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataset.py", line 418, in __getitems__
+    return self.dataset.__getitems__([self.indices[idx] for idx in indices])  # type: ignore[attr-defined]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataset.py", line 420, in __getitems__
+    return [self.dataset[self.indices[idx]] for idx in indices]
+            ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\pandas\core\frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\pandas\core\indexes\base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 9199
+[2024-09-25 12:01:26,173][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=8000, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 53, in fit
+    train_fedavg(
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 169, in train_fedavg
+    net = _train_one_epoch(net, trainloader, device, criterion, optimizer)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 180, in _train_one_epoch
+    for data, target in trainloader:
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataloader.py", line 630, in __next__
+    data = self._next_data()
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataloader.py", line 1344, in _next_data
+    return self._process_data(data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataloader.py", line 1370, in _process_data
+    data.reraise()
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\_utils.py", line 706, in reraise
+    raise exception
+KeyError: Caught KeyError in DataLoader worker process 0.
+Original Traceback (most recent call last):
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\pandas\core\indexes\base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 17343
+
+The above exception was the direct cause of the following exception:
+
+[36mray::launch_and_fit()[39m (pid=8000, ip=127.0.0.1)
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\_utils\worker.py", line 309, in _worker_loop
+    data = fetcher.fetch(index)  # type: ignore[possibly-undefined]
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\_utils\fetch.py", line 50, in fetch
+    data = self.dataset.__getitems__(possibly_batched_index)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataset.py", line 418, in __getitems__
+    return self.dataset.__getitems__([self.indices[idx] for idx in indices])  # type: ignore[attr-defined]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataset.py", line 420, in __getitems__
+    return [self.dataset[self.indices[idx]] for idx in indices]
+            ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\pandas\core\frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\pandas\core\indexes\base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 17343
+[2024-09-25 12:01:26,183][flwr][DEBUG] - fit_round 1 received 0 results and 2 failures
+[2024-09-25 12:01:26,318][flwr][INFO] - fit progress: (1, 0.005503485008054485, {'accuracy': 0.4078979641893549, 'f1-score': 0.5552689756816507}, 14.808542300000227)
+[2024-09-25 12:01:26,318][flwr][INFO] - evaluate_round 1: no clients selected, cancel
+[2024-09-25 12:01:26,319][flwr][DEBUG] - fit_round 2: strategy sampled 2 clients (out of 3)
+[2024-09-25 12:01:36,931][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=13652, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 53, in fit
+    train_fedavg(
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 169, in train_fedavg
+    net = _train_one_epoch(net, trainloader, device, criterion, optimizer)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 180, in _train_one_epoch
+    for data, target in trainloader:
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataloader.py", line 630, in __next__
+    data = self._next_data()
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataloader.py", line 1344, in _next_data
+    return self._process_data(data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataloader.py", line 1370, in _process_data
+    data.reraise()
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\_utils.py", line 706, in reraise
+    raise exception
+KeyError: Caught KeyError in DataLoader worker process 0.
+Original Traceback (most recent call last):
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\pandas\core\indexes\base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 16327
+
+The above exception was the direct cause of the following exception:
+
+[36mray::launch_and_fit()[39m (pid=13652, ip=127.0.0.1)
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\_utils\worker.py", line 309, in _worker_loop
+    data = fetcher.fetch(index)  # type: ignore[possibly-undefined]
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\_utils\fetch.py", line 50, in fetch
+    data = self.dataset.__getitems__(possibly_batched_index)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataset.py", line 418, in __getitems__
+    return self.dataset.__getitems__([self.indices[idx] for idx in indices])  # type: ignore[attr-defined]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataset.py", line 420, in __getitems__
+    return [self.dataset[self.indices[idx]] for idx in indices]
+            ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\pandas\core\frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\pandas\core\indexes\base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 16327
+[2024-09-25 12:01:36,945][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=8000, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 53, in fit
+    train_fedavg(
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 169, in train_fedavg
+    net = _train_one_epoch(net, trainloader, device, criterion, optimizer)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 180, in _train_one_epoch
+    for data, target in trainloader:
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataloader.py", line 630, in __next__
+    data = self._next_data()
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataloader.py", line 1344, in _next_data
+    return self._process_data(data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataloader.py", line 1370, in _process_data
+    data.reraise()
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\_utils.py", line 706, in reraise
+    raise exception
+KeyError: Caught KeyError in DataLoader worker process 0.
+Original Traceback (most recent call last):
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\pandas\core\indexes\base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 28432
+
+The above exception was the direct cause of the following exception:
+
+[36mray::launch_and_fit()[39m (pid=8000, ip=127.0.0.1)
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\_utils\worker.py", line 309, in _worker_loop
+    data = fetcher.fetch(index)  # type: ignore[possibly-undefined]
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\_utils\fetch.py", line 50, in fetch
+    data = self.dataset.__getitems__(possibly_batched_index)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataset.py", line 418, in __getitems__
+    return self.dataset.__getitems__([self.indices[idx] for idx in indices])  # type: ignore[attr-defined]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataset.py", line 420, in __getitems__
+    return [self.dataset[self.indices[idx]] for idx in indices]
+            ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\pandas\core\frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\pandas\core\indexes\base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 28432
+[2024-09-25 12:01:36,957][flwr][DEBUG] - fit_round 2 received 0 results and 2 failures
+[2024-09-25 12:01:37,104][flwr][INFO] - fit progress: (2, 0.005503485008054485, {'accuracy': 0.4078979641893549, 'f1-score': 0.5552689756816507}, 25.601204399999915)
+[2024-09-25 12:01:37,104][flwr][INFO] - evaluate_round 2: no clients selected, cancel
+[2024-09-25 12:01:37,104][flwr][DEBUG] - fit_round 3: strategy sampled 2 clients (out of 3)
+[2024-09-25 12:01:46,556][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=13652, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 53, in fit
+    train_fedavg(
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 169, in train_fedavg
+    net = _train_one_epoch(net, trainloader, device, criterion, optimizer)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 180, in _train_one_epoch
+    for data, target in trainloader:
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataloader.py", line 630, in __next__
+    data = self._next_data()
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataloader.py", line 1344, in _next_data
+    return self._process_data(data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataloader.py", line 1370, in _process_data
+    data.reraise()
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\_utils.py", line 706, in reraise
+    raise exception
+KeyError: Caught KeyError in DataLoader worker process 0.
+Original Traceback (most recent call last):
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\pandas\core\indexes\base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 5843
+
+The above exception was the direct cause of the following exception:
+
+[36mray::launch_and_fit()[39m (pid=13652, ip=127.0.0.1)
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\_utils\worker.py", line 309, in _worker_loop
+    data = fetcher.fetch(index)  # type: ignore[possibly-undefined]
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\_utils\fetch.py", line 50, in fetch
+    data = self.dataset.__getitems__(possibly_batched_index)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataset.py", line 418, in __getitems__
+    return self.dataset.__getitems__([self.indices[idx] for idx in indices])  # type: ignore[attr-defined]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataset.py", line 420, in __getitems__
+    return [self.dataset[self.indices[idx]] for idx in indices]
+            ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\pandas\core\frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\pandas\core\indexes\base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 5843
+[2024-09-25 12:01:46,577][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=8000, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 53, in fit
+    train_fedavg(
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 169, in train_fedavg
+    net = _train_one_epoch(net, trainloader, device, criterion, optimizer)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\model.py", line 180, in _train_one_epoch
+    for data, target in trainloader:
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataloader.py", line 630, in __next__
+    data = self._next_data()
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataloader.py", line 1344, in _next_data
+    return self._process_data(data)
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataloader.py", line 1370, in _process_data
+    data.reraise()
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\_utils.py", line 706, in reraise
+    raise exception
+KeyError: Caught KeyError in DataLoader worker process 0.
+Original Traceback (most recent call last):
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\pandas\core\indexes\base.py", line 3805, in get_loc
+    return self._engine.get_loc(casted_key)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "index.pyx", line 167, in pandas._libs.index.IndexEngine.get_loc
+  File "index.pyx", line 196, in pandas._libs.index.IndexEngine.get_loc
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7081, in pandas._libs.hashtable.PyObjectHashTable.get_item
+  File "pandas\\_libs\\hashtable_class_helper.pxi", line 7089, in pandas._libs.hashtable.PyObjectHashTable.get_item
+KeyError: 23888
+
+The above exception was the direct cause of the following exception:
+
+[36mray::launch_and_fit()[39m (pid=8000, ip=127.0.0.1)
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\_utils\worker.py", line 309, in _worker_loop
+    data = fetcher.fetch(index)  # type: ignore[possibly-undefined]
+           ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\_utils\fetch.py", line 50, in fetch
+    data = self.dataset.__getitems__(possibly_batched_index)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataset.py", line 418, in __getitems__
+    return self.dataset.__getitems__([self.indices[idx] for idx in indices])  # type: ignore[attr-defined]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\utils\data\dataset.py", line 420, in __getitems__
+    return [self.dataset[self.indices[idx]] for idx in indices]
+            ~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\pandas\core\frame.py", line 4102, in __getitem__
+    indexer = self.columns.get_loc(key)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\pandas\core\indexes\base.py", line 3812, in get_loc
+    raise KeyError(key) from err
+KeyError: 23888
+[2024-09-25 12:01:46,587][flwr][DEBUG] - fit_round 3 received 0 results and 2 failures
+[2024-09-25 12:01:46,736][flwr][INFO] - fit progress: (3, 0.005503485008054485, {'accuracy': 0.4078979641893549, 'f1-score': 0.5552689756816507}, 35.23410899999999)
+[2024-09-25 12:01:46,736][flwr][INFO] - evaluate_round 3: no clients selected, cancel
+[2024-09-25 12:01:46,736][flwr][DEBUG] - fit_round 4: strategy sampled 2 clients (out of 3)
