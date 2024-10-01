@@ -13,16 +13,22 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning):
         dataset, features_ohe, target_name, num_columns = load_mv()
 
     dataset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
-    #print(dataset)
-    #print(features_ohe)
+   
 
     if partitioning=="uniform":
         train_dataset, test_dataset = uniform_split(dataset, data_cfg, num_columns, features_ohe, target_name)
-
         if num_clients == 2:
             proportions = [.50, .50]
         elif num_clients == 3:
             proportions = [.35, .35, .30]
+        elif num_clients == 10:
+            proportions = np.ones(10)*0.10
+        elif num_clients == 50:
+            proportions = np.ones(50)*0.02
+        elif num_clients == 100:
+            proportions = np.ones(100)*0.01
+        elif num_clients == 1000:
+            proportions = np.ones(1000)*0.001
         
         lengths = [int(p * len(train_dataset)) for p in proportions]
         lengths[-1] = len(train_dataset) - sum(lengths[:-1])
@@ -61,7 +67,8 @@ def data_loaders(num_partitions: int, batch_size: int, val_ratio: float, train, 
     
     """
     num_instances_per_client = len(train) // num_partitions
-    partition_len = [num_instances_per_client] * num_partitions"""
+    partition_len = [num_instances_per_client] * num_partitions
+    """
 
     trainloaders = []
     valloaders = []
@@ -86,7 +93,6 @@ def data_loaders(num_partitions: int, batch_size: int, val_ratio: float, train, 
         )
 
     testloader = DataLoader(test, batch_size=128)
-    #print("Partition done successfully")
 
     return trainloaders, valloaders, testloader
 
@@ -120,7 +126,7 @@ def load_mv():
     dataset = encoding_categorical_variables(dataset[features])
     dataset[target_name] = target
     features_ohe = list(dataset.columns)
-    features_ohe.remove(target_name)     
+    features_ohe.remove(target_name)
     return dataset, features_ohe, target_name, num_columns
 
 def uniform_split(dataset, data_cfg, num_columns, features_ohe, target_name):
@@ -164,6 +170,12 @@ def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_oh
         train_list = split_by_x3(train)
     elif partitioning == "brand":
         train_list = split_by_brand(train)
+    elif partitioning == "category":
+        train_list = split_by_category(train)
+    elif partitioning == "x10":
+        train_list = split_by_x10(train)
+    elif partitioning == "age":
+        train_list = split_by_age(train)
 
     x_train_list = []
     y_train_list = []
@@ -203,6 +215,17 @@ def split_by_x3(df):
     subsets = [subset_brown, subset_red, subset_green]
     return subsets
 
+def split_by_x10(df):
+    cols = ['x1', 'x2', 'x4', 'x5', 'x6', 'x9', 'x10', 'x3_brown', 'x3_green',
+       'x3_red', 'x7_no', 'x7_yes', 'x8_large', 'x8_normal', 'binaryClass']
+    subset_neg = df[df['x10'] <= 0.0][cols]
+    subset_range1= df[(df['x10'] > 0.0) & (df['x10'] <= 0.5)][cols]
+    subset_range2 = df[(df['x10'] > 0.5) & (df['x10'] <= 1.0)][cols]
+    subset_pos = df[df['x10'] > 1.0][cols]
+    
+    subsets = [subset_neg, subset_range1, subset_range2, subset_pos]
+    return subsets
+
 def split_by_brand(df):
     cols = ['ProductPrice', 'CustomerAge', 'PurchaseFrequency', 'CustomerSatisfaction',
                                                           'ProductCategory_Headphones', 'ProductCategory_Laptops', 
@@ -218,4 +241,34 @@ def split_by_brand(df):
 
     subsets = [subset_samsung, subset_apple, subset_hp, subset_sony, subset_others]
     return subsets
-   
+
+def split_by_category(df):
+    cols = ['ProductPrice', 'CustomerAge', 'PurchaseFrequency', 'CustomerSatisfaction',
+                                                          'ProductCategory_Headphones', 'ProductCategory_Laptops', 
+                                                          'ProductCategory_Smart Watches', 'ProductCategory_Smartphones', 
+                                                          'ProductCategory_Tablets', 'ProductBrand_Apple', 'ProductBrand_HP', 
+                                                          'ProductBrand_Other Brands', 'ProductBrand_Samsung', 'ProductBrand_Sony', 
+                                                          'CustomerGender_0', 'CustomerGender_1', 'PurchaseIntent']
+    subset_smartphones = df[df['ProductCategory_Smartphones'] == 1][cols]
+    subset_smartwatches = df[df['ProductCategory_Smart Watches'] == 1][cols]
+    subset_tablets = df[df['ProductCategory_Tablets'] == 1][cols]
+    subset_laptops = df[df['ProductCategory_Laptops'] == 1][cols]
+    subset_headphones = df[df['ProductCategory_Headphones'] == 1][cols]
+
+    subsets = [subset_smartphones, subset_smartwatches, subset_tablets, subset_laptops, subset_headphones]
+    return subsets
+
+
+def split_by_age(df):
+    cols = ['ProductPrice', 'CustomerAge', 'PurchaseFrequency', 'CustomerSatisfaction',
+                                                          'ProductCategory_Headphones', 'ProductCategory_Laptops', 
+                                                          'ProductCategory_Smart Watches', 'ProductCategory_Smartphones', 
+                                                          'ProductCategory_Tablets', 'ProductBrand_Apple', 'ProductBrand_HP', 
+                                                          'ProductBrand_Other Brands', 'ProductBrand_Samsung', 'ProductBrand_Sony', 
+                                                          'CustomerGender_0', 'CustomerGender_1', 'PurchaseIntent']
+    subset_neg = df[df['CustomerAge'] <= 0.0][cols]
+    subset_range1= df[(df['CustomerAge'] > 0.0) & (df['CustomerAge'] <= 0.5)][cols]
+    subset_range2 = df[(df['CustomerAge'] > 0.5) & (df['CustomerAge'] <= 1.0)][cols]
+    subset_pos = df[df['CustomerAge'] > 1.0][cols]
+    subsets = [subset_neg, subset_range1, subset_range2, subset_pos]
+    return subsets
