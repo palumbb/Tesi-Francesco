@@ -1,0 +1,182 @@
+[2024-09-12 12:07:26,331][flwr][INFO] - Starting Flower simulation, config: ServerConfig(num_rounds=10, round_timeout=None)
+[2024-09-12 12:07:40,972][flwr][INFO] - Flower VCE: Ray initialized with resources: {'node:127.0.0.1': 1.0, 'CPU': 8.0, 'object_store_memory': 543328665.0, 'memory': 1086657332.0, 'node:__internal_head__': 1.0}
+[2024-09-12 12:07:40,973][flwr][INFO] - Initializing global parameters
+[2024-09-12 12:07:40,974][flwr][INFO] - Requesting initial parameters from one random client
+[2024-09-12 12:07:51,176][flwr][INFO] - Received initial parameters from one random client
+[2024-09-12 12:07:51,177][flwr][INFO] - Evaluating initial parameters
+[2024-09-12 12:07:51,290][flwr][INFO] - initial parameters (loss, other metrics): 31.4656369527181, {'accuracy': 0.43833333333333335}
+[2024-09-12 12:07:51,292][flwr][INFO] - FL starting
+[2024-09-12 12:07:51,293][flwr][DEBUG] - fit_round 1: strategy sampled 2 clients (out of 2)
+[2024-09-12 12:07:51,333][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=16872, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\Desktop\PoliMi\Magistrale\Tesi\Progetto\Tesi-Francesco\client.py", line 37, in fit
+    lr = config["lr"]
+         ~~~~~~^^^^^^
+KeyError: 'lr'
+[2024-09-12 12:07:56,864][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=13388, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\Desktop\PoliMi\Magistrale\Tesi\Progetto\Tesi-Francesco\client.py", line 37, in fit
+    lr = config["lr"]
+         ~~~~~~^^^^^^
+KeyError: 'lr'
+[2024-09-12 12:07:56,872][flwr][DEBUG] - fit_round 1 received 0 results and 2 failures
+[2024-09-12 12:07:56,934][flwr][INFO] - fit progress: (1, 31.4656369527181, {'accuracy': 0.43833333333333335}, 5.641130699999849)
+[2024-09-12 12:07:56,935][flwr][DEBUG] - evaluate_round 1: strategy sampled 2 clients (out of 2)
+[2024-09-12 12:08:12,138][flwr][DEBUG] - evaluate_round 1 received 2 results and 0 failures
+[2024-09-12 12:08:12,152][flwr][DEBUG] - fit_round 2: strategy sampled 2 clients (out of 2)
+[2024-09-12 12:08:12,184][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=16872, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\Desktop\PoliMi\Magistrale\Tesi\Progetto\Tesi-Francesco\client.py", line 37, in fit
+    lr = config["lr"]
+         ~~~~~~^^^^^^
+KeyError: 'lr'
+[2024-09-12 12:08:12,186][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=13388, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\Desktop\PoliMi\Magistrale\Tesi\Progetto\Tesi-Francesco\client.py", line 37, in fit
+    lr = config["lr"]
+         ~~~~~~^^^^^^
+KeyError: 'lr'
+[2024-09-12 12:08:12,229][flwr][DEBUG] - fit_round 2 received 0 results and 2 failures
+[2024-09-12 12:08:12,280][flwr][INFO] - fit progress: (2, 31.4656369527181, {'accuracy': 0.43833333333333335}, 20.987716499999806)
+[2024-09-12 12:08:12,281][flwr][DEBUG] - evaluate_round 2: strategy sampled 2 clients (out of 2)
+[2024-09-12 12:08:24,273][flwr][DEBUG] - evaluate_round 2 received 2 results and 0 failures
+[2024-09-12 12:08:24,274][flwr][DEBUG] - fit_round 3: strategy sampled 2 clients (out of 2)
+[2024-09-12 12:08:24,302][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=16872, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\Desktop\PoliMi\Magistrale\Tesi\Progetto\Tesi-Francesco\client.py", line 37, in fit
+    lr = config["lr"]
+         ~~~~~~^^^^^^
+KeyError: 'lr'
+[2024-09-12 12:08:24,303][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=13388, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\Desktop\PoliMi\Magistrale\Tesi\Progetto\Tesi-Francesco\client.py", line 37, in fit
+    lr = config["lr"]
+         ~~~~~~^^^^^^
+KeyError: 'lr'
+[2024-09-12 12:08:24,311][flwr][DEBUG] - fit_round 3 received 0 results and 2 failures
+[2024-09-12 12:08:24,357][flwr][INFO] - fit progress: (3, 31.4656369527181, {'accuracy': 0.43833333333333335}, 33.06397339999967)
+[2024-09-12 12:08:24,359][flwr][DEBUG] - evaluate_round 3: strategy sampled 2 clients (out of 2)
+[2024-09-12 12:08:36,068][flwr][DEBUG] - evaluate_round 3 received 2 results and 0 failures
+[2024-09-12 12:08:36,069][flwr][DEBUG] - fit_round 4: strategy sampled 2 clients (out of 2)
+[2024-09-12 12:08:36,104][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=13388, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\Desktop\PoliMi\Magistrale\Tesi\Progetto\Tesi-Francesco\client.py", line 37, in fit
+    lr = config["lr"]
+         ~~~~~~^^^^^^
+KeyError: 'lr'
+[2024-09-12 12:08:36,105][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=16872, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\Desktop\PoliMi\Magistrale\Tesi\Progetto\Tesi-Francesco\client.py", line 37, in fit
+    lr = config["lr"]
+         ~~~~~~^^^^^^
+KeyError: 'lr'
+[2024-09-12 12:08:36,119][flwr][DEBUG] - fit_round 4 received 0 results and 2 failures
+[2024-09-12 12:08:36,179][flwr][INFO] - fit progress: (4, 31.4656369527181, {'accuracy': 0.43833333333333335}, 44.88566709999941)
+[2024-09-12 12:08:36,180][flwr][DEBUG] - evaluate_round 4: strategy sampled 2 clients (out of 2)
+[2024-09-12 12:08:50,703][flwr][DEBUG] - evaluate_round 4 received 2 results and 0 failures
+[2024-09-12 12:08:50,704][flwr][DEBUG] - fit_round 5: strategy sampled 2 clients (out of 2)
+[2024-09-12 12:08:50,729][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=16872, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\Desktop\PoliMi\Magistrale\Tesi\Progetto\Tesi-Francesco\client.py", line 37, in fit
+    lr = config["lr"]
+         ~~~~~~^^^^^^
+KeyError: 'lr'
+[2024-09-12 12:08:50,730][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=13388, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\Desktop\PoliMi\Magistrale\Tesi\Progetto\Tesi-Francesco\client.py", line 37, in fit
+    lr = config["lr"]
+         ~~~~~~^^^^^^
+KeyError: 'lr'
+[2024-09-12 12:08:50,739][flwr][DEBUG] - fit_round 5 received 0 results and 2 failures
+[2024-09-12 12:08:50,787][flwr][INFO] - fit progress: (5, 31.4656369527181, {'accuracy': 0.43833333333333335}, 59.49420900000041)
+[2024-09-12 12:08:50,788][flwr][DEBUG] - evaluate_round 5: strategy sampled 2 clients (out of 2)

@@ -1,0 +1,54 @@
+[2024-09-12 10:29:54,362][flwr][INFO] - Starting Flower simulation, config: ServerConfig(num_rounds=10, round_timeout=None)
+[2024-09-12 10:30:09,468][flwr][INFO] - Flower VCE: Ray initialized with resources: {'memory': 1797790926.0, 'object_store_memory': 898895462.0, 'node:127.0.0.1': 1.0, 'CPU': 8.0, 'node:__internal_head__': 1.0}
+[2024-09-12 10:30:09,469][flwr][INFO] - Initializing global parameters
+[2024-09-12 10:30:09,470][flwr][INFO] - Requesting initial parameters from one random client
+[2024-09-12 10:30:15,734][flwr][ERROR] - [36mray::launch_and_get_parameters()[39m (pid=16812, ip=127.0.0.1)
+          ^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\importlib\__init__.py", line 90, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<frozen importlib._bootstrap>", line 1387, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1360, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1324, in _find_and_load_unlocked
+ModuleNotFoundError: No module named 'optim'
+
+The above exception was the direct cause of the following exception:
+
+[36mray::launch_and_get_parameters()[39m (pid=16812, ip=127.0.0.1)
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\hydra\_internal\instantiate\_instantiate2.py", line 134, in _resolve_target
+    target = _locate(target)
+             ^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\hydra\_internal\utils.py", line 637, in _locate
+    raise ImportError(
+ImportError: Error loading 'optim.Adam':
+ModuleNotFoundError("No module named 'optim'")
+Are you sure that module 'optim' is installed?
+
+The above exception was the direct cause of the following exception:
+
+[36mray::launch_and_get_parameters()[39m (pid=16812, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1890, in ray._raylet.execute_task
+  File "python\ray\_raylet.pyx", line 1991, in ray._raylet.execute_task
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 135, in launch_and_get_parameters
+    client: Client = _create_client(client_fn, cid)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 168, in _create_client
+    client_like: ClientLike = client_fn(cid)
+                              ^^^^^^^^^^^^^^
+  File "c:\Users\Francesco\Desktop\PoliMi\Magistrale\Tesi\Progetto\Tesi-Francesco\client.py", line 58, in client_fn
+    return FlowerClient(
+           ^^^^^^^^^^^^^
+  File "C:\Users\Francesco\Desktop\PoliMi\Magistrale\Tesi\Progetto\Tesi-Francesco\client.py", line 21, in __init__
+    self.optimizer = instantiate(optimizer_cfg)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\hydra\_internal\instantiate\_instantiate2.py", line 226, in instantiate
+    return instantiate_node(
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\hydra\_internal\instantiate\_instantiate2.py", line 333, in instantiate_node
+    _target_ = _resolve_target(node.get(_Keys.TARGET), full_key)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\hydra\_internal\instantiate\_instantiate2.py", line 139, in _resolve_target
+    raise InstantiationException(msg) from e
+hydra.errors.InstantiationException: Error locating target 'optim.Adam', set env var HYDRA_FULL_ERROR=1 to see chained exception.
+full_key: optimizer
