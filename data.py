@@ -1,4 +1,7 @@
 import pandas as pd
+import matplotlib
+import matplotlib.pyplot as plt
+import seaborn as sns
 import torch
 from torch.utils.data import DataLoader, random_split
 from torch.utils.data import TensorDataset, Dataset
@@ -13,39 +16,40 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning):
         dataset, features_ohe, target_name, num_columns = load_mv()
 
     dataset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
-   
 
-    if partitioning=="uniform":
-        train_dataset, test_dataset = uniform_split(dataset, data_cfg, num_columns, features_ohe, target_name)
-        if num_clients == 2:
-            proportions = [.50, .50]
-        elif num_clients == 3:
-            proportions = [.35, .35, .30]
-        elif num_clients == 10:
-            proportions = np.ones(10)*0.10
-        elif num_clients == 50:
-            proportions = np.ones(50)*0.02
-        elif num_clients == 100:
-            proportions = np.ones(100)*0.01
-        elif num_clients == 1000:
-            proportions = np.ones(1000)*0.001
-        
-        lengths = [int(p * len(train_dataset)) for p in proportions]
-        lengths[-1] = len(train_dataset) - sum(lengths[:-1])
-        trainsets = random_split(train_dataset, lengths)
+    #profiling(dataset)
     
-    else:
-        trainsets, test_dataset = split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_ohe, target_name)
-    
-
+    train_dataset, test_dataset = train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name)
     if federated:
-            trainloaders, valloaders, testloader = data_loaders(num_partitions=num_clients,
-                                                                    batch_size=data_cfg.batch_size,
-                                                                    val_ratio=data_cfg.val_split,
-                                                                    train = trainsets,
-                                                                    test = test_dataset
-                                                                    )
-            return trainloaders, valloaders, testloader
+        if partitioning=="uniform":
+            if num_clients == 2:
+                proportions = [.50, .50]
+            elif num_clients == 3:
+                proportions = [.35, .35, .30]
+            elif num_clients == 10:
+                proportions = np.ones(10)*0.10
+            elif num_clients == 50:
+                proportions = np.ones(50)*0.02
+            elif num_clients == 100:
+                proportions = np.ones(100)*0.01
+            elif num_clients == 1000:
+                proportions = np.ones(1000)*0.001
+            
+            lengths = [int(p * len(train_dataset)) for p in proportions]
+            lengths[-1] = len(train_dataset) - sum(lengths[:-1])
+            trainsets = random_split(train_dataset, lengths)
+        
+        else:
+            trainsets, test_dataset = split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_ohe, target_name)
+
+        trainloaders, valloaders, testloader = data_loaders(num_partitions=num_clients,
+                                                                batch_size=data_cfg.batch_size,
+                                                                val_ratio=data_cfg.val_split,
+                                                                train = trainsets,
+                                                                test = test_dataset
+                                                                )
+        return trainloaders, valloaders, testloader
+    
     else:
         return train_dataset, test_dataset
 
@@ -129,7 +133,19 @@ def load_mv():
     features_ohe.remove(target_name)
     return dataset, features_ohe, target_name, num_columns
 
-def uniform_split(dataset, data_cfg, num_columns, features_ohe, target_name):
+def profiling(df):
+    print(f"Null Values:\n {df.isna().sum()}")
+    print("\nUnique Values:")
+    for col in df:
+        print(f"{col} : {df[col].unique()}")
+    plt.figure(figsize=(10,12))
+    cor = df.corr()
+    sns.heatmap(cor, xticklabels=True, yticklabels=True, annot=True, cmap=plt.cm.Reds)
+    plt.show()
+
+    
+
+def train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name):
     train_samples = int(len(dataset)*data_cfg.train_split)
     train = dataset.iloc[0:train_samples,]
     test = dataset.iloc[train_samples:,]
@@ -176,6 +192,8 @@ def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_oh
         train_list = split_by_x10(train)
     elif partitioning == "age":
         train_list = split_by_age(train)
+    elif partitioning == "gender":
+        train_list = split_by_gender(train)
 
     x_train_list = []
     y_train_list = []
@@ -271,4 +289,16 @@ def split_by_age(df):
     subset_range2 = df[(df['CustomerAge'] > 0.5) & (df['CustomerAge'] <= 1.0)][cols]
     subset_pos = df[df['CustomerAge'] > 1.0][cols]
     subsets = [subset_neg, subset_range1, subset_range2, subset_pos]
+    return subsets
+
+def split_by_gender(df):
+    cols = ['ProductPrice', 'CustomerAge', 'PurchaseFrequency', 'CustomerSatisfaction',
+                                                          'ProductCategory_Headphones', 'ProductCategory_Laptops', 
+                                                          'ProductCategory_Smart Watches', 'ProductCategory_Smartphones', 
+                                                          'ProductCategory_Tablets', 'ProductBrand_Apple', 'ProductBrand_HP', 
+                                                          'ProductBrand_Other Brands', 'ProductBrand_Samsung', 'ProductBrand_Sony', 
+                                                          'CustomerGender_0', 'CustomerGender_1', 'PurchaseIntent']
+    subset_female = df[df['CustomerGender'] == 0 ][cols]
+    subset_male = df[df['CustomerGender'] == 1 ][cols]
+    subsets = [subset_female, subset_male]
     return subsets

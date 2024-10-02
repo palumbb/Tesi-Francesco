@@ -29,6 +29,10 @@ from torch.optim import SGD, Optimizer
 def main(cfg: DictConfig) -> None:
     
     device = cfg.server_device
+    """print(cfg.dataset_path)
+    print("Clients:" + str(cfg.num_clients))
+    print("Local epochs:" + str(cfg.num_epochs))
+    print("Sampled clients: " + str(cfg.clients_per_round))"""
 
     # 2. Prepare your dataset
     if cfg.federated:
@@ -98,27 +102,26 @@ def main(cfg: DictConfig) -> None:
         # 7. Save your results
         with open(os.path.join(save_path, "history.pkl"), "wb") as f_ptr:
             pickle.dump(history, f_ptr)
+
     else:
         trainset, testset = load_dataset(
             data_cfg=cfg.dataset,
             num_clients=cfg.num_clients,
-            federated=cfg.federated
+            federated=cfg.federated,
+            partitioning=cfg.partitioning
         )
         
-        #input_dim = trainset.tensors[0].shape[1]  
-        num_epochs = cfg.num_epochs
+        num_epochs = 50
         batch_size = cfg.batch_size
         learning_rate = cfg.learning_rate
         momentum = cfg.momentum
         weight_decay = cfg.weight_decay
-        input_dim = cfg.model.input_dim
-
+        
         train_loader = DataLoader(trainset, batch_size=batch_size, shuffle=True)
         test_loader = DataLoader(testset, batch_size=batch_size, shuffle=False)
 
-        model = BinaryNet(input_dim=input_dim, num_classes=1)
-        #optimizer = call(cfg.optimizer)
-        #optimizer = optimizer(model.parameters())
+        model = BinaryNet(cfg.dataset_path, partitioning=cfg.partitioning, num_classes=2)
+       
         optimizer = SGD(
             model.parameters(), lr=learning_rate, momentum=momentum, weight_decay=weight_decay
         )

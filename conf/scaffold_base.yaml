@@ -4,13 +4,13 @@
 # a similar configuration structure and hence be easy to customise)
 
 federated: True
-num_clients: 10
-num_epochs: 1
+num_clients: 4
+num_epochs: 10
 batch_size: 32
-clients_per_round: 10
+clients_per_round: 4
 learning_rate: 0.01
-num_rounds: 50
-partitioning: "uniform"
+num_rounds: 30
+partitioning: "age"
 dataset_path: "./data/consumer.csv"
 dataset_seed: 42
 alpha: 0.5
