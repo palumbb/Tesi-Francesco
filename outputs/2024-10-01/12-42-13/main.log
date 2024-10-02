@@ -1,0 +1,27 @@
+[2024-10-01 12:42:14,111][flwr][WARNING] - Both server and strategy were provided, ignoring strategy
+[2024-10-01 12:42:14,111][flwr][INFO] - Starting Flower simulation, config: ServerConfig(num_rounds=10, round_timeout=None)
+[2024-10-01 12:42:25,033][flwr][INFO] - Flower VCE: Ray initialized with resources: {'node:__internal_head__': 1.0, 'object_store_memory': 427458969.0, 'node:127.0.0.1': 1.0, 'CPU': 12.0, 'memory': 854917940.0}
+[2024-10-01 12:42:25,034][flwr][INFO] - Initializing global parameters
+[2024-10-01 12:42:25,034][flwr][INFO] - Requesting initial parameters from one random client
+[2024-10-01 12:42:29,471][flwr][ERROR] - [36mray::launch_and_get_parameters()[39m (pid=24324, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1843, in ray._raylet.execute_task
+  File "python\ray\_raylet.pyx", line 1877, in ray._raylet.execute_task
+  File "python\ray\_raylet.pyx", line 978, in ray._raylet.raise_if_dependency_failed
+ray.exceptions.RaySystemError: System error: No module named 'torch.privateuseone'
+traceback: Traceback (most recent call last):
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\ray\_private\serialization.py", line 423, in deserialize_objects
+    obj = self._deserialize_object(data, metadata, object_ref)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\ray\_private\serialization.py", line 280, in _deserialize_object
+    return self._deserialize_msgpack_data(data, metadata_fields)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\ray\_private\serialization.py", line 235, in _deserialize_msgpack_data
+    python_objects = self._deserialize_pickle5_data(pickle5_data)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\ray\_private\serialization.py", line 223, in _deserialize_pickle5_data
+    obj = pickle.loads(in_band, buffers=buffers)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\torch\_utils.py", line 333, in _rebuild_device_tensor_from_numpy
+    tensor = torch.from_numpy(data).to(dtype=dtype, device=device)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'torch.privateuseone'

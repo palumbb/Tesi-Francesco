@@ -1,0 +1,150 @@
+[2024-09-26 16:24:12,908][flwr][WARNING] - Both server and strategy were provided, ignoring strategy
+[2024-09-26 16:24:12,908][flwr][INFO] - Starting Flower simulation, config: ServerConfig(num_rounds=50, round_timeout=None)
+[2024-09-26 16:24:23,464][flwr][INFO] - Flower VCE: Ray initialized with resources: {'node:__internal_head__': 1.0, 'memory': 1295858075.0, 'CPU': 12.0, 'object_store_memory': 647929036.0, 'node:127.0.0.1': 1.0}
+[2024-09-26 16:24:23,464][flwr][INFO] - Initializing global parameters
+[2024-09-26 16:24:23,464][flwr][INFO] - Requesting initial parameters from one random client
+[2024-09-26 16:24:28,343][flwr][INFO] - Received initial parameters from one random client
+[2024-09-26 16:24:28,344][flwr][INFO] - Evaluating initial parameters
+[2024-09-26 16:24:28,407][flwr][INFO] - initial parameters (loss, other metrics): 0.005778675112459395, {'accuracy': 0.5616666666666666, 'f1-score': 0.7193169690501601}
+[2024-09-26 16:24:28,407][flwr][INFO] - FL starting
+[2024-09-26 16:24:28,407][flwr][DEBUG] - fit_round 1: strategy sampled 2 clients (out of 1000)
+[2024-09-26 16:24:28,441][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=19720, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 147, in launch_and_fit
+    client: Client = _create_client(client_fn, cid)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 168, in _create_client
+    client_like: ClientLike = client_fn(cid)
+                              ^^^^^^^^^^^^^^
+  File "c:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 116, in client_fn
+    trainloader = trainloaders[int(cid)]
+                  ~~~~~~~~~~~~^^^^^^^^^^
+IndexError: list index out of range
+[2024-09-26 16:24:34,629][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=308, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 147, in launch_and_fit
+    client: Client = _create_client(client_fn, cid)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 168, in _create_client
+    client_like: ClientLike = client_fn(cid)
+                              ^^^^^^^^^^^^^^
+  File "c:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 116, in client_fn
+    trainloader = trainloaders[int(cid)]
+                  ~~~~~~~~~~~~^^^^^^^^^^
+IndexError: list index out of range
+[2024-09-26 16:24:34,631][flwr][DEBUG] - fit_round 1 received 0 results and 2 failures
+[2024-09-26 16:24:34,677][flwr][INFO] - fit progress: (1, 0.005778675112459395, {'accuracy': 0.5616666666666666, 'f1-score': 0.7193169690501601}, 6.269321400002809)
+[2024-09-26 16:24:34,679][flwr][INFO] - evaluate_round 1: no clients selected, cancel
+[2024-09-26 16:24:34,679][flwr][DEBUG] - fit_round 2: strategy sampled 2 clients (out of 1000)
+[2024-09-26 16:24:34,712][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=19720, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 147, in launch_and_fit
+    client: Client = _create_client(client_fn, cid)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 168, in _create_client
+    client_like: ClientLike = client_fn(cid)
+                              ^^^^^^^^^^^^^^
+  File "c:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 116, in client_fn
+    trainloader = trainloaders[int(cid)]
+                  ~~~~~~~~~~~~^^^^^^^^^^
+IndexError: list index out of range
+[2024-09-26 16:24:34,712][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=308, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 147, in launch_and_fit
+    client: Client = _create_client(client_fn, cid)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 168, in _create_client
+    client_like: ClientLike = client_fn(cid)
+                              ^^^^^^^^^^^^^^
+  File "c:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 116, in client_fn
+    trainloader = trainloaders[int(cid)]
+                  ~~~~~~~~~~~~^^^^^^^^^^
+IndexError: list index out of range
+[2024-09-26 16:24:34,712][flwr][DEBUG] - fit_round 2 received 0 results and 2 failures
+[2024-09-26 16:24:34,759][flwr][INFO] - fit progress: (2, 0.005778675112459395, {'accuracy': 0.5616666666666666, 'f1-score': 0.7193169690501601}, 6.350804600006086)
+[2024-09-26 16:24:34,759][flwr][INFO] - evaluate_round 2: no clients selected, cancel
+[2024-09-26 16:24:34,759][flwr][DEBUG] - fit_round 3: strategy sampled 2 clients (out of 1000)
+[2024-09-26 16:24:34,792][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=19720, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 147, in launch_and_fit
+    client: Client = _create_client(client_fn, cid)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 168, in _create_client
+    client_like: ClientLike = client_fn(cid)
+                              ^^^^^^^^^^^^^^
+  File "c:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 116, in client_fn
+    trainloader = trainloaders[int(cid)]
+                  ~~~~~~~~~~~~^^^^^^^^^^
+IndexError: list index out of range
+[2024-09-26 16:24:34,792][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=308, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 147, in launch_and_fit
+    client: Client = _create_client(client_fn, cid)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 168, in _create_client
+    client_like: ClientLike = client_fn(cid)
+                              ^^^^^^^^^^^^^^
+  File "c:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 116, in client_fn
+    trainloader = trainloaders[int(cid)]
+                  ~~~~~~~~~~~~^^^^^^^^^^
+IndexError: list index out of range
+[2024-09-26 16:24:34,795][flwr][DEBUG] - fit_round 3 received 0 results and 2 failures
+[2024-09-26 16:24:34,840][flwr][INFO] - fit progress: (3, 0.005778675112459395, {'accuracy': 0.5616666666666666, 'f1-score': 0.7193169690501601}, 6.433200100000249)
+[2024-09-26 16:24:34,840][flwr][INFO] - evaluate_round 3: no clients selected, cancel
+[2024-09-26 16:24:34,844][flwr][DEBUG] - fit_round 4: strategy sampled 2 clients (out of 1000)
+[2024-09-26 16:24:34,874][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=19720, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 147, in launch_and_fit
+    client: Client = _create_client(client_fn, cid)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 168, in _create_client
+    client_like: ClientLike = client_fn(cid)
+                              ^^^^^^^^^^^^^^
+  File "c:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 116, in client_fn
+    trainloader = trainloaders[int(cid)]
+                  ~~~~~~~~~~~~^^^^^^^^^^
+IndexError: list index out of range
+[2024-09-26 16:24:43,664][flwr][DEBUG] - fit_round 4 received 1 results and 1 failures
+[2024-09-26 16:24:43,711][flwr][INFO] - fit progress: (4, 0.00577962597211202, {'accuracy': 0.5616666666666666, 'f1-score': 0.7193169690501601}, 15.306145399998059)
+[2024-09-26 16:24:43,711][flwr][INFO] - evaluate_round 4: no clients selected, cancel
+[2024-09-26 16:24:43,711][flwr][DEBUG] - fit_round 5: strategy sampled 2 clients (out of 1000)
+[2024-09-26 16:24:43,744][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=19720, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 147, in launch_and_fit
+    client: Client = _create_client(client_fn, cid)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 168, in _create_client
+    client_like: ClientLike = client_fn(cid)
+                              ^^^^^^^^^^^^^^
+  File "c:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 116, in client_fn
+    trainloader = trainloaders[int(cid)]
+                  ~~~~~~~~~~~~^^^^^^^^^^
+IndexError: list index out of range
+[2024-09-26 16:24:43,744][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=308, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 147, in launch_and_fit
+    client: Client = _create_client(client_fn, cid)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 168, in _create_client
+    client_like: ClientLike = client_fn(cid)
+                              ^^^^^^^^^^^^^^
+  File "c:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 116, in client_fn
+    trainloader = trainloaders[int(cid)]
+                  ~~~~~~~~~~~~^^^^^^^^^^
+IndexError: list index out of range
+[2024-09-26 16:24:43,756][flwr][DEBUG] - fit_round 5 received 0 results and 2 failures
+[2024-09-26 16:24:43,809][flwr][INFO] - fit progress: (5, 0.00577962597211202, {'accuracy': 0.5616666666666666, 'f1-score': 0.7193169690501601}, 15.400147299995297)
+[2024-09-26 16:24:43,810][flwr][INFO] - evaluate_round 5: no clients selected, cancel
+[2024-09-26 16:24:43,810][flwr][DEBUG] - fit_round 6: strategy sampled 2 clients (out of 1000)
+[2024-09-26 16:24:43,845][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=19720, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 147, in launch_and_fit
+    client: Client = _create_client(client_fn, cid)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 168, in _create_client
+    client_like: ClientLike = client_fn(cid)
+                              ^^^^^^^^^^^^^^
+  File "c:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 116, in client_fn
+    trainloader = trainloaders[int(cid)]
+                  ~~~~~~~~~~~~^^^^^^^^^^
+IndexError: list index out of range

@@ -4,7 +4,7 @@
 # a similar configuration structure and hence be easy to customise)
 
 federated: True
-num_clients: 2
+num_clients: 50
 num_epochs: 1
 batch_size: 32
 clients_per_round: 2
@@ -12,7 +12,7 @@ learning_rate: 0.01
 num_rounds: 50
 mu: 0.01
 partitioning: "uniform"
-dataset_path: "./data/mv.csv"
+dataset_path: "./data/consumer.csv"
 dataset_seed: 42
 alpha: 0.5
 labels_per_client: 2 # only used when partitioning is label quantity
@@ -40,10 +40,12 @@ dataset:
   labels_per_client: ${labels_per_client}
 
 model:
-  # model config
-  _target_: model.BinaryNet
-  input_dim: 14 #16 if consumer, 14 if mv
+   # model config
+  _target_: model.BinaryNet #change model in the centralized setting
+  #input_dim: 14 #16 if consumer, 14 if mv
   num_classes: 2
+  data: ${dataset_path}
+  partitioning: ${partitioning}
 
 strategy:
   _target_: flwr.server.strategy.FedAvg # points to your strategy (either custom or exiting in Flower)

@@ -1,0 +1,47 @@
+[2024-09-23 11:36:13,201][flwr][WARNING] - Both server and strategy were provided, ignoring strategy
+[2024-09-23 11:36:13,201][flwr][INFO] - Starting Flower simulation, config: ServerConfig(num_rounds=50, round_timeout=None)
+[2024-09-23 11:36:23,893][flwr][INFO] - Flower VCE: Ray initialized with resources: {'node:127.0.0.1': 1.0, 'memory': 1504213403.0, 'node:__internal_head__': 1.0, 'object_store_memory': 752106700.0, 'CPU': 12.0}
+[2024-09-23 11:36:23,895][flwr][INFO] - Initializing global parameters
+[2024-09-23 11:36:23,895][flwr][INFO] - Requesting initial parameters from one random client
+[2024-09-23 11:36:28,388][flwr][INFO] - Received initial parameters from one random client
+[2024-09-23 11:36:28,393][flwr][INFO] - Evaluating initial parameters
+[2024-09-23 11:36:28,449][flwr][INFO] - initial parameters (loss, other metrics): 0.005756422744856941, {'accuracy': 0.5622222222222222, 'f1-score': 0.7195729537366548}
+[2024-09-23 11:36:28,449][flwr][INFO] - FL starting
+[2024-09-23 11:36:28,450][flwr][DEBUG] - fit_round 1: strategy sampled 2 clients (out of 3)
+[2024-09-23 11:36:43,168][flwr][DEBUG] - fit_round 1 received 2 results and 0 failures
+[2024-09-23 11:36:43,168][flwr][WARNING] - No fit_metrics_aggregation_fn provided
+[2024-09-23 11:36:43,226][flwr][INFO] - fit progress: (1, 0.004271081586678823, {'accuracy': 0.8011111111111111, 'f1-score': 0.8311320754716981}, 14.779091599999447)
+[2024-09-23 11:36:43,226][flwr][INFO] - evaluate_round 1: no clients selected, cancel
+[2024-09-23 11:36:43,226][flwr][DEBUG] - fit_round 2: strategy sampled 2 clients (out of 3)
+[2024-09-23 11:36:43,262][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=17928, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 147, in launch_and_fit
+    client: Client = _create_client(client_fn, cid)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 168, in _create_client
+    client_like: ClientLike = client_fn(cid)
+                              ^^^^^^^^^^^^^^
+  File "c:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedprox.py", line 124, in client_fn
+    trainloader = trainloaders[int(cid)]
+                  ~~~~~~~~~~~~^^^^^^^^^^
+IndexError: list index out of range
+[2024-09-23 11:36:51,415][flwr][DEBUG] - fit_round 2 received 1 results and 1 failures
+[2024-09-23 11:36:51,452][flwr][INFO] - fit progress: (2, 0.0030986296468310886, {'accuracy': 0.8433333333333334, 'f1-score': 0.8669811320754717}, 23.012457799999538)
+[2024-09-23 11:36:51,452][flwr][INFO] - evaluate_round 2: no clients selected, cancel
+[2024-09-23 11:36:51,464][flwr][DEBUG] - fit_round 3: strategy sampled 2 clients (out of 3)
+[2024-09-23 11:36:51,488][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=17928, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 147, in launch_and_fit
+    client: Client = _create_client(client_fn, cid)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 168, in _create_client
+    client_like: ClientLike = client_fn(cid)
+                              ^^^^^^^^^^^^^^
+  File "c:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedprox.py", line 124, in client_fn
+    trainloader = trainloaders[int(cid)]
+                  ~~~~~~~~~~~~^^^^^^^^^^
+IndexError: list index out of range
+[2024-09-23 11:36:59,895][flwr][DEBUG] - fit_round 3 received 1 results and 1 failures
+[2024-09-23 11:36:59,944][flwr][INFO] - fit progress: (3, 0.0029136890835232206, {'accuracy': 0.8616666666666667, 'f1-score': 0.881145584725537}, 31.499567799999568)
+[2024-09-23 11:36:59,944][flwr][INFO] - evaluate_round 3: no clients selected, cancel
+[2024-09-23 11:36:59,944][flwr][DEBUG] - fit_round 4: strategy sampled 2 clients (out of 3)

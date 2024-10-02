@@ -1,0 +1,42 @@
+[2024-09-12 10:58:56,754][flwr][INFO] - Starting Flower simulation, config: ServerConfig(num_rounds=10, round_timeout=None)
+[2024-09-12 10:59:12,375][flwr][INFO] - Flower VCE: Ray initialized with resources: {'node:127.0.0.1': 1.0, 'memory': 1649047143.0, 'CPU': 8.0, 'object_store_memory': 824523571.0, 'node:__internal_head__': 1.0}
+[2024-09-12 10:59:12,376][flwr][INFO] - Initializing global parameters
+[2024-09-12 10:59:12,377][flwr][INFO] - Requesting initial parameters from one random client
+[2024-09-12 10:59:18,555][flwr][INFO] - Received initial parameters from one random client
+[2024-09-12 10:59:18,556][flwr][INFO] - Evaluating initial parameters
+[2024-09-12 10:59:18,623][flwr][INFO] - initial parameters (loss, other metrics): 15.568993695576985, {'accuracy': 0.43833333333333335}
+[2024-09-12 10:59:18,625][flwr][INFO] - FL starting
+[2024-09-12 10:59:18,626][flwr][DEBUG] - fit_round 1: strategy sampled 2 clients (out of 2)
+[2024-09-12 10:59:18,683][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=11672, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\Desktop\PoliMi\Magistrale\Tesi\Progetto\Tesi-Francesco\client.py", line 42, in fit
+    optimizer = config.optimizer
+                ^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'optimizer'
+[2024-09-12 10:59:25,141][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=7124, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 148, in launch_and_fit
+    return maybe_call_fit(
+           ^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\client.py", line 184, in maybe_call_fit
+    return client.fit(fit_ins)
+           ^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\miniconda3\envs\flower\Lib\site-packages\flwr\client\app.py", line 297, in _fit
+    results = self.numpy_client.fit(parameters, ins.config)  # type: ignore
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Francesco\Desktop\PoliMi\Magistrale\Tesi\Progetto\Tesi-Francesco\client.py", line 42, in fit
+    optimizer = config.optimizer
+                ^^^^^^^^^^^^^^^^
+AttributeError: 'dict' object has no attribute 'optimizer'
+[2024-09-12 10:59:25,148][flwr][DEBUG] - fit_round 1 received 0 results and 2 failures
+[2024-09-12 10:59:25,207][flwr][INFO] - fit progress: (1, 15.568993695576985, {'accuracy': 0.43833333333333335}, 6.581070499999441)
+[2024-09-12 10:59:25,209][flwr][DEBUG] - evaluate_round 1: strategy sampled 2 clients (out of 2)

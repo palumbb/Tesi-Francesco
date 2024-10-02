@@ -1,0 +1,45 @@
+federated: true
+num_clients: 4
+num_epochs: 10
+batch_size: 32
+clients_per_round: 4
+learning_rate: 0.01
+num_rounds: 30
+partitioning: age
+dataset_path: ./data/consumer.csv
+dataset_seed: 42
+alpha: 0.5
+labels_per_client: 2
+momentum: 0.9
+weight_decay: 1.0e-05
+client_fn:
+  _target_: client_fedavg.gen_client_fn
+  _recursive_: false
+  num_epochs: ${num_epochs}
+  learning_rate: ${learning_rate}
+  momentum: ${momentum}
+  weight_decay: ${weight_decay}
+dataset:
+  path: ${dataset_path}
+  partitioning: ${partitioning}
+  batch_size: ${batch_size}
+  train_split: 0.8
+  val_split: 0.1
+  seed: ${dataset_seed}
+model:
+  _target_: model.BinaryNet
+  num_classes: 2
+  data: ${dataset_path}
+  partitioning: ${partitioning}
+strategy:
+  _target_: flwr.server.strategy.FedAvg
+  fraction_fit: 1.0e-05
+  fraction_evaluate: 0.0
+  min_fit_clients: ${clients_per_round}
+  min_available_clients: ${clients_per_round}
+  min_evaluate_clients: 0
+client: null
+server_device: cpu
+client_resources:
+  num_cpus: 4
+  num_gpus: 0.0
