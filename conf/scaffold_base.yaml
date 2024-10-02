@@ -15,7 +15,7 @@ dataset_path: "./data/consumer.csv"
 dataset_seed: 42
 alpha: 0.5
 labels_per_client: 2 # only used when partitioning is label quantity
-momentum: 0.9
+momentum: 0.5
 weight_decay: 0.00001
 
 client_fn:

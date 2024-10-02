@@ -3,15 +3,15 @@
 # Please follow the provided structure (this will ensuring all baseline follow
 # a similar configuration structure and hence be easy to customise)
 
-federated: False
+federated: True
 num_clients: 4 # change the proportions of each client in the partition_dataset section
 num_epochs: 10
 batch_size: 32
 clients_per_round: 4
 learning_rate: 0.01
 num_rounds: 30
-partitioning: "age"
-dataset_path: "./data/mv.csv" #also change the input dim
+partitioning: "satisfaction"
+dataset_path: "./data/consumer.csv" #also change the input dim
 dataset_seed: 42
 alpha: 0.5
 labels_per_client: 2 # only used when partitioning is label quantity

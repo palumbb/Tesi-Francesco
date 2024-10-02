@@ -29,10 +29,10 @@ from torch.optim import SGD, Optimizer
 def main(cfg: DictConfig) -> None:
     
     device = cfg.server_device
-    """print(cfg.dataset_path)
+    print(cfg.dataset_path)
     print("Clients:" + str(cfg.num_clients))
     print("Local epochs:" + str(cfg.num_epochs))
-    print("Sampled clients: " + str(cfg.clients_per_round))"""
+    print("Sampled clients: " + str(cfg.clients_per_round))
 
     # 2. Prepare your dataset
     if cfg.federated:

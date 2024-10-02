@@ -16,9 +16,8 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning):
         dataset, features_ohe, target_name, num_columns = load_mv()
 
     dataset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
-
     #profiling(dataset)
-    
+
     train_dataset, test_dataset = train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name)
     if federated:
         if partitioning=="uniform":
@@ -194,10 +193,11 @@ def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_oh
         train_list = split_by_age(train)
     elif partitioning == "gender":
         train_list = split_by_gender(train)
+    elif partitioning == "satisfaction":
+        train_list = split_by_satisfaction(train)
 
     x_train_list = []
     y_train_list = []
-
     for train_df in train_list:
         x_train = train_df[features_ohe].to_numpy()
         x_train = np.vstack(x_train).astype(np.float32)
@@ -298,7 +298,23 @@ def split_by_gender(df):
                                                           'ProductCategory_Tablets', 'ProductBrand_Apple', 'ProductBrand_HP', 
                                                           'ProductBrand_Other Brands', 'ProductBrand_Samsung', 'ProductBrand_Sony', 
                                                           'CustomerGender_0', 'CustomerGender_1', 'PurchaseIntent']
-    subset_female = df[df['CustomerGender'] == 0 ][cols]
-    subset_male = df[df['CustomerGender'] == 1 ][cols]
+    subset_female = df[df['CustomerGender_0'] == 0 ][cols]
+    subset_male = df[df['CustomerGender_1'] == 1 ][cols]
     subsets = [subset_female, subset_male]
+    return subsets
+
+def split_by_satisfaction(df):
+    cols = ['ProductPrice', 'CustomerAge', 'PurchaseFrequency', 'CustomerSatisfaction',
+                                                          'ProductCategory_Headphones', 'ProductCategory_Laptops', 
+                                                          'ProductCategory_Smart Watches', 'ProductCategory_Smartphones', 
+                                                          'ProductCategory_Tablets', 'ProductBrand_Apple', 'ProductBrand_HP', 
+                                                          'ProductBrand_Other Brands', 'ProductBrand_Samsung', 'ProductBrand_Sony', 
+                                                          'CustomerGender_0', 'CustomerGender_1', 'PurchaseIntent']
+    
+    subset_1 = df[(df['CustomerSatisfaction'] <= 0) & (df['CustomerSatisfaction'] > -1)][cols]
+    subset_2 = df[(df['CustomerSatisfaction'] <= -1) & (df['CustomerSatisfaction'] > -2)][cols]
+    subset_3 = df[(df['CustomerSatisfaction'] > 0) & (df['CustomerSatisfaction'] <= 1)][cols]
+    subset_4= df[(df['CustomerSatisfaction'] > 1) & (df['CustomerSatisfaction'] <= 2)][cols]
+
+    subsets = [subset_1, subset_2, subset_3, subset_4]
     return subsets
