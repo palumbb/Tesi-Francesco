@@ -4,19 +4,19 @@
 # a similar configuration structure and hence be easy to customise)
 
 federated: True
-num_clients: 2
-num_epochs: 1
+num_clients: 4
+num_epochs: 10
 batch_size: 32
-clients_per_round: 2
+clients_per_round: 4
 learning_rate: 0.01
-num_rounds: 50
+num_rounds: 30
 mu: 0.01
-partitioning: "gender"
-dataset_path: "./data/consumer.csv"
+partitioning: "x5"
+dataset_path: "./data/mv.csv"
 dataset_seed: 42
 alpha: 0.5
 labels_per_client: 2 # only used when partitioning is label quantity
-momentum: 0.5
+momentum: 0.9
 weight_decay: 0.00001
 
 client_fn:

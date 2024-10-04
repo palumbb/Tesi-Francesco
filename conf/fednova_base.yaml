@@ -4,15 +4,15 @@
 # a similar configuration structure and hence be easy to customise)
 
 federated: True
-num_clients: 10
-num_epochs: 1
+num_clients: 100
+num_epochs: 10
 batch_size: 32
-clients_per_round: 2
+clients_per_round: 100
 learning_rate: 0.01
-num_rounds: 50
+num_rounds: 30
 alpha: 0.5
 partitioning: "uniform"
-dataset_path: "./data/mv.csv"
+dataset_path: "./data/consumer.csv"
 dataset_seed: 42
 labels_per_client: 2 # only used when partitioning is label quantity
 momentum: 0.9

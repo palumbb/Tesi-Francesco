@@ -24,7 +24,7 @@ from torch.optim import SGD, Optimizer
 
 
 
-@hydra.main(config_path="conf", config_name="scaffold_base", version_base=None)
+@hydra.main(config_path="conf", config_name="fedavg_base", version_base=None)
 
 def main(cfg: DictConfig) -> None:
     
@@ -113,7 +113,7 @@ def main(cfg: DictConfig) -> None:
             partitioning=cfg.partitioning
         )
         
-        num_epochs = 200
+        num_epochs = 50
         batch_size = cfg.batch_size
         learning_rate = cfg.learning_rate
         momentum = cfg.momentum

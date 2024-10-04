@@ -2,6 +2,7 @@ import pandas as pd
 import matplotlib
 import matplotlib.pyplot as plt
 import seaborn as sns
+from mlxtend.frequent_patterns import apriori, association_rules
 import torch
 from torch.utils.data import DataLoader, random_split
 from torch.utils.data import TensorDataset, Dataset
@@ -16,7 +17,8 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning):
         dataset, features_ohe, target_name, num_columns = load_mv()
 
     dataset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
-    #profiling(dataset)
+
+    profiling(dataset, data_path)
 
     train_dataset, test_dataset = train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name)
     if federated:
@@ -119,6 +121,7 @@ def load_mv():
     types = {"x1":float, "x2":float, "x3":str, "x4":float,"x5":float,"x6":float,
                  "x7":str,"x8":str,"x9":float,"x10":float,"binaryClass":str}
     dataset = pd.read_csv("./data/mv.csv", dtype=types)
+    
     features = list(dataset.columns)
     target_name = "binaryClass"
     dataset.replace('N', 0, inplace=True)
@@ -132,15 +135,29 @@ def load_mv():
     features_ohe.remove(target_name)
     return dataset, features_ohe, target_name, num_columns
 
-def profiling(df):
-    print(f"Null Values:\n {df.isna().sum()}")
+def profiling(df, data):
+    """print(f"Null Values:\n {df.isna().sum()}")
     print("\nUnique Values:")
     for col in df:
         print(f"{col} : {df[col].unique()}")
     plt.figure(figsize=(10,12))
     cor = df.corr()
     sns.heatmap(cor, xticklabels=True, yticklabels=True, annot=True, cmap=plt.cm.Reds)
-    plt.show()
+    plt.show()"""
+    if data == "./data/mv.csv":
+        association_cols = ['x3_brown',  'x3_green',  'x3_red',  'x7_no',  'x7_yes',  'x8_large',  'x8_normal', 'binaryClass']
+        rules = apriori(df[association_cols], min_support = 0.2, use_colnames = True, verbose = 1)
+        rules = rules.set_index('itemsets').filter(like='binaryClass', axis=0)
+    elif data == "./data/consumer.csv":
+        association_cols = ['ProductCategory_Headphones',
+       'ProductCategory_Laptops', 'ProductCategory_Smart Watches',
+       'ProductCategory_Smartphones', 'ProductCategory_Tablets',
+       'ProductBrand_Apple', 'ProductBrand_HP', 'ProductBrand_Other Brands',
+       'ProductBrand_Samsung', 'ProductBrand_Sony', 'CustomerGender_0',
+       'CustomerGender_1', 'PurchaseIntent']
+        rules = apriori(df[association_cols], min_support = 0.2, use_colnames = True, verbose = 1)
+        rules = rules.set_index('itemsets').filter(like='PurchaseIntent', axis=0)
+    print(rules)
 
     
 
@@ -181,8 +198,17 @@ def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_oh
     train[num_columns] = scaler.fit_transform(train[num_columns])
     test[num_columns] = scaler.transform(test[num_columns])
 
+
     if partitioning == "x3":
         train_list = split_by_x3(train)
+    elif partitioning == "x4":
+        train_list = split_by_x4(train)
+    elif partitioning == "x5":
+        train_list = split_by_x5(train)
+    elif partitioning == "x6":
+        train_list = split_by_x6(train)
+    elif partitioning == "x8":
+        train_list = split_by_x8(train)
     elif partitioning == "brand":
         train_list = split_by_brand(train)
     elif partitioning == "category":
@@ -233,6 +259,50 @@ def split_by_x3(df):
     subsets = [subset_brown, subset_red, subset_green]
     return subsets
 
+def split_by_x4(df):
+    cols = ['x1', 'x2', 'x4', 'x5', 'x6', 'x9', 'x10', 'x3_brown', 'x3_green',
+       'x3_red', 'x7_no', 'x7_yes', 'x8_large', 'x8_normal', 'binaryClass']
+    subset_1 = df[(df['x4'] <= 0.0) & (df['x4'] > -0.5)][cols]
+    subset_2= df[(df['x4'] > 0.0) & (df['x4'] <= 1)][cols]
+    subset_3 = df[(df['x4'] > 1)][cols]
+    subset_4 = df[df['x4'] <= -0.5][cols]
+    
+    subsets = [subset_1, subset_2, subset_3, subset_4]
+    
+    return subsets
+
+def split_by_x5(df):
+    cols = ['x1', 'x2', 'x4', 'x5', 'x6', 'x9', 'x10', 'x3_brown', 'x3_green',
+       'x3_red', 'x7_no', 'x7_yes', 'x8_large', 'x8_normal', 'binaryClass']
+    subset_1 = df[(df['x5'] <= 0.0) & (df['x5'] > -0.5)][cols]
+    subset_2= df[(df['x5'] > 0.0) & (df['x5'] <= 1)][cols]
+    subset_3 = df[(df['x5'] > 1)][cols]
+    subset_4 = df[df['x5'] <= -0.5][cols]
+
+    subsets = [subset_1, subset_2, subset_3, subset_4]
+    return subsets
+
+def split_by_x6(df):
+    cols = ['x1', 'x2', 'x4', 'x5', 'x6', 'x9', 'x10', 'x3_brown', 'x3_green',
+       'x3_red', 'x7_no', 'x7_yes', 'x8_large', 'x8_normal', 'binaryClass']
+    subset_1 = df[(df['x6'] <= 0.0) & (df['x6'] > -0.5)][cols]
+    subset_2= df[(df['x6'] > 0.0) & (df['x6'] <= 1)][cols]
+    subset_3 = df[(df['x6'] > 1)][cols]
+    subset_4 = df[df['x6'] <= -0.5][cols]
+
+    subsets = [subset_1, subset_2, subset_3, subset_4]
+    return subsets
+
+def split_by_x8(df):
+    cols = ['x1', 'x2', 'x4', 'x5', 'x6', 'x9', 'x10', 'x3_brown', 'x3_green',
+       'x3_red', 'x7_no', 'x7_yes', 'x8_large', 'x8_normal', 'binaryClass']
+    
+    subset_normal = df[df['x8_normal'] == 1][cols]
+    subset_large = df[df['x8_large'] == 1][cols]
+
+    subsets = [subset_normal, subset_large]
+    return subsets
+
 def split_by_x10(df):
     cols = ['x1', 'x2', 'x4', 'x5', 'x6', 'x9', 'x10', 'x3_brown', 'x3_green',
        'x3_red', 'x7_no', 'x7_yes', 'x8_large', 'x8_normal', 'binaryClass']
@@ -243,6 +313,7 @@ def split_by_x10(df):
     
     subsets = [subset_neg, subset_range1, subset_range2, subset_pos]
     return subsets
+
 
 def split_by_brand(df):
     cols = ['ProductPrice', 'CustomerAge', 'PurchaseFrequency', 'CustomerSatisfaction',
