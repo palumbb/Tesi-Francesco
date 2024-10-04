@@ -1,0 +1,22 @@
+[2024-10-02 13:20:36,425][flwr][WARNING] - Both server and strategy were provided, ignoring strategy
+[2024-10-02 13:20:36,426][flwr][INFO] - Starting Flower simulation, config: ServerConfig(num_rounds=30, round_timeout=None)
+[2024-10-02 13:20:45,899][flwr][INFO] - Flower VCE: Ray initialized with resources: {'memory': 1095158171.0, 'node:127.0.0.1': 1.0, 'object_store_memory': 547579084.0, 'CPU': 12.0, 'node:__internal_head__': 1.0}
+[2024-10-02 13:20:45,902][flwr][INFO] - Initializing global parameters
+[2024-10-02 13:20:45,902][flwr][INFO] - Requesting initial parameters from one random client
+[2024-10-02 13:20:50,253][flwr][INFO] - Received initial parameters from one random client
+[2024-10-02 13:20:50,254][flwr][INFO] - Evaluating initial parameters
+[2024-10-02 13:20:50,314][flwr][INFO] - initial parameters (loss, other metrics): 0.0057767193516095475, {'accuracy': 0.5172222222222222, 'f1-score': 0.514253773057574}
+[2024-10-02 13:20:50,316][flwr][INFO] - FL starting
+[2024-10-02 13:20:50,316][flwr][DEBUG] - fit_round 1: strategy sampled 5 clients (out of 5)
+[2024-10-02 13:20:50,352][flwr][ERROR] - [36mray::launch_and_fit()[39m (pid=2732, ip=127.0.0.1)
+  File "python\ray\_raylet.pyx", line 1896, in ray._raylet.execute_task
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 147, in launch_and_fit
+    client: Client = _create_client(client_fn, cid)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\andri\anaconda3\envs\flower\Lib\site-packages\flwr\simulation\ray_transport\ray_client_proxy.py", line 168, in _create_client
+    client_like: ClientLike = client_fn(cid)
+                              ^^^^^^^^^^^^^^
+  File "c:\Users\andri\OneDrive\Desktop\Tesi Palumbo\Tesi-Francesco\client_fedavg.py", line 116, in client_fn
+    trainloader = trainloaders[int(cid)]
+                  ~~~~~~~~~~~~^^^^^^^^^^
+IndexError: list index out of range

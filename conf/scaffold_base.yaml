@@ -5,11 +5,11 @@
 
 federated: True
 num_clients: 4
-num_epochs: 10
+num_epochs: 1
 batch_size: 32
 clients_per_round: 4
 learning_rate: 0.01
-num_rounds: 30
+num_rounds: 10
 partitioning: "age"
 dataset_path: "./data/consumer.csv"
 dataset_seed: 42
