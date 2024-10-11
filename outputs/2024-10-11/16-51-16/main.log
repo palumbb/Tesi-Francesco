@@ -1,0 +1,19 @@
+[2024-10-11 16:51:17,140][flwr][WARNING] - Both server and strategy were provided, ignoring strategy
+[2024-10-11 16:51:17,140][flwr][INFO] - Starting Flower simulation, config: ServerConfig(num_rounds=10, round_timeout=None)
+[2024-10-11 16:51:35,030][flwr][INFO] - Flower VCE: Ray initialized with resources: {'node:__internal_head__': 1.0, 'object_store_memory': 410492928.0, 'CPU': 8.0, 'memory': 820985856.0, 'node:127.0.0.1': 1.0}
+[2024-10-11 16:51:35,030][flwr][INFO] - Initializing global parameters
+[2024-10-11 16:51:35,030][flwr][INFO] - Requesting initial parameters from one random client
+[2024-10-11 16:51:43,996][flwr][INFO] - Received initial parameters from one random client
+[2024-10-11 16:51:44,011][flwr][INFO] - Evaluating initial parameters
+[2024-10-11 16:51:44,180][flwr][INFO] - initial parameters (loss, other metrics): 0.005795159108108945, {'accuracy': 0.4688888888888889, 'f1-score': 0.5735950044603033}
+[2024-10-11 16:51:44,180][flwr][INFO] - FL starting
+[2024-10-11 16:51:44,180][flwr][DEBUG] - fit_round 1: strategy sampled 2 clients (out of 2)
+[2024-10-11 16:52:10,565][flwr][DEBUG] - fit_round 1 received 2 results and 0 failures
+[2024-10-11 16:52:10,578][flwr][WARNING] - No fit_metrics_aggregation_fn provided
+[2024-10-11 16:52:10,688][flwr][INFO] - fit progress: (1, 0.005150569015079074, {'accuracy': 0.695, 'f1-score': 0.6409417920209287}, 26.50908289999984)
+[2024-10-11 16:52:10,688][flwr][INFO] - evaluate_round 1: no clients selected, cancel
+[2024-10-11 16:52:10,696][flwr][DEBUG] - fit_round 2: strategy sampled 2 clients (out of 2)
+[2024-10-11 16:52:24,955][flwr][DEBUG] - fit_round 2 received 2 results and 0 failures
+[2024-10-11 16:52:25,075][flwr][INFO] - fit progress: (2, 0.0035415565139717527, {'accuracy': 0.8266666666666667, 'f1-score': 0.844311377245509}, 40.891906299999846)
+[2024-10-11 16:52:25,077][flwr][INFO] - evaluate_round 2: no clients selected, cancel
+[2024-10-11 16:52:25,079][flwr][DEBUG] - fit_round 3: strategy sampled 2 clients (out of 2)

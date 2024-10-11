@@ -4,13 +4,14 @@
 # a similar configuration structure and hence be easy to customise)
 
 federated: True
-num_clients: 4
+name: Scaffold
+num_clients: 2
 num_epochs: 1
 batch_size: 32
-clients_per_round: 4
+clients_per_round: 2
 learning_rate: 0.01
-num_rounds: 10
-partitioning: "age"
+num_rounds: 2
+partitioning: "gender"
 dataset_path: "./data/consumer.csv"
 dataset_seed: 42
 alpha: 0.5

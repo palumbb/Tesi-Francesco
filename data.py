@@ -18,7 +18,7 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning):
 
     dataset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
 
-    profiling(dataset, data_path)
+    #profiling(dataset, data_path)
 
     train_dataset, test_dataset = train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name)
     if federated:
@@ -369,9 +369,18 @@ def split_by_gender(df):
                                                           'ProductCategory_Tablets', 'ProductBrand_Apple', 'ProductBrand_HP', 
                                                           'ProductBrand_Other Brands', 'ProductBrand_Samsung', 'ProductBrand_Sony', 
                                                           'CustomerGender_0', 'CustomerGender_1', 'PurchaseIntent']
-    subset_female = df[df['CustomerGender_0'] == 0 ][cols]
-    subset_male = df[df['CustomerGender_1'] == 1 ][cols]
-    subsets = [subset_female, subset_male]
+    subset_1 = df[df['CustomerGender_0'] == 1 ][cols]
+    subset_2 = df[df['CustomerGender_1'] == 1 ][cols]
+    
+    percentage = True
+    if(percentage):
+        male_sample1 = subset_1.sample(frac=0.6, random_state=42)
+        female_sample1 = subset_2.sample(frac=0.2, random_state=0)
+        male_sample2 = subset_1.sample(frac=0.4, random_state=55)
+        female_sample2 = subset_2.sample(frac=0.2, random_state=1)
+        subset_1 = pd.concat([male_sample1, female_sample1])
+        subset_2 = pd.concat([male_sample2, female_sample2])
+    subsets = [subset_1, subset_2]
     return subsets
 
 def split_by_satisfaction(df):

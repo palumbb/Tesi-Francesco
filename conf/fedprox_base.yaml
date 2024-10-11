@@ -4,15 +4,16 @@
 # a similar configuration structure and hence be easy to customise)
 
 federated: True
-num_clients: 4
-num_epochs: 10
+name: FedProx
+num_clients: 2
+num_epochs: 1
 batch_size: 32
-clients_per_round: 4
+clients_per_round: 2
 learning_rate: 0.01
-num_rounds: 30
+num_rounds: 2
 mu: 0.01
-partitioning: "x5"
-dataset_path: "./data/mv.csv"
+partitioning: "gender"
+dataset_path: "./data/consumer.csv"
 dataset_seed: 42
 alpha: 0.5
 labels_per_client: 2 # only used when partitioning is label quantity

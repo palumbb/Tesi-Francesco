@@ -232,37 +232,27 @@ def gen_evaluate_fn(
     testloader: DataLoader,
     device: torch.device,
     model: DictConfig,
+    accuracies: List[float],  # Aggiungi accuracies per tracciare
 ) -> Callable[
     [int, NDArrays, Dict[str, Scalar]], Optional[Tuple[float, Dict[str, Scalar]]]
 ]:
-    """Generate the function for centralized evaluation.
-
-    Parameters
-    ----------
-    testloader : DataLoader
-        The dataloader to test the model with.
-    device : torch.device
-        The device to test the model on.
-
-    Returns
-    -------
-    Callable[ [int, NDArrays, Dict[str, Scalar]],
-               Optional[Tuple[float, Dict[str, Scalar]]] ]
-    The centralized evaluation function.
-    """
+    """Generate the function for centralized evaluation with accuracy tracking."""
 
     def evaluate(
         server_round: int, parameters_ndarrays: NDArrays, config: Dict[str, Scalar]
     ) -> Optional[Tuple[float, Dict[str, Scalar]]]:
-        # pylint: disable=unused-argument
-        """Use the entire Emnist test set for evaluation."""
+        """Evaluate the model for the current round."""
         net = instantiate(model)
         params_dict = zip(net.state_dict().keys(), parameters_ndarrays)
         state_dict = OrderedDict({k: torch.Tensor(v) for k, v in params_dict})
         net.load_state_dict(state_dict, strict=True)
         net.to(device)
 
+        # Evaluate the model
         loss, accuracy, f1_score = test(net, testloader, device=device)
+
+        accuracies.append(accuracy)
+
         return loss, {"accuracy": accuracy, "f1-score": f1_score}
 
     return evaluate

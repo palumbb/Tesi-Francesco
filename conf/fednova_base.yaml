@@ -4,14 +4,15 @@
 # a similar configuration structure and hence be easy to customise)
 
 federated: True
-num_clients: 100
-num_epochs: 10
+name: FedNova
+num_clients: 2
+num_epochs: 1
 batch_size: 32
-clients_per_round: 100
+clients_per_round: 2
 learning_rate: 0.01
-num_rounds: 30
+num_rounds: 2
 alpha: 0.5
-partitioning: "uniform"
+partitioning: "gender"
 dataset_path: "./data/consumer.csv"
 dataset_seed: 42
 labels_per_client: 2 # only used when partitioning is label quantity

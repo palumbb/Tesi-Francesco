@@ -1,0 +1,24 @@
+[2024-10-11 18:22:40,537][flwr][WARNING] - Both server and strategy were provided, ignoring strategy
+[2024-10-11 18:22:40,538][flwr][INFO] - Starting Flower simulation, config: ServerConfig(num_rounds=2, round_timeout=None)
+[2024-10-11 18:22:49,869][flwr][INFO] - Flower VCE: Ray initialized with resources: {'CPU': 8.0, 'object_store_memory': 744434073.0, 'memory': 1488868148.0, 'node:127.0.0.1': 1.0, 'node:__internal_head__': 1.0}
+[2024-10-11 18:22:49,870][flwr][INFO] - Initializing global parameters
+[2024-10-11 18:22:49,871][flwr][INFO] - Requesting initial parameters from one random client
+[2024-10-11 18:22:54,384][flwr][INFO] - Received initial parameters from one random client
+[2024-10-11 18:22:54,385][flwr][INFO] - Evaluating initial parameters
+[2024-10-11 18:22:54,486][flwr][INFO] - initial parameters (loss, other metrics): 0.005753622021940019, {'accuracy': 0.5494444444444444, 'f1-score': 0.7075369635773531}
+[2024-10-11 18:22:54,486][flwr][INFO] - FL starting
+[2024-10-11 18:22:54,501][flwr][DEBUG] - fit_round 1: strategy sampled 2 clients (out of 2)
+[2024-10-11 18:23:10,155][flwr][DEBUG] - fit_round 1 received 2 results and 0 failures
+[2024-10-11 18:23:10,155][flwr][WARNING] - No fit_metrics_aggregation_fn provided
+[2024-10-11 18:23:10,222][flwr][INFO] - fit progress: (1, 0.0053493969970279266, {'accuracy': 0.6527777777777778, 'f1-score': 0.5785569790964261}, 15.729533000000629)
+[2024-10-11 18:23:10,222][flwr][INFO] - evaluate_round 1: no clients selected, cancel
+[2024-10-11 18:23:10,222][flwr][DEBUG] - fit_round 2: strategy sampled 2 clients (out of 2)
+[2024-10-11 18:23:18,529][flwr][DEBUG] - fit_round 2 received 2 results and 0 failures
+[2024-10-11 18:23:18,611][flwr][INFO] - fit progress: (2, 0.003634985519780053, {'accuracy': 0.8083333333333333, 'f1-score': 0.8213360952874158}, 24.109473700000308)
+[2024-10-11 18:23:18,612][flwr][INFO] - evaluate_round 2: no clients selected, cancel
+[2024-10-11 18:23:18,612][flwr][INFO] - FL finished in 24.11182170000029
+[2024-10-11 18:23:18,612][flwr][INFO] - app_fit: losses_distributed []
+[2024-10-11 18:23:18,612][flwr][INFO] - app_fit: metrics_distributed_fit {}
+[2024-10-11 18:23:18,612][flwr][INFO] - app_fit: metrics_distributed {}
+[2024-10-11 18:23:18,612][flwr][INFO] - app_fit: losses_centralized [(0, 0.005753622021940019), (1, 0.0053493969970279266), (2, 0.003634985519780053)]
+[2024-10-11 18:23:18,617][flwr][INFO] - app_fit: metrics_centralized {'accuracy': [(0, 0.5494444444444444), (1, 0.6527777777777778), (2, 0.8083333333333333)], 'f1-score': [(0, 0.7075369635773531), (1, 0.5785569790964261), (2, 0.8213360952874158)]}
