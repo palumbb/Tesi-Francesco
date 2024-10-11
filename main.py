@@ -25,11 +25,13 @@ from torch.optim import SGD, Optimizer
 
 
 
-@hydra.main(config_path="conf", config_name="scaffold_base", version_base=None)
+@hydra.main(config_path="conf", config_name="fedavg_base", version_base=None)
 
 def main(cfg: DictConfig) -> None:
     device = cfg.server_device
-    print("Dataset:" + str(cfg.dataset_path))
+    
+    print(f"Strategy: {cfg.name}")
+    print("Dataset: " + str(cfg.dataset_path))
     print("Partitioning: " + str(cfg.partitioning))
     print("Clients:" + str(cfg.num_clients))
     print("Local epochs:" + str(cfg.num_epochs))
