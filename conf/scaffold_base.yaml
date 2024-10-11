@@ -33,7 +33,7 @@ dataset:
   partitioning: ${partitioning}
   batch_size: ${batch_size} # batch_size = batch_size_ratio * total_local_data_size
   train_split: 0.8
-  val_split: 0.1
+  val_split: 0.0
   seed: ${dataset_seed}
   alpha: ${alpha}
   labels_per_client: ${labels_per_client}
