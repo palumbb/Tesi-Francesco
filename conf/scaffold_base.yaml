@@ -5,13 +5,13 @@
 
 federated: True
 name: Scaffold
-num_clients: 2
-num_epochs: 1
+num_clients: 100
+num_epochs: 10
 batch_size: 32
-clients_per_round: 2
+clients_per_round: 100
 learning_rate: 0.01
-num_rounds: 2
-partitioning: "gender"
+num_rounds: 30
+partitioning: "uniform"
 dataset_path: "./data/consumer.csv"
 dataset_seed: 42
 alpha: 0.5

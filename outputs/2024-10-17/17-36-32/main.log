@@ -1,0 +1,54 @@
+[2024-10-17 17:36:32,477][flwr][WARNING] - Both server and strategy were provided, ignoring strategy
+[2024-10-17 17:36:32,479][flwr][INFO] - Starting Flower simulation, config: num_rounds=30, no round_timeout
+[2024-10-17 17:36:46,668][flwr][INFO] - Flower VCE: Ray initialized with resources: {'CPU': 8.0, 'memory': 890191872.0, 'node:127.0.0.1': 1.0, 'object_store_memory': 445095936.0, 'node:__internal_head__': 1.0}
+[2024-10-17 17:36:46,670][flwr][INFO] - Optimize your simulation with Flower VCE: https://flower.ai/docs/framework/how-to-run-simulations.html
+[2024-10-17 17:36:46,671][flwr][INFO] - No `client_resources` specified. Using minimal resources for clients.
+[2024-10-17 17:36:46,672][flwr][INFO] - Flower VCE: Resources for each Virtual Client: {'num_cpus': 1, 'num_gpus': 0.0}
+[2024-10-17 17:36:46,725][flwr][INFO] - Flower VCE: Creating VirtualClientEngineActorPool with 8 actors
+[2024-10-17 17:36:46,729][flwr][INFO] - [INIT]
+[2024-10-17 17:36:46,733][flwr][INFO] - Requesting initial parameters from one random client
+[2024-10-17 17:36:56,300][flwr][INFO] - Received initial parameters from one random client
+[2024-10-17 17:36:56,301][flwr][INFO] - Starting evaluation of initial global parameters
+[2024-10-17 17:36:56,375][flwr][ERROR] - Using a target size (torch.Size([128, 4])) that is different to the input size (torch.Size([128, 1])) is deprecated. Please ensure they have the same size.
+[2024-10-17 17:36:56,429][flwr][ERROR] - Traceback (most recent call last):
+  File "C:\Users\Riccardo\miniconda3\envs\flower\Lib\site-packages\flwr\simulation\app.py", line 339, in start_simulation
+    hist = run_fl(
+           ^^^^^^^
+  File "C:\Users\Riccardo\miniconda3\envs\flower\Lib\site-packages\flwr\server\server.py", line 492, in run_fl
+    hist, elapsed_time = server.fit(
+                         ^^^^^^^^^^^
+  File "C:\Users\Riccardo\miniconda3\envs\flower\Lib\site-packages\flwr\server\server.py", line 95, in fit
+    res = self.strategy.evaluate(0, parameters=self.parameters)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Riccardo\miniconda3\envs\flower\Lib\site-packages\flwr\server\strategy\fedavg.py", line 167, in evaluate
+    eval_res = self.evaluate_fn(server_round, parameters_ndarrays, {})
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Riccardo\Desktop\PoliMi\Tesi-Francesco\server_scaffold.py", line 251, in evaluate
+    loss, accuracy, f1_score = test(net, testloader, device=device)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "c:\Users\Riccardo\Desktop\PoliMi\Tesi-Francesco\model.py", line 375, in test
+    loss += criterion(output, target).item()
+            ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Riccardo\miniconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1553, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Riccardo\miniconda3\envs\flower\Lib\site-packages\torch\nn\modules\module.py", line 1562, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Riccardo\miniconda3\envs\flower\Lib\site-packages\torch\nn\modules\loss.py", line 621, in forward
+    return F.binary_cross_entropy(input, target, weight=self.weight, reduction=self.reduction)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\Riccardo\miniconda3\envs\flower\Lib\site-packages\torch\nn\functional.py", line 3163, in binary_cross_entropy
+    raise ValueError(
+ValueError: Using a target size (torch.Size([128, 4])) that is different to the input size (torch.Size([128, 1])) is deprecated. Please ensure they have the same size.
+
+[2024-10-17 17:36:56,444][flwr][ERROR] - Your simulation crashed :(. This could be because of several reasons. The most common are: 
+	 > Sometimes, issues in the simulation code itself can cause crashes. It's always a good idea to double-check your code for any potential bugs or inconsistencies that might be contributing to the problem. For example: 
+		 - You might be using a class attribute in your clients that hasn't been defined.
+		 - There could be an incorrect method call to a 3rd party library (e.g., PyTorch).
+		 - The return types of methods in your clients/strategies might be incorrect.
+	 > Your system couldn't fit a single VirtualClient: try lowering `client_resources`.
+	 > All the actors in your pool crashed. This could be because: 
+		 - You clients hit an out-of-memory (OOM) error and actors couldn't recover from it. Try launching your simulation with more generous `client_resources` setting (i.e. it seems {'num_cpus': 1, 'num_gpus': 0.0} is not enough for your run). Use fewer concurrent actors. 
+		 - You were running a multi-node simulation and all worker nodes disconnected. The head node might still be alive but cannot accommodate any actor with resources: {'num_cpus': 1, 'num_gpus': 0.0}.
+Take a look at the Flower simulation examples for guidance <https://flower.ai/docs/framework/how-to-run-simulations.html>.
