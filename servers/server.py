@@ -4,7 +4,8 @@ import torch
 from hydra.utils import instantiate
 from omegaconf import DictConfig
 
-from model import BinaryNet, evaluate
+from model.binarynet import BinaryNet, evaluate
+from model.multiclassnet import MulticlassNet, evaluate
 
 
 def get_on_fit_config(config: DictConfig):

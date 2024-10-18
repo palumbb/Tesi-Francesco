@@ -21,7 +21,7 @@ class BinaryNet(nn.Module):
         self.fc2 = nn.Linear(64, 32)
         self.fc3 = nn.Linear(32, 1)
         self.relu = nn.ReLU()
-        self.sigmoid = nn.Sigmoid()  # For binary classification (num_classes = 2 so it is useless)
+        self.sigmoid = nn.Sigmoid()  
 
     def forward(self, x):
         x = self.relu(self.fc1(x))

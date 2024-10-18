@@ -33,7 +33,8 @@ from hydra.utils import instantiate
 from omegaconf import DictConfig
 from torch.utils.data import DataLoader
 
-from model import test
+from model.binarynet import test_binary
+from model.multiclassnet import test_multi
 
 FitResultsAndFailures = Tuple[
     List[Tuple[ClientProxy, FitRes]],
@@ -233,6 +234,7 @@ def gen_evaluate_fn(
     device: torch.device,
     model: DictConfig,
     accuracies: List[float],  # Aggiungi accuracies per tracciare
+    num_classes: int
 ) -> Callable[
     [int, NDArrays, Dict[str, Scalar]], Optional[Tuple[float, Dict[str, Scalar]]]
 ]:
@@ -249,7 +251,10 @@ def gen_evaluate_fn(
         net.to(device)
 
         # Evaluate the model
-        loss, accuracy, f1_score = test(net, testloader, device=device)
+        if num_classes <= 2:
+            loss, accuracy, f1_score = test_binary(net, testloader, device=device)
+        else:
+            loss, accuracy, f1_score = test_multi(net, testloader, device=device)
 
         accuracies.append(accuracy)
 

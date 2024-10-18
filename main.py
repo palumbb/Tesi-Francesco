@@ -9,20 +9,20 @@ import pickle
 import matplotlib.pyplot as plt
 import flwr as fl
 import hydra
-import datetime
 from flwr.server.client_manager import SimpleClientManager
 from flwr.server.server import Server
 from hydra.core.hydra_config import HydraConfig
 from hydra.utils import call, instantiate
 from omegaconf import DictConfig, OmegaConf
-from model import BinaryNet, train_centralized, test
+from model.binarynet import BinaryNet, train_centralized_binary, test_binary
 from data import load_dataset
-from server_fednova import FedNovaServer
-from server_scaffold import ScaffoldServer, gen_evaluate_fn
+from servers.server_fednova import FedNovaServer
+from servers.server_scaffold import ScaffoldServer, gen_evaluate_fn
 from strategy import FedNovaStrategy, ScaffoldStrategy
 from torch.utils.data import DataLoader
 from torch.optim import SGD, Optimizer
 
+# NEXT STEP: CAMBIARE CLIENTS (TRAIN_FEDAVG_BINARY ECC...)
 
 
 @hydra.main(config_path="conf", config_name="fedavg_base", version_base=None)
@@ -43,7 +43,7 @@ def main(cfg: DictConfig) -> None:
     run_labels = ["FedAvg", "FedProx", "FedNova", "Scaffold"]
 
     # Definisci il percorso dove salvare i dati di accuracy
-    if cfg.dataset_path=="./data/consumer.csv":
+    """if cfg.dataset_path=="./data/consumer.csv":
         accuracy_save_path = 'plot_data/consumer/10clients.pkl'
     elif cfg.dataset_path=="./data/mv.csv":
         accuracy_save_path = 'plot_data/mv/10clients.pkl'
@@ -53,7 +53,7 @@ def main(cfg: DictConfig) -> None:
     if current_run_idx < len(run_labels):
         run_label = run_labels[current_run_idx]
     else:
-        run_label = f"Run {current_run_idx + 1}"  # Default se finisce la lista
+        run_label = f"Run {current_run_idx + 1}"  # Default se finisce la lista"""
 
     # 2. Prepare your dataset
     if cfg.federated:
@@ -89,7 +89,8 @@ def main(cfg: DictConfig) -> None:
             testloader, 
             device=device, 
             model=cfg.model, 
-            accuracies=accuracies  # Passiamo accuracies
+            accuracies=accuracies,
+            num_classes=cfg.model.num_classes 
         )
 
         # 4. Define your strategy
@@ -129,7 +130,7 @@ def main(cfg: DictConfig) -> None:
             pickle.dump(history, f_ptr)
 
         # 8. Plot the accuracies for each strategy
-        save_accuracies(accuracies, accuracy_save_path)
+        """save_accuracies(accuracies, accuracy_save_path)
         all_accuracies = load_accuracies(accuracy_save_path)
 
         plt.figure(figsize=(10, 6))
@@ -148,7 +149,7 @@ def main(cfg: DictConfig) -> None:
         plt.ylabel('Accuracy')
         plt.legend()
         plt.grid(True)
-        plt.show()
+        plt.show()"""
 
     else:
         trainset, testset = load_dataset(
@@ -173,9 +174,9 @@ def main(cfg: DictConfig) -> None:
             model.parameters(), lr=learning_rate, momentum=momentum, weight_decay=weight_decay
         )
 
-        train_centralized(model, train_loader, optimizer, num_epochs, device)
+        train_centralized_binary(model, train_loader, optimizer, num_epochs, device)
 
-        test_loss, test_accuracy, f1_score = test(model, test_loader, device)
+        test_loss, test_accuracy, f1_score = test_binary(model, test_loader, device)
 
         print(f"Test Loss: {test_loss}")
         print(f"Test Accuracy: {test_accuracy}")

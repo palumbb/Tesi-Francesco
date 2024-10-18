@@ -9,7 +9,7 @@ from hydra.utils import instantiate
 from omegaconf import DictConfig
 from torch.utils.data import DataLoader
 
-from model import test, train_fedavg
+from model.multiclassnet import test_multi, train_fedavg
 
 
 # pylint: disable=too-many-instance-attributes
@@ -63,10 +63,13 @@ class FlowerClientFedAvg(fl.client.NumPyClient):
         return final_p_np, len(self.trainloader.dataset), {}
 
     def evaluate(self, parameters, config: Dict[str, Scalar]):
-        """Evaluate using given parameters."""
         self.set_parameters(parameters)
-        loss, acc = test(self.net, self.valloader, self.device)
-        return float(loss), len(self.valloader.dataset), {"accuracy": float(acc)}
+        loss, acc, f1 = test_multi(self.net, self.valloader, self.device)  # Usa test_multiclass
+        return float(loss), len(self.valloader.dataset), {
+            "accuracy": float(acc),
+            "f1-score": float(f1),  # Aggiungi F1-score per valutazioni più dettagliate
+        }
+
 
 
 # pylint: disable=too-many-arguments

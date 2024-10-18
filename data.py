@@ -309,6 +309,7 @@ def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_oh
             y_train_tensor = torch.tensor(y_train, dtype=torch.float32).view(-1, 1)
         else:
             y_train_tensor = torch.tensor(y_train, dtype=torch.float32)
+            #y_train_tensor=y_train_tensor.to(torch.float)
         
         x_train_list.append(x_train_tensor)
         y_train_list.append(y_train_tensor)
@@ -323,6 +324,7 @@ def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_oh
         y_test_tensor = torch.tensor(y_test, dtype=torch.float32).view(-1, 1)
     else:
         y_test_tensor = torch.tensor(y_test, dtype=torch.float32)
+        #y_test_tensor=y_test_tensor.to(torch.float)
 
     train_datasets = [TensorDataset(x_tensor, y_tensor) for x_tensor, y_tensor in zip(x_train_list, y_train_list)]
     test_dataset = TensorDataset(x_test_tensor, y_test_tensor)
