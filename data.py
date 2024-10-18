@@ -22,8 +22,9 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning):
     elif data_path=="./data/car.csv":
         dataset, features_ohe, target_name, num_columns = load_car()
         labels_per_client = 4
-    """elif data_path=="./data/nursery.csv":
-        dataset, features_ohe, target_name, num_columns = load_nursery()"""
+    elif data_path=="./data/nursery.csv":
+        dataset, features_ohe, target_name, num_columns = load_nursery()
+        labels_per_client = 4
 
     dataset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
     #profiling(dataset, data_path)
@@ -158,7 +159,22 @@ def load_car():
     features_ohe = list(dataset.columns)
     num_columns = 'categorical'
     #features_ohe.remove(target_name)
-    print(dataset.shape)
+
+    return dataset, features_ohe, target_name, num_columns
+
+def load_nursery():
+    # MIXED
+    types = {"parents":str, "has_nurs":str, "form":str, "children":int,"housing":str,
+            "finance":str,"social":str, "health":str, "class":str}
+    dataset = pd.read_csv("./data/nursery.csv", dtype=types)
+    features = list(dataset.columns)
+    target_name = ["'class'_not_recom",
+       "'class'_priority", "'class'_recommend", "'class'_spec_prior",
+       "'class'_very_recom"]
+    #profiling(dataset)
+    dataset = encoding_categorical_variables(dataset[features])
+    features_ohe = list(dataset.columns)
+    num_columns = 'categorical'
     return dataset, features_ohe, target_name, num_columns
 
 def profiling(df):
@@ -170,7 +186,7 @@ def profiling(df):
     for col in df:
         print(f"{col} : {df[col].unique()}")
     plt.figure(figsize=(10,12))
-    print(data.head(10))
+    #print(data.head(10))
     cor = data.corr(method='kendall')
     sns.heatmap(cor, xticklabels=True, yticklabels=True, annot=True, cmap=plt.cm.Reds)
     plt.show()
@@ -217,7 +233,7 @@ def train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, 
     train_samples = int(len(dataset)*data_cfg.train_split)
     train = dataset.iloc[0:train_samples,]
     test = dataset.iloc[train_samples:,]
-    if num_columns != 'categorical':
+    if (num_columns != 'categorical'):
         scaler = StandardScaler()
         train[num_columns] = scaler.fit_transform(train[num_columns])
         test[num_columns] = scaler.transform(test[num_columns])
@@ -277,6 +293,8 @@ def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_oh
         train_list = split_by_satisfaction(train)
     elif partitioning == "doors":
         train_list = split_by_doors(train)
+    elif partitioning == "health":
+        train_list = split_by_health(train)
 
     x_train_list = []
     y_train_list = []
@@ -474,3 +492,24 @@ def split_by_doors(df):
     
     subsets = [subset_1, subset_2, subset_3]
     return subsets
+
+def split_by_health(df):
+    cols = ["'parents'_great_pret", "'parents'_pretentious", "'parents'_usual",
+       "'has_nurs'_critical", "'has_nurs'_improper", "'has_nurs'_less_proper",
+       "'has_nurs'_proper", "'has_nurs'_very_crit", "'form'_complete",
+       "'form'_completed", "'form'_foster", "'form'_incomplete",
+       "'children'_1", "'children'_2", "'children'_3", "'children'_more",
+       "'housing'_convenient", "'housing'_critical", "'housing'_less_conv",
+       "'finance'_convenient", "'finance'_inconv", "'social'_nonprob",
+       "'social'_problematic", "'social'_slightly_prob", "'health'_not_recom",
+       "'health'_priority", "'health'_recommended", "'class'_not_recom",
+       "'class'_priority", "'class'_recommend", "'class'_spec_prior",
+       "'class'_very_recom"]
+    
+    subset_1 = df[df["'health'_priority"] == 1]
+    subset_2 = df[df["'health'_recommended"] == 1]
+    subset_3 = df[df["'health'_not_recom"] == 1]
+
+    subsets = [subset_1, subset_2, subset_3]
+    return subsets
+    
