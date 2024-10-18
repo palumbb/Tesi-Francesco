@@ -13,10 +13,10 @@ from sklearn.metrics import f1_score
 class MulticlassNet(nn.Module):
     def __init__(self, data, partitioning, num_classes=4):  # Impostiamo num_classes=4
         super(MulticlassNet, self).__init__()
-        if data == "./data/consumer.csv":
-            input_dim = 16
-        elif data == "./data/mv.csv":
-            input_dim = 14
+        if data == "./data/car.csv":
+            input_dim = 25
+        elif data == "./data/nursery.csv":
+            input_dim = 32
         self.fc1 = nn.Linear(input_dim, 64)
         self.fc2 = nn.Linear(64, 32)
         self.fc3 = nn.Linear(32, num_classes)  # Cambiamo l'output per supportare 4 classi
