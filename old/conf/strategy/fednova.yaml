@@ -1,6 +1,0 @@
----
-
-name: fednova
-strategy:
-  _target_: strategy.fednova.FedNova
-  _partial_: true
