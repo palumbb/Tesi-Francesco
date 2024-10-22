@@ -1,0 +1,48 @@
+[2024-10-22 15:52:44,801][flwr][WARNING] - Both server and strategy were provided, ignoring strategy
+[2024-10-22 15:52:44,807][flwr][INFO] - Starting Flower simulation, config: num_rounds=3, no round_timeout
+[2024-10-22 15:52:56,407][flwr][INFO] - Flower VCE: Ray initialized with resources: {'CPU': 8.0, 'memory': 625483776.0, 'node:127.0.0.1': 1.0, 'object_store_memory': 312741888.0, 'node:__internal_head__': 1.0}
+[2024-10-22 15:52:56,408][flwr][INFO] - Optimize your simulation with Flower VCE: https://flower.ai/docs/framework/how-to-run-simulations.html
+[2024-10-22 15:52:56,410][flwr][INFO] - Flower VCE: Resources for each Virtual Client: {'num_cpus': 4, 'num_gpus': 0.0}
+[2024-10-22 15:52:56,440][flwr][INFO] - Flower VCE: Creating VirtualClientEngineActorPool with 2 actors
+[2024-10-22 15:52:56,443][flwr][INFO] - [INIT]
+[2024-10-22 15:52:56,444][flwr][INFO] - Requesting initial parameters from one random client
+[2024-10-22 15:53:04,799][flwr][INFO] - Received initial parameters from one random client
+[2024-10-22 15:53:04,801][flwr][INFO] - Starting evaluation of initial global parameters
+[2024-10-22 15:53:05,085][flwr][INFO] - initial parameters (loss, other metrics): 0.05145373305788747, {'accuracy': 0.11921296296296297, 'f1-score': 0.07138743189545173}
+[2024-10-22 15:53:05,086][flwr][INFO] - 
+[2024-10-22 15:53:05,087][flwr][INFO] - [ROUND 1]
+[2024-10-22 15:53:05,088][flwr][INFO] - configure_fit: strategy sampled 3 clients (out of 3)
+[2024-10-22 15:53:39,192][flwr][INFO] - aggregate_fit: received 3 results and 0 failures
+[2024-10-22 15:53:39,197][flwr][WARNING] - No fit_metrics_aggregation_fn provided
+[2024-10-22 15:53:39,476][flwr][INFO] - fit progress: (1, 0.03791654625056702, {'accuracy': 0.408179012345679, 'f1-score': 0.1830126171032272}, 34.389599400004954)
+[2024-10-22 15:53:39,478][flwr][INFO] - configure_evaluate: no clients selected, skipping evaluation
+[2024-10-22 15:53:39,480][flwr][INFO] - 
+[2024-10-22 15:53:39,481][flwr][INFO] - [ROUND 2]
+[2024-10-22 15:53:39,482][flwr][INFO] - configure_fit: strategy sampled 3 clients (out of 3)
+[2024-10-22 15:54:03,883][flwr][INFO] - aggregate_fit: received 3 results and 0 failures
+[2024-10-22 15:54:04,127][flwr][INFO] - fit progress: (2, 0.030983067382081054, {'accuracy': 0.5405092592592593, 'f1-score': 0.2869991595206362}, 59.04177910000726)
+[2024-10-22 15:54:04,129][flwr][INFO] - configure_evaluate: no clients selected, skipping evaluation
+[2024-10-22 15:54:04,130][flwr][INFO] - 
+[2024-10-22 15:54:04,131][flwr][INFO] - [ROUND 3]
+[2024-10-22 15:54:04,131][flwr][INFO] - configure_fit: strategy sampled 3 clients (out of 3)
+[2024-10-22 15:54:29,215][flwr][INFO] - aggregate_fit: received 3 results and 0 failures
+[2024-10-22 15:54:29,481][flwr][INFO] - fit progress: (3, 0.028613211150154656, {'accuracy': 0.5941358024691358, 'f1-score': 0.32172453964752545}, 84.39443539999775)
+[2024-10-22 15:54:29,483][flwr][INFO] - configure_evaluate: no clients selected, skipping evaluation
+[2024-10-22 15:54:29,485][flwr][INFO] - 
+[2024-10-22 15:54:29,486][flwr][INFO] - [SUMMARY]
+[2024-10-22 15:54:29,487][flwr][INFO] - Run finished 3 round(s) in 84.40s
+[2024-10-22 15:54:29,488][flwr][INFO] - 	History (loss, centralized):
+[2024-10-22 15:54:29,489][flwr][INFO] - 		round 0: 0.05145373305788747
+[2024-10-22 15:54:29,490][flwr][INFO] - 		round 1: 0.03791654625056702
+[2024-10-22 15:54:29,491][flwr][INFO] - 		round 2: 0.030983067382081054
+[2024-10-22 15:54:29,492][flwr][INFO] - 		round 3: 0.028613211150154656
+[2024-10-22 15:54:29,493][flwr][INFO] - 	History (metrics, centralized):
+[2024-10-22 15:54:29,494][flwr][INFO] - 	{'accuracy': [(0, 0.11921296296296297),
+[2024-10-22 15:54:29,495][flwr][INFO] - 	              (1, 0.408179012345679),
+[2024-10-22 15:54:29,495][flwr][INFO] - 	              (2, 0.5405092592592593),
+[2024-10-22 15:54:29,496][flwr][INFO] - 	              (3, 0.5941358024691358)],
+[2024-10-22 15:54:29,498][flwr][INFO] - 	 'f1-score': [(0, 0.07138743189545173),
+[2024-10-22 15:54:29,503][flwr][INFO] - 	              (1, 0.1830126171032272),
+[2024-10-22 15:54:29,504][flwr][INFO] - 	              (2, 0.2869991595206362),
+[2024-10-22 15:54:29,506][flwr][INFO] - 	              (3, 0.32172453964752545)]}
+[2024-10-22 15:54:29,507][flwr][INFO] - 

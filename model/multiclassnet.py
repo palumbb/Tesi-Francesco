@@ -11,25 +11,23 @@ from torch.nn.parameter import Parameter
 from sklearn.metrics import f1_score
 
 class MulticlassNet(nn.Module):
-    def __init__(self, data, partitioning, num_classes=4):  # Impostiamo num_classes=4
+    def __init__(self, data, partitioning, num_classes=5):  # Impostiamo num_classes=4
         super(MulticlassNet, self).__init__()
         if data == "./data/car.csv":
             input_dim = 25
         elif data == "./data/nursery.csv":
-            input_dim = 32
+            input_dim = 27
         self.fc1 = nn.Linear(input_dim, 64)
         self.fc2 = nn.Linear(64, 32)
         self.fc3 = nn.Linear(32, num_classes)  # Cambiamo l'output per supportare 4 classi
         self.relu = nn.ReLU()
-        self.softmax = nn.Softmax(dim=1)  # Usiamo softmax per la classificazione multi-classe
 
     def forward(self, x):
         x = self.relu(self.fc1(x))
         x = self.relu(self.fc2(x))
         x = self.fc3(x)
-        x = self.softmax(x)  # Softmax per ottenere probabilità
-        return x
-    
+        return x  # Rimuoviamo softmax, lasciamo che CrossEntropyLoss lo gestisca
+
 def train_centralized_multi(model, train_loader, optimizer, num_epochs, device):
     criterion = nn.CrossEntropyLoss()  # CrossEntropy per multi-class
     model.train()
@@ -88,17 +86,26 @@ def test_multi(
     with torch.no_grad():
         for data, target in testloader:
             data, target = data.to(device), target.to(device)
+
+            # Assicurati che i target siano LongTensor (interi)
+            target = target.float()
+
+            # Output del modello (logits)
             output = net(data)
-            
-            loss += criterion(output, target.long()).item()  # CrossEntropy lavora con target long
+
+            # Calcola la perdita usando CrossEntropyLoss
+            loss += criterion(output, target).item()  # CrossEntropy lavora con target long
             
             # Predizioni: prendiamo la classe con la probabilità più alta
             _, predicted = torch.max(output, 1)
+            _, target = torch.max(target, 1)
             
             all_predictions.extend(predicted.cpu().numpy())
             all_targets.extend(target.cpu().numpy())
             
             total += target.size(0)
+            print(predicted.shape)
+            print(target.shape)
             correct += (predicted == target).sum().item()
     
     # Calcolo della loss e dell'accuracy
@@ -109,3 +116,4 @@ def test_multi(
     f1 = f1_score(all_targets, all_predictions, average='macro')  # Macro per classi bilanciate
 
     return loss, acc, f1
+

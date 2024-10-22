@@ -107,7 +107,7 @@ def data_loaders(num_partitions: int, batch_size: int, val_ratio: float, train, 
             DataLoader(for_val, batch_size=batch_size, shuffle=False, num_workers=2)
         )
 
-    testloader = DataLoader(test, batch_size=128)
+    testloader = DataLoader(test, batch_size=batch_size)
 
     return trainloaders, valloaders, testloader
 
@@ -153,12 +153,14 @@ def load_car():
     dataset = pd.read_csv("./data/car.csv", dtype=types)
     features = list(dataset.columns)
     target_name = ['safety_acc',  'safety_good',  'safety_unacc',  'safety_vgood']
-    #profiling(dataset)
+    profiling(dataset)
     dataset = encoding_categorical_variables(dataset[features])
     #dataset[target_name] = target
     features_ohe = list(dataset.columns)
     num_columns = 'categorical'
-    #features_ohe.remove(target_name)
+    for t in target_name:
+        features_ohe.remove(t)
+    
 
     return dataset, features_ohe, target_name, num_columns
 
@@ -168,20 +170,21 @@ def load_nursery():
             "finance":str,"social":str, "health":str, "class":str}
     dataset = pd.read_csv("./data/nursery.csv", dtype=types)
     features = list(dataset.columns)
-    target_name = ["'class'_not_recom",
-       "'class'_priority", "'class'_recommend", "'class'_spec_prior",
-       "'class'_very_recom"]
-    #profiling(dataset)
+    target_name = ["'class'_not_recom", "'class'_priority", "'class'_recommend", "'class'_spec_prior", "'class'_very_recom"]
+    profiling(dataset)
     dataset = encoding_categorical_variables(dataset[features])
     features_ohe = list(dataset.columns)
     num_columns = 'categorical'
+    for t in target_name:
+        features_ohe.remove(t)
     return dataset, features_ohe, target_name, num_columns
 
 def profiling(df):
     data = df.copy()
     le = preprocessing.LabelEncoder()
     data = data.apply(le.fit_transform) 
-    print(f"Null Values:\n {df.isna().sum()}")
+    select_features(data, "./data/car.csv")
+    """print(f"Null Values:\n {df.isna().sum()}")
     print("\nUnique Values:")
     for col in df:
         print(f"{col} : {df[col].unique()}")
@@ -191,15 +194,20 @@ def profiling(df):
     sns.heatmap(cor, xticklabels=True, yticklabels=True, annot=True, cmap=plt.cm.Reds)
     plt.show()
     #compute_associationrules(df, data)
+    #select_features"""
 
 def select_features(df, data_path):
-    X = df
+    X = df.copy()
     if data_path == "./data/car.csv":
-        y = df["safety"]
+        X.drop('safety', axis=1)
+        y = X["safety"]
     print(X.shape)
-    X_new = SelectKBest(mutual_info_classif, k=5).fit_transform(X, y)
-    print(X_new.shape)
-    print(X_new)
+    selector = SelectKBest(mutual_info_classif, k='all')
+    selector.fit(X, y)
+    scores = selector.scores_
+    indexes = np.argsort(scores)[::-1][:3]
+    print(X.columns[indexes])
+    print(scores[indexes])
     
 
 def compute_associationrules(df, data):
@@ -303,7 +311,8 @@ def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_oh
         x_train = np.vstack(x_train).astype(np.float32)
         y_train = train_df[target_name].to_numpy()
         y_train = np.vstack(y_train).astype(np.float32)
-
+        print(x_train.shape)
+        print(y_train.shape)
         x_train_tensor = torch.tensor(x_train, dtype=torch.float32)
         if labels_per_client <= 2:
             y_train_tensor = torch.tensor(y_train, dtype=torch.float32).view(-1, 1)
@@ -318,13 +327,16 @@ def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_oh
     x_test = np.vstack(x_test).astype(np.float32)
     y_test = test[target_name].to_numpy()
     y_test = np.vstack(y_test).astype(np.float32)
-
+    
     x_test_tensor = torch.tensor(x_test, dtype=torch.float32)
     if labels_per_client <= 2:
         y_test_tensor = torch.tensor(y_test, dtype=torch.float32).view(-1, 1)
     else:
         y_test_tensor = torch.tensor(y_test, dtype=torch.float32)
         #y_test_tensor=y_test_tensor.to(torch.float)
+
+    """for i, (x_tensor, y_tensor) in enumerate(zip(x_train_list, y_train_list)):
+        print(f"Tensor {i}: x_tensor.shape = {x_tensor.shape}, y_tensor.shape = {y_tensor.shape}")"""
 
     train_datasets = [TensorDataset(x_tensor, y_tensor) for x_tensor, y_tensor in zip(x_train_list, y_train_list)]
     test_dataset = TensorDataset(x_test_tensor, y_test_tensor)

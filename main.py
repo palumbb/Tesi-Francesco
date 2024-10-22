@@ -29,7 +29,7 @@ from torch.optim import SGD, Optimizer
 
 def main(cfg: DictConfig) -> None:
     device = cfg.server_device
-    
+
     print(f"Strategy: {cfg.name}")
     print("Dataset: " + str(cfg.dataset_path))
     print("Partitioning: " + str(cfg.partitioning))
@@ -37,7 +37,6 @@ def main(cfg: DictConfig) -> None:
     print("Local epochs:" + str(cfg.num_epochs))
     print("Sampled clients: " + str(cfg.clients_per_round))
     print("Rounds: " + str(cfg.num_rounds))
-
 
     accuracies = []
     run_labels = ["FedAvg", "FedProx", "FedNova", "Scaffold"]
