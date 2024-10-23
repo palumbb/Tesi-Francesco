@@ -22,11 +22,13 @@ from servers.server_scaffold import ScaffoldServer, gen_evaluate_fn
 from strategy import FedNovaStrategy, ScaffoldStrategy
 from torch.utils.data import DataLoader
 from torch.optim import SGD, Optimizer
+import pandas as pd
 
 
 @hydra.main(config_path="conf", config_name="fedavg_base", version_base=None)
 
 def main(cfg: DictConfig) -> None:
+
     device = cfg.server_device
 
     print(f"Strategy: {cfg.name}")
@@ -157,7 +159,7 @@ def main(cfg: DictConfig) -> None:
             partitioning=cfg.partitioning
         )
         
-        num_epochs = 10
+        num_epochs = 1
         batch_size = cfg.batch_size
         learning_rate = cfg.learning_rate
         momentum = cfg.momentum
@@ -172,7 +174,7 @@ def main(cfg: DictConfig) -> None:
             model.parameters(), lr=learning_rate, momentum=momentum, weight_decay=weight_decay
         )
 
-        train_centralized_multi(model, train_loader, optimizer, device)
+        train_centralized_multi(model, train_loader, optimizer, num_epochs, device)
 
         test_loss, test_accuracy, f1_score = test_multi(model, test_loader, device)
 

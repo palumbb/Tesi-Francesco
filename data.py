@@ -15,26 +15,31 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning):
     data_path = data_cfg.path
     if data_path=="./data/consumer.csv":
         dataset, features_ohe, target_name, num_columns = load_consumer()
-        #labels_per_client = 2
         num_classes = 2
     elif data_path=="./data/mv.csv":
         dataset, features_ohe, target_name, num_columns = load_mv()
-        #labels_per_client = 2
         num_classes = 2
     elif data_path=="./data/car.csv":
         dataset, features_ohe, target_name, num_columns = load_car_2()
-        #labels_per_client = 4
         num_classes = 4
     elif data_path=="./data/nursery.csv":
         dataset, features_ohe, target_name, num_columns = load_nursery()
-        #labels_per_client = 4
         num_classes = 5
+    elif data_path=="./data/shuttle.csv":
+        dataset, features_ohe, target_name, num_columns = load_shuttle()
+        num_classes = 7
+    elif data_path=="./data/wall-robot-navigation.csv":
+        dataset, features_ohe, target_name, num_columns = load_wall()
+        num_classes = 4
 
     dataset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
-    #print(dataset)
+
+    #print(dataset.shape)
+    #print(dataset.shape)
     #profiling(dataset, data_path)
     #select_features(dataset, data_path)
-    print(dataset[target_name])
+    #print(dataset[target_name])
+
     train_dataset, test_dataset = train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, num_classes)
     if federated:
         if partitioning=="uniform":
@@ -127,6 +132,7 @@ def load_consumer():
     target = dataset[target_name]
     features.remove(target_name)
     num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
+    profiling(dataset, "./data/consumer.csv")
     dataset = encoding_categorical_variables(dataset[features])
     dataset[target_name] = target
     features_ohe = list(dataset.columns)
@@ -188,6 +194,7 @@ def load_car_2():
     features_ohe.remove(target_name)
     return dataset, features_ohe, target_name, num_columns
 
+# ADAPT AS LOAD CAR 2
 def load_nursery():
     # MIXED
     types = {"parents":str, "has_nurs":str, "form":str, "children":int,"housing":str,
@@ -195,7 +202,7 @@ def load_nursery():
     dataset = pd.read_csv("./data/nursery.csv", dtype=types)
     features = list(dataset.columns)
     target_name = ["'class'_not_recom", "'class'_priority", "'class'_recommend", "'class'_spec_prior", "'class'_very_recom"]
-    profiling(dataset)
+    profiling(dataset, "./data/nursery.csv")    
     dataset = encoding_categorical_variables(dataset[features])
     features_ohe = list(dataset.columns)
     num_columns = 'categorical'
@@ -203,11 +210,41 @@ def load_nursery():
         features_ohe.remove(t)
     return dataset, features_ohe, target_name, num_columns
 
-def profiling(df):
+def load_shuttle():
+    types = {'A1': int, 'A2': int, 'A3': int, 'A4': int, 'A5': int, 'A6': int, 'A7': int, 'A8': int, 'A9': int, 'class': int}
+    dataset = pd.read_csv("./data/shuttle.csv", dtype=types)
+    features = list(dataset.columns)
+    target_name = "class"
+    target = dataset[target_name]
+    features.remove(target_name)
+    num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
+    profiling(dataset, "./data/shuttle.csv")
+    dataset = encoding_categorical_variables(dataset[features])
+    dataset[target_name] = target
+    features_ohe = list(dataset.columns)
+    features_ohe.remove(target_name)
+    return dataset, features_ohe, target_name, num_columns
+
+def load_wall():
+    types = {'V1': float, 'V2': float, 'V3': float, 'V4': float, 'Class': int}
+    dataset = pd.read_csv("./data/wall-robot-navigation.csv", dtype=types)
+    features = list(dataset.columns)
+    target_name = "Class"
+    target = dataset[target_name]
+    features.remove(target_name)
+    num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
+    profiling(dataset, "./data/wall-robot-navigation.csv")
+    dataset = encoding_categorical_variables(dataset[features])
+    dataset[target_name] = target
+    features_ohe = list(dataset.columns)
+    features_ohe.remove(target_name)
+    return dataset, features_ohe, target_name, num_columns
+
+def profiling(df, data_path):
     data = df.copy()
     le = preprocessing.LabelEncoder()
     data = data.apply(le.fit_transform) 
-    select_features(data, "./data/car.csv")
+    select_features(data, data_path)
     """print(f"Null Values:\n {df.isna().sum()}")
     print("\nUnique Values:")
     for col in df:
@@ -225,14 +262,29 @@ def select_features(df, data_path):
     if data_path == "./data/car.csv":
         X.drop('safety', axis=1)
         y = X["safety"]
+    elif data_path == "./data/shuttle.csv":
+        X.drop('class', axis=1)
+        y = X["class"]
+    elif data_path == "./data/consumer.csv":
+        X.drop('PurchaseIntent', axis=1)
+        y = X["PurchaseIntent"]
+    elif data_path == "./data/nursery.csv":
+        X.drop("'class'", axis=1)
+        y = X["'class'"]
+    elif data_path == "./data/mv.csv":
+        X.drop('binaryclass', axis=1)
+        y = X["binaryclass"]
+    elif data_path == "./data/wall-robot-navigation.csv":
+        X.drop('Class', axis=1)
+        y = X["Class"]
     print(X.shape)
     selector = SelectKBest(mutual_info_classif, k='all')
     selector.fit(X, y)
     scores = selector.scores_
     indexes = np.argsort(scores)[::-1][:3]
 
-    print(X.columns[indexes])
-    print(scores[indexes])
+    #print(X.columns[indexes])
+    #print(scores[indexes])
     
 
 def compute_associationrules(df, data):
@@ -292,6 +344,7 @@ def train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, 
     else:
         y_train_tensor = torch.tensor(y_train, dtype=torch.float32)
         y_test_tensor = torch.tensor(y_test, dtype=torch.float32)
+
     train_dataset = TensorDataset(x_train_tensor, y_train_tensor)
     test_dataset = TensorDataset(x_test_tensor, y_test_tensor)
 
