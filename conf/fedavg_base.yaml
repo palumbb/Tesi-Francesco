@@ -5,13 +5,13 @@
 
 federated: True
 name: FedAvg
-num_clients: 2 # change the proportions of each client in the partition_dataset section
-num_epochs: 10
+num_clients: 3 # change the proportions of each client in the partition_dataset section
+num_epochs: 1
 batch_size: 32
-clients_per_round: 100
+clients_per_round: 3
 learning_rate: 0.01
-num_rounds: 30
-partitioning: "doors"
+num_rounds: 3
+partitioning: "health"
 dataset_path: "./data/car.csv" #also change the input dim
 dataset_seed: 42
 alpha: 0.5
@@ -20,7 +20,7 @@ momentum: 0.9
 weight_decay: 0.00001
 
 client_fn:
-  _target_: client_fedavg.gen_client_fn
+  _target_: clients.multiclass.client_fedavg.gen_client_fn
   _recursive_: False
   num_epochs: ${num_epochs}
   learning_rate: ${learning_rate}
@@ -38,9 +38,8 @@ dataset:
 
 model:
   # model config
-  _target_: model.Net #change model in the centralized setting
-  num_classes: 4
-  _partial_: true
+  _target_: model.multiclassnet.MulticlassNet #change model in the centralized setting
+  num_classes: 5
   data: ${dataset_path}
   partitioning: ${partitioning}
 
