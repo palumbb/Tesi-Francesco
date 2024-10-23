@@ -8,25 +8,34 @@ import torch.optim as optim
 from torch.utils.data import DataLoader
 from torch.optim import SGD, Optimizer
 from torch.nn.parameter import Parameter
-from sklearn.metrics import f1_score
+from sklearn.metrics import accuracy_score, f1_score
 
 class MulticlassNet(nn.Module):
     def __init__(self, data, partitioning, num_classes=5):  # Impostiamo num_classes=4
         super(MulticlassNet, self).__init__()
         if data == "./data/car.csv":
-            input_dim = 25
+            input_dim = 21
         elif data == "./data/nursery.csv":
             input_dim = 27
+        if data=="./data/consumer.csv":
+            input_dim = 16
+        elif data == "./data/mv.csv":
+            input_dim = 14
+        if data=="./data/shuttle.csv":
+            input_dim = 9
+        elif data == "./data/wall-robot-navigation.csv":
+            input_dim = 4
         self.fc1 = nn.Linear(input_dim, 64)
-        self.fc2 = nn.Linear(64, 32)
-        self.fc3 = nn.Linear(32, num_classes)  # Cambiamo l'output per supportare 4 classi
         self.relu = nn.ReLU()
+        self.fc2 = nn.Linear(64, num_classes)
+        self.softmax = nn.Softmax(dim=1)
 
     def forward(self, x):
-        x = self.relu(self.fc1(x))
-        x = self.relu(self.fc2(x))
-        x = self.fc3(x)
-        return x  # Rimuoviamo softmax, lasciamo che CrossEntropyLoss lo gestisca
+        out = self.fc1(x)
+        out = self.relu(out)
+        out = self.fc2(out)
+        out = self.softmax(out) 
+        return out
 
 def train_centralized_multi(model, train_loader, optimizer, num_epochs, device):
     criterion = nn.CrossEntropyLoss()  # CrossEntropy per multi-class
@@ -36,7 +45,9 @@ def train_centralized_multi(model, train_loader, optimizer, num_epochs, device):
         for X_batch, y_batch in train_loader:
             optimizer.zero_grad()
             outputs = model(X_batch)
-            loss = criterion(outputs, y_batch.long())  # y_batch è l'indice della classe
+            y_batch = y_batch.long()
+            y_batch = torch.argmax(y_batch, dim=1)
+            loss = criterion(outputs, y_batch)  # y_batch è l'indice della classe
             loss.backward()
             optimizer.step()
 
@@ -69,12 +80,17 @@ def _train_one_epoch(
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
         output = net(data)
+        target = target.long()
+        #print(target)
+        target = torch.argmax(target, dim=1)
+        # IL PROBLEMA E' CHE TORCH.ARGMAX TRASFORMA IL TARGET IN UN TENSORE DI TUTTI 0
+        #print(target)
         loss = criterion(output, target)
         loss.backward()
         optimizer.step()
     return net
 
-def test_multi(
+"""def test_multi(
     net: nn.Module, testloader: DataLoader, device: torch.device
 ) -> Tuple[float, float, float]:
     criterion = nn.CrossEntropyLoss()  # CrossEntropy per multi-class
@@ -87,33 +103,72 @@ def test_multi(
         for data, target in testloader:
             data, target = data.to(device), target.to(device)
 
-            # Assicurati che i target siano LongTensor (interi)
             target = target.float()
 
-            # Output del modello (logits)
             output = net(data)
-
-            # Calcola la perdita usando CrossEntropyLoss
-            loss += criterion(output, target).item()  # CrossEntropy lavora con target long
-            
-            # Predizioni: prendiamo la classe con la probabilità più alta
+            print(output)
+            # classe con probabilità più alta
             _, predicted = torch.max(output, 1)
-            _, target = torch.max(target, 1)
-            
+            target = torch.argmax(target, dim=1)
+
+            #print(predicted)
+            #print(target)
+
+            loss += criterion(output, target).item()  # CrossEntropy lavora con target long
+          
             all_predictions.extend(predicted.cpu().numpy())
             all_targets.extend(target.cpu().numpy())
             
             total += target.size(0)
-            print(predicted.shape)
-            print(target.shape)
             correct += (predicted == target).sum().item()
     
-    # Calcolo della loss e dell'accuracy
     loss = loss / total
     acc = correct / total
-    
-    # Calcolo della F1-score per multi-class
+
     f1 = f1_score(all_targets, all_predictions, average='macro')  # Macro per classi bilanciate
 
-    return loss, acc, f1
+    return loss, acc, f1"""
 
+def test_multi(
+    net: nn.Module, testloader: DataLoader, device: torch.device
+) -> Tuple[float, float, float]:
+    """Evaluate the network on the test set."""
+    criterion = nn.NLLLoss()
+    net.eval()
+    total_loss = 0.0
+    all_targets = []
+    all_predictions = []
+    
+    with torch.no_grad():
+        for data, target in testloader:
+            data, target = data.to(device), target.to(device)
+            output = net(data)
+
+            target = target.long()
+            #print("Output dtype:", output.dtype)  # Deve essere float32
+            #print("Target dtype:", target.dtype)
+
+            _, predicted = torch.max(output, dim=1) 
+            target = torch.argmax(target, dim=1)
+
+            #IL PROBLEMA E' QUI: DOPO ARGMAX IL TARGET DIVENTA UN TENSORE DI TUTTI 0
+            #print(predicted)
+            #print(target)
+            
+
+            loss = criterion(output, target)
+            total_loss += loss.item()
+            
+            all_predictions.extend(predicted.cpu().numpy())
+            all_targets.extend(target.cpu().numpy())
+    
+    # Calcolo della loss media
+    avg_loss = total_loss / len(testloader)
+    
+    # Calcolo dell'accuracy
+    acc = accuracy_score(all_targets, all_predictions)
+    
+    # Calcolo della F1-score (macro per bilanciare tra tutte le classi)
+    f1 = f1_score(all_targets, all_predictions, average='macro')
+
+    return avg_loss, acc, f1

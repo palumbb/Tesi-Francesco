@@ -15,19 +15,20 @@ from hydra.core.hydra_config import HydraConfig
 from hydra.utils import call, instantiate
 from omegaconf import DictConfig, OmegaConf
 from model.binarynet import BinaryNet, train_centralized_binary, test_binary
+from model.multiclassnet import MulticlassNet, train_centralized_multi, test_multi
 from data import load_dataset
 from servers.server_fednova import FedNovaServer
 from servers.server_scaffold import ScaffoldServer, gen_evaluate_fn
 from strategy import FedNovaStrategy, ScaffoldStrategy
 from torch.utils.data import DataLoader
 from torch.optim import SGD, Optimizer
-
-# NEXT STEP: CAMBIARE CLIENTS (TRAIN_FEDAVG_BINARY ECC...)
+import pandas as pd
 
 
 @hydra.main(config_path="conf", config_name="fedavg_base", version_base=None)
 
 def main(cfg: DictConfig) -> None:
+
     device = cfg.server_device
 
     print(f"Strategy: {cfg.name}")
@@ -158,7 +159,7 @@ def main(cfg: DictConfig) -> None:
             partitioning=cfg.partitioning
         )
         
-        num_epochs = 50
+        num_epochs = 1
         batch_size = cfg.batch_size
         learning_rate = cfg.learning_rate
         momentum = cfg.momentum
@@ -167,15 +168,15 @@ def main(cfg: DictConfig) -> None:
         train_loader = DataLoader(trainset, batch_size=batch_size, shuffle=True)
         test_loader = DataLoader(testset, batch_size=batch_size, shuffle=False)
 
-        model = BinaryNet(cfg.dataset_path, partitioning=cfg.partitioning, num_classes=2)
+        model = MulticlassNet(cfg.dataset_path, partitioning=cfg.partitioning, num_classes=2)
        
         optimizer = SGD(
             model.parameters(), lr=learning_rate, momentum=momentum, weight_decay=weight_decay
         )
 
-        train_centralized_binary(model, train_loader, optimizer, num_epochs, device)
+        train_centralized_multi(model, train_loader, optimizer, num_epochs, device)
 
-        test_loss, test_accuracy, f1_score = test_binary(model, test_loader, device)
+        test_loss, test_accuracy, f1_score = test_multi(model, test_loader, device)
 
         print(f"Test Loss: {test_loss}")
         print(f"Test Accuracy: {test_accuracy}")

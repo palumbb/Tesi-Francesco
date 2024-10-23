@@ -1,0 +1,21 @@
+[2024-10-23 18:09:58,083][flwr][WARNING] - Both server and strategy were provided, ignoring strategy
+[2024-10-23 18:09:58,083][flwr][INFO] - Starting Flower simulation, config: num_rounds=3, no round_timeout
+[2024-10-23 18:10:09,140][flwr][INFO] - Flower VCE: Ray initialized with resources: {'CPU': 8.0, 'object_store_memory': 782469120.0, 'node:127.0.0.1': 1.0, 'node:__internal_head__': 1.0, 'memory': 1564938240.0}
+[2024-10-23 18:10:09,140][flwr][INFO] - Optimize your simulation with Flower VCE: https://flower.ai/docs/framework/how-to-run-simulations.html
+[2024-10-23 18:10:09,140][flwr][INFO] - Flower VCE: Resources for each Virtual Client: {'num_cpus': 4, 'num_gpus': 0.0}
+[2024-10-23 18:10:09,176][flwr][INFO] - Flower VCE: Creating VirtualClientEngineActorPool with 2 actors
+[2024-10-23 18:10:09,177][flwr][INFO] - [INIT]
+[2024-10-23 18:10:09,178][flwr][INFO] - Requesting initial parameters from one random client
+[2024-10-23 18:10:14,454][flwr][INFO] - Received initial parameters from one random client
+[2024-10-23 18:10:14,455][flwr][INFO] - Starting evaluation of initial global parameters
+[2024-10-23 18:10:14,502][flwr][INFO] - initial parameters (loss, other metrics): -0.17306973593575614, {'accuracy': 0.3250915750915751, 'f1-score': 0.08177839207555863}
+[2024-10-23 18:10:14,502][flwr][INFO] - 
+[2024-10-23 18:10:14,502][flwr][INFO] - [ROUND 1]
+[2024-10-23 18:10:14,502][flwr][INFO] - configure_fit: strategy sampled 3 clients (out of 3)
+[2024-10-23 18:10:34,749][flwr][INFO] - aggregate_fit: received 3 results and 0 failures
+[2024-10-23 18:10:34,766][flwr][WARNING] - No fit_metrics_aggregation_fn provided
+[2024-10-23 18:10:34,818][flwr][INFO] - fit progress: (1, -0.9655391437666757, {'accuracy': 1.0, 'f1-score': 1.0}, 20.318540599997505)
+[2024-10-23 18:10:34,818][flwr][INFO] - configure_evaluate: no clients selected, skipping evaluation
+[2024-10-23 18:10:34,818][flwr][INFO] - 
+[2024-10-23 18:10:34,818][flwr][INFO] - [ROUND 2]
+[2024-10-23 18:10:34,818][flwr][INFO] - configure_fit: strategy sampled 3 clients (out of 3)

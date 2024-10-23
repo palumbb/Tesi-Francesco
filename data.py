@@ -15,22 +15,32 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning):
     data_path = data_cfg.path
     if data_path=="./data/consumer.csv":
         dataset, features_ohe, target_name, num_columns = load_consumer()
-        labels_per_client = 2
+        num_classes = 2
     elif data_path=="./data/mv.csv":
         dataset, features_ohe, target_name, num_columns = load_mv()
-        labels_per_client = 2
+        num_classes = 2
     elif data_path=="./data/car.csv":
-        dataset, features_ohe, target_name, num_columns = load_car()
-        labels_per_client = 4
+        dataset, features_ohe, target_name, num_columns = load_car_2()
+        num_classes = 4
     elif data_path=="./data/nursery.csv":
         dataset, features_ohe, target_name, num_columns = load_nursery()
-        labels_per_client = 4
+        num_classes = 5
+    elif data_path=="./data/shuttle.csv":
+        dataset, features_ohe, target_name, num_columns = load_shuttle()
+        num_classes = 7
+    elif data_path=="./data/wall-robot-navigation.csv":
+        dataset, features_ohe, target_name, num_columns = load_wall()
+        num_classes = 4
 
     dataset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
+
+    #print(dataset.shape)
+    #print(dataset.shape)
     #profiling(dataset, data_path)
     #select_features(dataset, data_path)
+    #print(dataset[target_name])
 
-    train_dataset, test_dataset = train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, labels_per_client)
+    train_dataset, test_dataset = train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, num_classes)
     if federated:
         if partitioning=="uniform":
             if num_clients == 2:
@@ -51,7 +61,7 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning):
             trainsets = random_split(train_dataset, lengths)
         
         else:
-            trainsets, test_dataset = split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_ohe, target_name, labels_per_client)
+            trainsets, test_dataset = split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_ohe, target_name, num_classes)
 
         trainloaders, valloaders, testloader = data_loaders(num_partitions=num_clients,
                                                                 batch_size=data_cfg.batch_size,
@@ -122,6 +132,7 @@ def load_consumer():
     target = dataset[target_name]
     features.remove(target_name)
     num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
+    profiling(dataset, "./data/consumer.csv")
     dataset = encoding_categorical_variables(dataset[features])
     dataset[target_name] = target
     features_ohe = list(dataset.columns)
@@ -160,10 +171,30 @@ def load_car():
     num_columns = 'categorical'
     for t in target_name:
         features_ohe.remove(t)
-    
 
     return dataset, features_ohe, target_name, num_columns
 
+def load_car_2():
+    types = {"index":str, "buying":str, "maint":str, "doors":str,"persons":str,
+            "lug_boot":str,"safety":str}
+    dataset = pd.read_csv("./data/car.csv", dtype=types)
+    features = list(dataset.columns)
+    target_name = "safety"
+    dataset.replace('unacc', 0, inplace=True)
+    dataset.replace('acc', 1, inplace=True)
+    dataset.replace('vgood', 2, inplace=True)
+    dataset.replace('good', 3, inplace=True)
+    target = dataset[target_name]
+    features.remove(target_name)
+    num_columns = 'categorical'
+    #profiling(dataset)
+    dataset = encoding_categorical_variables(dataset[features])
+    dataset[target_name] = target
+    features_ohe = list(dataset.columns)
+    features_ohe.remove(target_name)
+    return dataset, features_ohe, target_name, num_columns
+
+# ADAPT AS LOAD CAR 2
 def load_nursery():
     # MIXED
     types = {"parents":str, "has_nurs":str, "form":str, "children":int,"housing":str,
@@ -171,7 +202,7 @@ def load_nursery():
     dataset = pd.read_csv("./data/nursery.csv", dtype=types)
     features = list(dataset.columns)
     target_name = ["'class'_not_recom", "'class'_priority", "'class'_recommend", "'class'_spec_prior", "'class'_very_recom"]
-    profiling(dataset)
+    profiling(dataset, "./data/nursery.csv")    
     dataset = encoding_categorical_variables(dataset[features])
     features_ohe = list(dataset.columns)
     num_columns = 'categorical'
@@ -179,11 +210,41 @@ def load_nursery():
         features_ohe.remove(t)
     return dataset, features_ohe, target_name, num_columns
 
-def profiling(df):
+def load_shuttle():
+    types = {'A1': int, 'A2': int, 'A3': int, 'A4': int, 'A5': int, 'A6': int, 'A7': int, 'A8': int, 'A9': int, 'class': int}
+    dataset = pd.read_csv("./data/shuttle.csv", dtype=types)
+    features = list(dataset.columns)
+    target_name = "class"
+    target = dataset[target_name]
+    features.remove(target_name)
+    num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
+    profiling(dataset, "./data/shuttle.csv")
+    dataset = encoding_categorical_variables(dataset[features])
+    dataset[target_name] = target
+    features_ohe = list(dataset.columns)
+    features_ohe.remove(target_name)
+    return dataset, features_ohe, target_name, num_columns
+
+def load_wall():
+    types = {'V1': float, 'V2': float, 'V3': float, 'V4': float, 'Class': int}
+    dataset = pd.read_csv("./data/wall-robot-navigation.csv", dtype=types)
+    features = list(dataset.columns)
+    target_name = "Class"
+    target = dataset[target_name]
+    features.remove(target_name)
+    num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
+    profiling(dataset, "./data/wall-robot-navigation.csv")
+    dataset = encoding_categorical_variables(dataset[features])
+    dataset[target_name] = target
+    features_ohe = list(dataset.columns)
+    features_ohe.remove(target_name)
+    return dataset, features_ohe, target_name, num_columns
+
+def profiling(df, data_path):
     data = df.copy()
     le = preprocessing.LabelEncoder()
     data = data.apply(le.fit_transform) 
-    select_features(data, "./data/car.csv")
+    select_features(data, data_path)
     """print(f"Null Values:\n {df.isna().sum()}")
     print("\nUnique Values:")
     for col in df:
@@ -201,13 +262,29 @@ def select_features(df, data_path):
     if data_path == "./data/car.csv":
         X.drop('safety', axis=1)
         y = X["safety"]
+    elif data_path == "./data/shuttle.csv":
+        X.drop('class', axis=1)
+        y = X["class"]
+    elif data_path == "./data/consumer.csv":
+        X.drop('PurchaseIntent', axis=1)
+        y = X["PurchaseIntent"]
+    elif data_path == "./data/nursery.csv":
+        X.drop("'class'", axis=1)
+        y = X["'class'"]
+    elif data_path == "./data/mv.csv":
+        X.drop('binaryclass', axis=1)
+        y = X["binaryclass"]
+    elif data_path == "./data/wall-robot-navigation.csv":
+        X.drop('Class', axis=1)
+        y = X["Class"]
     print(X.shape)
     selector = SelectKBest(mutual_info_classif, k='all')
     selector.fit(X, y)
     scores = selector.scores_
     indexes = np.argsort(scores)[::-1][:3]
-    print(X.columns[indexes])
-    print(scores[indexes])
+
+    #print(X.columns[indexes])
+    #print(scores[indexes])
     
 
 def compute_associationrules(df, data):
@@ -236,8 +313,12 @@ def compute_associationrules(df, data):
         return 0
     print(rules)
 
-def train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, labels_per_client):
+def train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, num_classes):
     # ONLY USED FOR RANDOM SPLIT
+    """if num_columns == 'categorical':
+        le = preprocessing.LabelEncoder()
+        dataset[target_name] = le.fit_transform(dataset[target_name])"""
+    #print(dataset)
     train_samples = int(len(dataset)*data_cfg.train_split)
     train = dataset.iloc[0:train_samples,]
     test = dataset.iloc[train_samples:,]
@@ -245,6 +326,7 @@ def train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, 
         scaler = StandardScaler()
         train[num_columns] = scaler.fit_transform(train[num_columns])
         test[num_columns] = scaler.transform(test[num_columns])
+    
     x_train = train[features_ohe].to_numpy()
     x_train = np.vstack(x_train).astype(np.float32)
     y_train = train[target_name].to_numpy()
@@ -256,18 +338,19 @@ def train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, 
 
     x_train_tensor = torch.tensor(x_train, dtype=torch.float32)
     x_test_tensor = torch.tensor(x_test, dtype=torch.float32)
-    if labels_per_client <= 2:
+    if num_classes <= 2:
         y_train_tensor = torch.tensor(y_train, dtype=torch.float32).view(-1, 1)
         y_test_tensor = torch.tensor(y_test, dtype=torch.float32).view(-1, 1)
     else:
         y_train_tensor = torch.tensor(y_train, dtype=torch.float32)
         y_test_tensor = torch.tensor(y_test, dtype=torch.float32)
+
     train_dataset = TensorDataset(x_train_tensor, y_train_tensor)
     test_dataset = TensorDataset(x_test_tensor, y_test_tensor)
 
     return train_dataset, test_dataset
 
-def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_ohe, target_name, labels_per_client):
+def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_ohe, target_name, num_classes):
     # ONLY USED FOR ATTRIBUTE SPLIT
     train_samples = int(len(dataset)*data_cfg.train_split)
     train = dataset.iloc[0:train_samples,]
@@ -311,10 +394,10 @@ def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_oh
         x_train = np.vstack(x_train).astype(np.float32)
         y_train = train_df[target_name].to_numpy()
         y_train = np.vstack(y_train).astype(np.float32)
-        print(x_train.shape)
-        print(y_train.shape)
+        #print(x_train.shape)
+        #print(y_train.shape)
         x_train_tensor = torch.tensor(x_train, dtype=torch.float32)
-        if labels_per_client <= 2:
+        if num_classes <= 2:
             y_train_tensor = torch.tensor(y_train, dtype=torch.float32).view(-1, 1)
         else:
             y_train_tensor = torch.tensor(y_train, dtype=torch.float32)
@@ -329,7 +412,7 @@ def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_oh
     y_test = np.vstack(y_test).astype(np.float32)
     
     x_test_tensor = torch.tensor(x_test, dtype=torch.float32)
-    if labels_per_client <= 2:
+    if num_classes <= 2:
         y_test_tensor = torch.tensor(y_test, dtype=torch.float32).view(-1, 1)
     else:
         y_test_tensor = torch.tensor(y_test, dtype=torch.float32)
