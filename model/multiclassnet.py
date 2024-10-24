@@ -64,9 +64,7 @@ def train_fedavg(
     momentum: float,
     weight_decay: float,
 ) -> None:
-    weights = (1/np.array([ 384,   69, 1210,   65]))*(np.sum([ 384,   69, 1210,   65])/4)
-    weights = torch.Tensor(weights)
-    criterion = nn.CrossEntropyLoss(weight=weights)  # CrossEntropy per multi-class
+    criterion = nn.CrossEntropyLoss()  # CrossEntropy per multi-class
     optimizer = SGD(
         net.parameters(), lr=learning_rate, momentum=momentum, weight_decay=weight_decay
     )
