@@ -1,7 +1,7 @@
 import pandas as pd
-#import matplotlib.pyplot as plt
-#import seaborn as sns
-#from mlxtend.frequent_patterns import apriori, association_rules
+import matplotlib.pyplot as plt
+import seaborn as sns
+from mlxtend.frequent_patterns import apriori, association_rules
 import torch
 from torch.utils.data import DataLoader, random_split
 from torch.utils.data import TensorDataset, Dataset
@@ -282,7 +282,7 @@ def select_features(df, data_path):
     #print(X.columns[indexes])
     #print(scores[indexes])
     
-"""
+
 def compute_associationrules(df, data):
     if data == "./data/mv.csv":
         association_cols = ['x3_brown',  'x3_green',  'x3_red',  'x7_no',  'x7_yes',  'x8_large',  'x8_normal', 'binaryClass']
@@ -308,7 +308,6 @@ def compute_associationrules(df, data):
     elif data == "./data/nursery.csv":
         return 0
     print(rules)
-"""
 
 def train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, num_classes):
     # ONLY USED FOR RANDOM SPLIT
