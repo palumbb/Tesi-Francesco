@@ -6,7 +6,7 @@ model is going to be evaluated, etc. At the end, this script saves the results.
 
 import os
 import pickle
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import flwr as fl
 import hydra
 from flwr.server.client_manager import SimpleClientManager

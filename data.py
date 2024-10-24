@@ -1,7 +1,7 @@
 import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from mlxtend.frequent_patterns import apriori, association_rules
+#import matplotlib.pyplot as plt
+#import seaborn as sns
+#from mlxtend.frequent_patterns import apriori, association_rules
 import torch
 from torch.utils.data import DataLoader, random_split
 from torch.utils.data import TensorDataset, Dataset
@@ -20,7 +20,7 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning):
         dataset, features_ohe, target_name, num_columns = load_mv()
         num_classes = 2
     elif data_path=="./data/car.csv":
-        dataset, features_ohe, target_name, num_columns = load_car_2()
+        dataset, features_ohe, target_name, num_columns = load_car()
         num_classes = 4
     elif data_path=="./data/nursery.csv":
         dataset, features_ohe, target_name, num_columns = load_nursery()
@@ -164,7 +164,7 @@ def load_car():
     dataset = pd.read_csv("./data/car.csv", dtype=types)
     features = list(dataset.columns)
     target_name = ['safety_acc',  'safety_good',  'safety_unacc',  'safety_vgood']
-    profiling(dataset)
+    profiling(dataset, "./data/car.csv")
     dataset = encoding_categorical_variables(dataset[features])
     #dataset[target_name] = target
     features_ohe = list(dataset.columns)
@@ -211,33 +211,29 @@ def load_nursery():
     return dataset, features_ohe, target_name, num_columns
 
 def load_shuttle():
-    types = {'A1': int, 'A2': int, 'A3': int, 'A4': int, 'A5': int, 'A6': int, 'A7': int, 'A8': int, 'A9': int, 'class': int}
+    types = {'A1': int, 'A2': int, 'A3': int, 'A4': int, 'A5': int, 'A6': int, 'A7': int, 'A8': int, 'A9': int, 'class': str}
     dataset = pd.read_csv("./data/shuttle.csv", dtype=types)
     features = list(dataset.columns)
-    target_name = "class"
-    target = dataset[target_name]
-    features.remove(target_name)
+    target_name = ["class_1", "class_2", "class_3", "class_4", "class_5", "class_6", "class_7"]
     num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
     profiling(dataset, "./data/shuttle.csv")
     dataset = encoding_categorical_variables(dataset[features])
-    dataset[target_name] = target
     features_ohe = list(dataset.columns)
-    features_ohe.remove(target_name)
+    for t in target_name:
+        features_ohe.remove(t)
     return dataset, features_ohe, target_name, num_columns
 
 def load_wall():
-    types = {'V1': float, 'V2': float, 'V3': float, 'V4': float, 'Class': int}
+    types = {'V1': float, 'V2': float, 'V3': float, 'V4': float, 'Class': str}
     dataset = pd.read_csv("./data/wall-robot-navigation.csv", dtype=types)
     features = list(dataset.columns)
-    target_name = "Class"
-    target = dataset[target_name]
-    features.remove(target_name)
+    target_name = ["Class_1","Class_2","Class_3","Class_4"]
     num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
     profiling(dataset, "./data/wall-robot-navigation.csv")
     dataset = encoding_categorical_variables(dataset[features])
-    dataset[target_name] = target
     features_ohe = list(dataset.columns)
-    features_ohe.remove(target_name)
+    for t in target_name:
+        features_ohe.remove(t)
     return dataset, features_ohe, target_name, num_columns
 
 def profiling(df, data_path):
@@ -286,7 +282,7 @@ def select_features(df, data_path):
     #print(X.columns[indexes])
     #print(scores[indexes])
     
-
+"""
 def compute_associationrules(df, data):
     if data == "./data/mv.csv":
         association_cols = ['x3_brown',  'x3_green',  'x3_red',  'x7_no',  'x7_yes',  'x8_large',  'x8_normal', 'binaryClass']
@@ -312,6 +308,7 @@ def compute_associationrules(df, data):
     elif data == "./data/nursery.csv":
         return 0
     print(rules)
+"""
 
 def train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, num_classes):
     # ONLY USED FOR RANDOM SPLIT

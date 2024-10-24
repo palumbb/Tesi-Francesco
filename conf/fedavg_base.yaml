@@ -10,9 +10,9 @@ num_epochs: 1
 batch_size: 32
 clients_per_round: 3
 learning_rate: 0.01
-num_rounds: 3
+num_rounds: 10
 partitioning: "uniform"
-dataset_path: "./data/wall-robot-navigation.csv" #also change the input dim
+dataset_path: "./data/car.csv" #also change the input dim
 dataset_seed: 42
 alpha: 0.5
 labels_per_client: 4 # only used when partitioning is label quantity
@@ -39,7 +39,7 @@ dataset:
 model:
   # model config
   _target_: model.multiclassnet.MulticlassNet #change model in the centralized setting
-  num_classes: 7
+  num_classes: 4
   data: ${dataset_path}
   partitioning: ${partitioning}
 
