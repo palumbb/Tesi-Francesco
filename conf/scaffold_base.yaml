@@ -12,7 +12,7 @@ clients_per_round: 100
 learning_rate: 0.01
 num_rounds: 30
 partitioning: "uniform"
-dataset_path: "./data/consumer.csv"
+dataset_path: "./data/mushrooms.csv"
 dataset_seed: 42
 alpha: 0.5
 labels_per_client: 2 # only used when partitioning is label quantity
@@ -20,7 +20,7 @@ momentum: 0.9
 weight_decay: 0.00001
 
 client_fn:
-  _target_: client_scaffold.gen_client_fn
+  _target_: clients.multiclass.client_scaffold.gen_client_fn
   _recursive_: False
   num_epochs: ${num_epochs}
   learning_rate: ${learning_rate}
@@ -40,9 +40,7 @@ dataset:
 
 model:
    # model config
-  _target_: model.BinaryNet #change model in the centralized setting
-  #input_dim: 14 #16 if consumer, 14 if mv
-  num_classes: 2
+  _target_: model.multiclassnet.MulticlassNet #change model in the centralized setting
   data: ${dataset_path}
   partitioning: ${partitioning}
 

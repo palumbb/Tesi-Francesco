@@ -1,0 +1,33 @@
+[2024-10-27 16:44:59,141][flwr][WARNING] - Both server and strategy were provided, ignoring strategy
+[2024-10-27 16:44:59,143][flwr][INFO] - Starting Flower simulation, config: num_rounds=10, no round_timeout
+[2024-10-27 16:45:12,278][flwr][INFO] - Flower VCE: Ray initialized with resources: {'CPU': 8.0, 'object_store_memory': 448876953.0, 'node:127.0.0.1': 1.0, 'node:__internal_head__': 1.0, 'memory': 897753908.0}
+[2024-10-27 16:45:12,278][flwr][INFO] - Optimize your simulation with Flower VCE: https://flower.ai/docs/framework/how-to-run-simulations.html
+[2024-10-27 16:45:12,278][flwr][INFO] - Flower VCE: Resources for each Virtual Client: {'num_cpus': 4, 'num_gpus': 0.0}
+[2024-10-27 16:45:12,317][flwr][INFO] - Flower VCE: Creating VirtualClientEngineActorPool with 2 actors
+[2024-10-27 16:45:12,329][flwr][INFO] - [INIT]
+[2024-10-27 16:45:12,330][flwr][INFO] - Requesting initial parameters from one random client
+[2024-10-27 16:45:18,930][flwr][INFO] - Received initial parameters from one random client
+[2024-10-27 16:45:18,930][flwr][INFO] - Starting evaluation of initial global parameters
+[2024-10-27 16:45:19,002][flwr][INFO] - initial parameters (loss, other metrics): 1.391140341758728, {'accuracy': 0.163003663003663, 'f1-score': 0.05549307287238764}
+[2024-10-27 16:45:19,003][flwr][INFO] - 
+[2024-10-27 16:45:19,004][flwr][INFO] - [ROUND 1]
+[2024-10-27 16:45:19,005][flwr][INFO] - configure_fit: strategy sampled 3 clients (out of 3)
+[2024-10-27 16:45:45,257][flwr][INFO] - aggregate_fit: received 3 results and 0 failures
+[2024-10-27 16:45:45,273][flwr][WARNING] - No fit_metrics_aggregation_fn provided
+[2024-10-27 16:45:45,371][flwr][INFO] - fit progress: (1, 1.309513851574489, {'accuracy': 0.5778388278388278, 'f1-score': 0.49156755539502844}, 26.36827119998634)
+[2024-10-27 16:45:45,373][flwr][INFO] - configure_evaluate: no clients selected, skipping evaluation
+[2024-10-27 16:45:45,373][flwr][INFO] - 
+[2024-10-27 16:45:45,374][flwr][INFO] - [ROUND 2]
+[2024-10-27 16:45:45,375][flwr][INFO] - configure_fit: strategy sampled 3 clients (out of 3)
+[2024-10-27 16:46:09,057][flwr][INFO] - aggregate_fit: received 3 results and 0 failures
+[2024-10-27 16:46:09,172][flwr][INFO] - fit progress: (2, 1.2065101998192924, {'accuracy': 0.5256410256410257, 'f1-score': 0.43369601308971734}, 50.16869389999192)
+[2024-10-27 16:46:09,174][flwr][INFO] - configure_evaluate: no clients selected, skipping evaluation
+[2024-10-27 16:46:09,175][flwr][INFO] - 
+[2024-10-27 16:46:09,177][flwr][INFO] - [ROUND 3]
+[2024-10-27 16:46:09,177][flwr][INFO] - configure_fit: strategy sampled 3 clients (out of 3)
+[2024-10-27 16:46:34,573][flwr][INFO] - aggregate_fit: received 3 results and 0 failures
+[2024-10-27 16:46:34,734][flwr][INFO] - fit progress: (3, 1.1495687655040197, {'accuracy': 0.6135531135531136, 'f1-score': 0.5281672189061062}, 75.73978679999709)
+[2024-10-27 16:46:34,734][flwr][INFO] - configure_evaluate: no clients selected, skipping evaluation
+[2024-10-27 16:46:34,734][flwr][INFO] - 
+[2024-10-27 16:46:34,734][flwr][INFO] - [ROUND 4]
+[2024-10-27 16:46:34,749][flwr][INFO] - configure_fit: strategy sampled 3 clients (out of 3)

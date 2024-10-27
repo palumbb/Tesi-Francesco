@@ -234,7 +234,6 @@ def gen_evaluate_fn(
     device: torch.device,
     model: DictConfig,
     accuracies: List[float],  # Aggiungi accuracies per tracciare
-    num_classes: int
 ) -> Callable[
     [int, NDArrays, Dict[str, Scalar]], Optional[Tuple[float, Dict[str, Scalar]]]
 ]:
@@ -251,10 +250,10 @@ def gen_evaluate_fn(
         net.to(device)
 
         # Evaluate the model
-        if num_classes <= 2:
+        """if num_classes <= 2:
             loss, accuracy, f1_score = test_binary(net, testloader, device=device)
-        else:
-            loss, accuracy, f1_score = test_multi(net, testloader, device=device)
+        else:"""
+        loss, accuracy, f1_score = test_multi(net, testloader, device=device)
 
         accuracies.append(accuracy)
 

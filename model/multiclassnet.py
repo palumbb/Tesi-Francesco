@@ -12,20 +12,29 @@ from sklearn.metrics import accuracy_score, f1_score
 import numpy as np
 
 class MulticlassNet(nn.Module):
-    def __init__(self, data, partitioning, num_classes=5):  # Impostiamo num_classes=4
+    def __init__(self, data, partitioning):  # Impostiamo num_classes=4
         super(MulticlassNet, self).__init__()
         if data == "./data/car.csv":
             input_dim = 21
+            num_classes = 4
         elif data == "./data/nursery.csv":
             input_dim = 27
+            num_classes = 5
         if data=="./data/consumer.csv":
             input_dim = 16
+            num_classes = 2
         elif data == "./data/mv.csv":
             input_dim = 14
+            num_classes = 2
         if data=="./data/shuttle.csv":
             input_dim = 9
+            num_classes = 7
         elif data == "./data/wall-robot-navigation.csv":
             input_dim = 4
+            num_classes = 4
+        elif data == "./data/mushrooms.csv":
+            input_dim = 115
+            num_classes = 2
         self.fc1 = nn.Linear(input_dim, 64)
         self.relu = nn.ReLU()
         self.fc2 = nn.Linear(64, 32)
@@ -33,12 +42,10 @@ class MulticlassNet(nn.Module):
         self.softmax = nn.Softmax(dim=1)
 
     def forward(self, x):
-        out = self.fc1(x)
-        out = self.relu(out)
-        out = self.fc2(out)
-        out = self.relu(out)
-        out = self.fc3(out)
-        out = self.softmax(out) 
+        x = self.relu(self.fc1(x))
+        x = self.relu(self.fc2(x))
+        x = self.relu(self.fc3(x))
+        out = self.softmax(x) 
         return out
 
 def train_centralized_multi(model, train_loader, optimizer, num_epochs, device):
@@ -49,8 +56,7 @@ def train_centralized_multi(model, train_loader, optimizer, num_epochs, device):
         for X_batch, y_batch in train_loader:
             optimizer.zero_grad()
             outputs = model(X_batch)
-            # y_batch = y_batch.long()
-            # y_batch = torch.argmax(y_batch, dim=1)
+
             loss = criterion(outputs, y_batch)  # y_batch è l'indice della classe
             loss.backward()
             optimizer.step()
@@ -81,59 +87,249 @@ def _train_one_epoch(
 ) -> nn.Module:
     """Train the network on the training set for one epoch."""
     for data, target in trainloader:
-        
         data, target = data.to(device), target.to(device)
         optimizer.zero_grad()
-        
         output = net(data)
-        #target = target.long()
-        #print(target)
-        
-        # IL PROBLEMA E' CHE TORCH.ARGMAX TRASFORMA IL TARGET IN UN TENSORE DI TUTTI 0
-        #print(target)
         loss = criterion(output, target)
         loss.backward()
         optimizer.step()
     return net
 
-"""def test_multi(
-    net: nn.Module, testloader: DataLoader, device: torch.device
-) -> Tuple[float, float, float]:
-    criterion = nn.CrossEntropyLoss()  # CrossEntropy per multi-class
-    net.eval()
-    correct, total, loss = 0, 0, 0.0
-    all_targets = []
-    all_predictions = []
-    
-    with torch.no_grad():
-        for data, target in testloader:
-            data, target = data.to(device), target.to(device)
+class ScaffoldOptimizer(SGD):
+    """Implements SGD optimizer step function as defined in the SCAFFOLD paper."""
 
-            target = target.float()
+    def __init__(self, grads, step_size, momentum, weight_decay):
+        super().__init__(
+            grads, lr=step_size, momentum=momentum, weight_decay=weight_decay
+        )
 
-            output = net(data)
-            print(output)
-            # classe con probabilità più alta
-            _, predicted = torch.max(output, 1)
-            target = torch.argmax(target, dim=1)
+    def step_custom(self, server_cv, client_cv):
+        """Implement the custom step function fo SCAFFOLD."""
+        # y_i = y_i - \eta * (g_i + c - c_i)  -->
+        # y_i = y_i - \eta*(g_i + \mu*b_{t}) - \eta*(c - c_i)
+        self.step()
+        for group in self.param_groups:
+            for par, s_cv, c_cv in zip(group["params"], server_cv, client_cv):
+                par.data.add_(s_cv - c_cv, alpha=-group["lr"])
 
-            #print(predicted)
-            #print(target)
 
-            loss += criterion(output, target).item()  # CrossEntropy lavora con target long
-          
-            all_predictions.extend(predicted.cpu().numpy())
-            all_targets.extend(target.cpu().numpy())
-            
-            total += target.size(0)
-            correct += (predicted == target).sum().item()
-    
-    loss = loss / total
-    acc = correct / total
+def train_scaffold(
+    net: nn.Module,
+    trainloader: DataLoader,
+    device: torch.device,
+    epochs: int,
+    learning_rate: float,
+    momentum: float,
+    weight_decay: float,
+    server_cv: torch.Tensor,
+    client_cv: torch.Tensor,
+) -> None:
+    # pylint: disable=too-many-arguments
+    """Train the network on the training set using SCAFFOLD.
 
-    f1 = f1_score(all_targets, all_predictions, average='macro')  # Macro per classi bilanciate
+    Parameters
+    ----------
+    net : nn.Module
+        The neural network to train.
+    trainloader : DataLoader
+        The training set dataloader object.
+    device : torch.device
+        The device on which to train the network.
+    epochs : int
+        The number of epochs to train the network.
+    learning_rate : float
+        The learning rate.
+    momentum : float
+        The momentum for SGD optimizer.
+    weight_decay : float
+        The weight decay for SGD optimizer.
+    server_cv : torch.Tensor
+        The server's control variate.
+    client_cv : torch.Tensor
+        The client's control variate.
+    """
+    criterion = nn.BCELoss()
+    optimizer = ScaffoldOptimizer(
+        net.parameters(), learning_rate, momentum, weight_decay
+    )
+    net.train()
+    for _ in range(epochs):
+        net = _train_one_epoch_scaffold(
+            net, trainloader, device, criterion, optimizer, server_cv, client_cv
+        )
 
-    return loss, acc, f1"""
+
+def _train_one_epoch_scaffold(
+    net: nn.Module,
+    trainloader: DataLoader,
+    device: torch.device,
+    criterion: nn.Module,
+    optimizer: ScaffoldOptimizer,
+    server_cv: torch.Tensor,
+    client_cv: torch.Tensor,
+) -> nn.Module:
+    # pylint: disable=too-many-arguments
+    """Train the network on the training set for one epoch."""
+    for data, target in trainloader:
+        data, target = data.to(device), target.to(device)
+        optimizer.zero_grad()
+        output = net(data)
+        loss = criterion(output, target)
+        loss.backward()
+        optimizer.step_custom(server_cv, client_cv)
+    return net
+
+def train_fedprox(
+    net: nn.Module,
+    trainloader: DataLoader,
+    device: torch.device,
+    epochs: int,
+    proximal_mu: float,
+    learning_rate: float,
+    momentum: float,
+    weight_decay: float,
+) -> None:
+    # pylint: disable=too-many-arguments
+    """Train the network on the training set using FedAvg.
+
+    Parameters
+    ----------
+    net : nn.Module
+        The neural network to train.
+    trainloader : DataLoader
+        The training set dataloader object.
+    device : torch.device
+        The device on which to train the network.
+    epochs : int
+        The number of epochs to train the network.
+    proximal_mu : float
+        The proximal mu parameter.
+    learning_rate : float
+        The learning rate.
+    momentum : float
+        The momentum for SGD optimizer.
+    weight_decay : float
+        The weight decay for SGD optimizer.
+
+    Returns
+    -------
+    None
+    """
+    criterion = nn.BCELoss()
+    optimizer = SGD(
+        net.parameters(), lr=learning_rate, momentum=momentum, weight_decay=weight_decay
+    )
+    global_params = [param.detach().clone() for param in net.parameters()]
+    net.train()
+    for _ in range(epochs):
+        net = _train_one_epoch_fedprox(
+            net, global_params, trainloader, device, criterion, optimizer, proximal_mu
+        )
+
+
+def _train_one_epoch_fedprox(
+    net: nn.Module,
+    global_params: List[Parameter],
+    trainloader: DataLoader,
+    device: torch.device,
+    criterion: nn.Module,
+    optimizer: Optimizer,
+    proximal_mu: float,
+) -> nn.Module:
+    # pylint: disable=too-many-arguments
+    """Train the network on the training set for one epoch."""
+    for data, target in trainloader:
+        data, target = data.to(device), target.to(device)
+        optimizer.zero_grad()
+        output = net(data)
+        loss = criterion(output, target)
+        proximal_term = 0.0
+        for param, global_param in zip(net.parameters(), global_params):
+            proximal_term += torch.norm(param - global_param) ** 2
+        loss += (proximal_mu / 2) * proximal_term
+        loss.backward()
+        optimizer.step()
+    return net
+
+
+def train_fednova(
+    net: nn.Module,
+    trainloader: DataLoader,
+    device: torch.device,
+    epochs: int,
+    learning_rate: float,
+    momentum: float,
+    weight_decay: float,
+) -> Tuple[float, List[torch.Tensor]]:
+    # pylint: disable=too-many-arguments
+    """Train the network on the training set using FedNova.
+
+    Parameters
+    ----------
+    net : nn.Module
+        The neural network to train.
+    trainloader : DataLoader
+        The training set dataloader object.
+    device : torch.device
+        The device on which to train the network.
+    epochs : int
+        The number of epochs to train the network.
+    learning_rate : float
+        The learning rate.
+    momentum : float
+        The momentum for SGD optimizer.
+    weight_decay : float
+        The weight decay for SGD optimizer.
+
+    Returns
+    -------
+    tuple[float, List[torch.Tensor]]
+        The a_i and g_i values.
+    """
+    criterion = nn.BCELoss()
+    optimizer = SGD(
+        net.parameters(), lr=learning_rate, momentum=momentum, weight_decay=weight_decay
+    )
+    net.train()
+    local_steps = 0
+    # clone all the parameters
+    prev_net = [param.detach().clone() for param in net.parameters()]
+    for _ in range(epochs):
+        net, local_steps = _train_one_epoch_fednova(
+            net, trainloader, device, criterion, optimizer, local_steps
+        )
+    # compute ||a_i||_1
+    a_i = (
+        local_steps - (momentum * (1 - momentum**local_steps) / (1 - momentum))
+    ) / (1 - momentum)
+    # compute g_i
+    g_i = [
+        torch.div(prev_param - param.detach(), a_i)
+        for prev_param, param in zip(prev_net, net.parameters())
+    ]
+
+    return a_i, g_i
+
+
+def _train_one_epoch_fednova(
+    net: nn.Module,
+    trainloader: DataLoader,
+    device: torch.device,
+    criterion: nn.Module,
+    optimizer: Optimizer,
+    local_steps: int,
+) -> Tuple[nn.Module, int]:
+    # pylint: disable=too-many-arguments
+    """Train the network on the training set for one epoch."""
+    for data, target in trainloader:
+        data, target = data.to(device), target.to(device)
+        optimizer.zero_grad()
+        output = net(data)
+        loss = criterion(output, target)
+        loss.backward()
+        optimizer.step()
+        local_steps += 1
+    return net, local_steps
 
 def test_multi(
     net: nn.Module, testloader: DataLoader, device: torch.device
@@ -150,7 +346,7 @@ def test_multi(
             data, target = data.to(device), target.to(device)
             output = net(data)
             predicted = torch.argmax(output, dim=1) 
-            
+
             loss = criterion(output, target)
             target = target.long()
             target = torch.argmax(target, dim=1)

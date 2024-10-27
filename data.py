@@ -16,31 +16,40 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning):
     if data_path=="./data/consumer.csv":
         dataset, features_ohe, target_name, num_columns = load_consumer()
         num_classes = 2
+        to_view = True
     elif data_path=="./data/mv.csv":
         dataset, features_ohe, target_name, num_columns = load_mv()
         num_classes = 2
+        to_view = True
     elif data_path=="./data/car.csv":
         dataset, features_ohe, target_name, num_columns = load_car()
         num_classes = 4
+        to_view = False
     elif data_path=="./data/nursery.csv":
         dataset, features_ohe, target_name, num_columns = load_nursery()
         num_classes = 5
+        to_view = False
     elif data_path=="./data/shuttle.csv":
         dataset, features_ohe, target_name, num_columns = load_shuttle()
         num_classes = 7
+        to_view = False
     elif data_path=="./data/wall-robot-navigation.csv":
         dataset, features_ohe, target_name, num_columns = load_wall()
         num_classes = 4
+        to_view = False
+    elif data_path=="./data/mushrooms.csv":
+        dataset, features_ohe, target_name, num_columns = load_mushrooms()
+        num_classes = 2
+        to_view = False
 
     dataset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
 
     #print(dataset.shape)
-    #print(dataset.shape)
     #profiling(dataset, data_path)
     #select_features(dataset, data_path)
-    #print(dataset[target_name])
+    print(dataset[target_name])
 
-    train_dataset, test_dataset = train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, num_classes)
+    train_dataset, test_dataset = train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, num_classes, to_view)
     if federated:
         if partitioning=="uniform":
             if num_clients == 2:
@@ -174,27 +183,6 @@ def load_car():
 
     return dataset, features_ohe, target_name, num_columns
 
-def load_car_2():
-    types = {"index":str, "buying":str, "maint":str, "doors":str,"persons":str,
-            "lug_boot":str,"safety":str}
-    dataset = pd.read_csv("./data/car.csv", dtype=types)
-    features = list(dataset.columns)
-    target_name = "safety"
-    dataset.replace('unacc', 0, inplace=True)
-    dataset.replace('acc', 1, inplace=True)
-    dataset.replace('vgood', 2, inplace=True)
-    dataset.replace('good', 3, inplace=True)
-    target = dataset[target_name]
-    features.remove(target_name)
-    num_columns = 'categorical'
-    #profiling(dataset)
-    dataset = encoding_categorical_variables(dataset[features])
-    dataset[target_name] = target
-    features_ohe = list(dataset.columns)
-    features_ohe.remove(target_name)
-    return dataset, features_ohe, target_name, num_columns
-
-# ADAPT AS LOAD CAR 2
 def load_nursery():
     # MIXED
     types = {"parents":str, "has_nurs":str, "form":str, "children":int,"housing":str,
@@ -210,7 +198,27 @@ def load_nursery():
         features_ohe.remove(t)
     return dataset, features_ohe, target_name, num_columns
 
+def load_mushrooms():
+    # CATEGORICAL
+    types = {'CapShape' : str, 'CapSurface' : str, 'CapColor' : str, 'Bruises' : bool, 'Odor' : str,
+       'GillAttachment' : str, 'GillSpacing' : str, 'GillSize' : str, 'GillColor' : str, 'StalkShape' : str,
+       'StalkRoot' : str, 'StalkSurfaceAboveRing' : str, 'StalkSurfaceBelowRing' : str,
+       'StalkColorAboveRing' : str, 'StalkColorBelowRing' : str, 'VeilType' : str, 'VeilColor' : str,
+       'RingNumber' : str, 'RingType' : str, 'SporePrintColor' : str, 'Population' : str, 'Habitat' : str,
+       'Class' : str}
+    dataset = pd.read_csv("./data/mushrooms.csv", dtype=types)
+    features = list(dataset.columns)
+    target_name = ["Class_poisonous", "Class_edible"]
+    dataset = encoding_categorical_variables(dataset[features])
+    features_ohe = list(dataset.columns)
+    num_columns = 'categorical'
+    for t in target_name:
+        features_ohe.remove(t)
+    return dataset, features_ohe, target_name, num_columns
+
+
 def load_shuttle():
+    # NUMERICAL
     types = {'A1': int, 'A2': int, 'A3': int, 'A4': int, 'A5': int, 'A6': int, 'A7': int, 'A8': int, 'A9': int, 'class': str}
     dataset = pd.read_csv("./data/shuttle.csv", dtype=types)
     features = list(dataset.columns)
@@ -224,6 +232,7 @@ def load_shuttle():
     return dataset, features_ohe, target_name, num_columns
 
 def load_wall():
+    # NUMERICAL
     types = {'V1': float, 'V2': float, 'V3': float, 'V4': float, 'Class': str}
     dataset = pd.read_csv("./data/wall-robot-navigation.csv", dtype=types)
     features = list(dataset.columns)
@@ -309,7 +318,7 @@ def compute_associationrules(df, data):
         return 0
     print(rules)
 
-def train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, num_classes):
+def train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, num_classes, to_view):
     # ONLY USED FOR RANDOM SPLIT
     """if num_columns == 'categorical':
         le = preprocessing.LabelEncoder()
@@ -334,13 +343,12 @@ def train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, 
 
     x_train_tensor = torch.tensor(x_train, dtype=torch.float32)
     x_test_tensor = torch.tensor(x_test, dtype=torch.float32)
-    if num_classes <= 2:
+    if to_view == True:
         y_train_tensor = torch.tensor(y_train, dtype=torch.float32).view(-1, 1)
         y_test_tensor = torch.tensor(y_test, dtype=torch.float32).view(-1, 1)
     else:
         y_train_tensor = torch.tensor(y_train, dtype=torch.float32)
         y_test_tensor = torch.tensor(y_test, dtype=torch.float32)
-
     train_dataset = TensorDataset(x_train_tensor, y_train_tensor)
     test_dataset = TensorDataset(x_test_tensor, y_test_tensor)
 

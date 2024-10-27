@@ -11,7 +11,7 @@ from torch.nn.parameter import Parameter
 from sklearn.metrics import f1_score
 
 class BinaryNet(nn.Module):
-    def __init__(self, data, partitioning, num_classes):
+    def __init__(self, data, partitioning):
         super(BinaryNet, self).__init__()
         if data=="./data/consumer.csv":
             input_dim = 16
@@ -136,30 +136,6 @@ def train_fedavg(
     momentum: float,
     weight_decay: float,
 ) -> None:
-    # pylint: disable=too-many-arguments
-    """Train the network on the training set using FedAvg.
-
-    Parameters
-    ----------
-    net : nn.Module
-        The neural network to train.
-    trainloader : DataLoader
-        The training set dataloader object.
-    device : torch.device
-        The device on which to train the network.
-    epochs : int
-        The number of epochs to train the network.
-    learning_rate : float
-        The learning rate.
-    momentum : float
-        The momentum for SGD optimizer.
-    weight_decay : float
-        The weight decay for SGD optimizer.
-
-    Returns
-    -------
-    None
-    """
     criterion = nn.BCELoss()
     optimizer = SGD(
         net.parameters(), lr=learning_rate, momentum=momentum, weight_decay=weight_decay
