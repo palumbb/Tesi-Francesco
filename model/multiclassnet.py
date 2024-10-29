@@ -148,7 +148,7 @@ def train_scaffold(
     client_cv : torch.Tensor
         The client's control variate.
     """
-    criterion = nn.BCELoss()
+    criterion = nn.CrossEntropyLoss()
     optimizer = ScaffoldOptimizer(
         net.parameters(), learning_rate, momentum, weight_decay
     )
@@ -215,7 +215,7 @@ def train_fedprox(
     -------
     None
     """
-    criterion = nn.BCELoss()
+    criterion = nn.CrossEntropyLoss()
     optimizer = SGD(
         net.parameters(), lr=learning_rate, momentum=momentum, weight_decay=weight_decay
     )
@@ -286,7 +286,7 @@ def train_fednova(
     tuple[float, List[torch.Tensor]]
         The a_i and g_i values.
     """
-    criterion = nn.BCELoss()
+    criterion = nn.CrossEntropyLoss()
     optimizer = SGD(
         net.parameters(), lr=learning_rate, momentum=momentum, weight_decay=weight_decay
     )

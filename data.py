@@ -318,6 +318,7 @@ def compute_associationrules(df, data):
     elif data == "./data/nursery.csv":
         return 0
     print(rules)
+    
 
 def train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, num_classes, to_view):
     # ONLY USED FOR RANDOM SPLIT

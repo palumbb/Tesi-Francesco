@@ -56,7 +56,7 @@ class ScaffoldServer(Server):
         self.model_params = instantiate(model)
         self.server_cv: List[torch.Tensor] = []
 
-    def _get_initial_parameters(self, timeout: Optional[float], server_round: int) -> Parameters:
+    def _get_initial_parameters(self, timeout: Optional[float]) -> Parameters:
         """Get initial parameters from one of the available clients."""
         # Server-side parameter initialization
         parameters: Optional[Parameters] = self.strategy.initialize_parameters(
@@ -70,7 +70,7 @@ class ScaffoldServer(Server):
         log(INFO, "Requesting initial parameters from one random client")
         random_client = self._client_manager.sample(1)[0]
         ins = GetParametersIns(config={})
-        get_parameters_res = random_client.get_parameters(ins=ins, timeout=timeout, group_id=server_round)
+        get_parameters_res = random_client.get_parameters(ins=ins, timeout=timeout)
         log(INFO, "Received initial parameters from one random client")
         self.server_cv = [
             torch.from_numpy(t)

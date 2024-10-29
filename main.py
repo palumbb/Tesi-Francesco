@@ -6,7 +6,7 @@ model is going to be evaluated, etc. At the end, this script saves the results.
 
 import os
 import pickle
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 import flwr as fl
 import hydra
 from flwr.server.client_manager import SimpleClientManager
@@ -25,7 +25,7 @@ from torch.optim import SGD, Optimizer
 import pandas as pd
 
 
-@hydra.main(config_path="conf", config_name="fedavg_base", version_base=None)
+@hydra.main(config_path="conf", config_name="fedprox_base", version_base=None)
 
 def main(cfg: DictConfig) -> None:
 
