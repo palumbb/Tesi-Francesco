@@ -25,7 +25,7 @@ from torch.optim import SGD, Optimizer
 import pandas as pd
 
 
-@hydra.main(config_path="conf", config_name="fednova_base", version_base=None)
+@hydra.main(config_path="conf", config_name="fedavg_base", version_base=None)
 
 def main(cfg: DictConfig) -> None:
 
@@ -68,6 +68,7 @@ def main(cfg: DictConfig) -> None:
         # 3. Define your clients
         client_fn = None
         if cfg.client_fn._target_ == "clients.multiclass.client_scaffold.gen_client_fn":
+            print("siamo in if scaffold")
             save_path = HydraConfig.get().runtime.output_dir
             client_cv_dir = os.path.join(save_path, "client_cvs")
             print("Local cvs for scaffold clients are saved to: ", client_cv_dir)
@@ -159,7 +160,7 @@ def main(cfg: DictConfig) -> None:
             partitioning=cfg.partitioning
         )
         
-        num_epochs = 1
+        num_epochs = 50
         batch_size = cfg.batch_size
         learning_rate = cfg.learning_rate
         momentum = cfg.momentum

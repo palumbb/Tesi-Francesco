@@ -4,8 +4,8 @@ import torch
 from hydra.utils import instantiate
 from omegaconf import DictConfig
 
-from model.binarynet import BinaryNet, evaluate
-from model.multiclassnet import MulticlassNet, evaluate
+from model.binarynet import BinaryNet, test_binary
+from model.multiclassnet import MulticlassNet, test_multi
 
 
 def get_on_fit_config(config: DictConfig):
@@ -18,7 +18,7 @@ def get_on_fit_config(config: DictConfig):
 
     return fit_config_fn
 
-def get_evalulate_fn(model_cfg, optimizer_cfg, testloader):
+def get_evaluate_fn(model_cfg, optimizer_cfg, testloader):
 
     def evaluate_fn(server_round: int, parameters, config):
         model = instantiate(model_cfg)
@@ -28,7 +28,7 @@ def get_evalulate_fn(model_cfg, optimizer_cfg, testloader):
         params_dict = zip(model.state_dict().keys(), parameters)
         state_dict = OrderedDict({k: torch.Tensor(v) for k, v in params_dict})
         model.load_state_dict(state_dict, strict=True)
-        loss, accuracy = evaluate(model, testloader, device)
+        loss, accuracy = test_multi(model, testloader, device)
         return loss, {"global accuracy": accuracy}
 
     return evaluate_fn

@@ -5,14 +5,14 @@
 
 federated: True
 name: FedAvg
-num_clients: 3 # change the proportions of each client in the partition_dataset section
-num_epochs: 1
+num_clients: 8 # change the proportions of each client in the partition_dataset section
+num_epochs: 10
 batch_size: 32
-clients_per_round: 3
+clients_per_round: 8
 learning_rate: 0.01
-num_rounds: 10
-partitioning: "uniform"
-dataset_path: "./data/wall-robot-navigation.csv" #also change the input dim
+num_rounds: 30
+partitioning: "a1"
+dataset_path: "./data/shuttle.csv" #also change the input dim
 dataset_seed: 42
 alpha: 0.5
 labels_per_client: 4 # only used when partitioning is label quantity

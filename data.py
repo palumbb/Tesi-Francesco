@@ -44,10 +44,7 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning):
 
     dataset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
 
-    #print(dataset.shape)
-    #profiling(dataset, data_path)
-    #select_features(dataset, data_path)
-    print(dataset[target_name])
+    #print(dataset[target_name])
 
     train_dataset, test_dataset = train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, num_classes, to_view)
     if federated:
@@ -70,7 +67,7 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning):
             trainsets = random_split(train_dataset, lengths)
         
         else:
-            trainsets, test_dataset = split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_ohe, target_name, num_classes)
+            trainsets, test_dataset = split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_ohe, target_name, to_view)
 
         trainloaders, valloaders, testloader = data_loaders(num_partitions=num_clients,
                                                                 batch_size=data_cfg.batch_size,
@@ -209,6 +206,7 @@ def load_mushrooms():
     dataset = pd.read_csv("./data/mushrooms.csv", dtype=types)
     features = list(dataset.columns)
     target_name = ["Class_poisonous", "Class_edible"]
+    #profiling(dataset, "./data/mushrooms.csv")
     dataset = encoding_categorical_variables(dataset[features])
     features_ohe = list(dataset.columns)
     num_columns = 'categorical'
@@ -224,7 +222,7 @@ def load_shuttle():
     features = list(dataset.columns)
     target_name = ["class_1", "class_2", "class_3", "class_4", "class_5", "class_6", "class_7"]
     num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
-    profiling(dataset, "./data/shuttle.csv")
+    #profiling(dataset, "./data/shuttle.csv")
     dataset = encoding_categorical_variables(dataset[features])
     features_ohe = list(dataset.columns)
     for t in target_name:
@@ -282,14 +280,17 @@ def select_features(df, data_path):
     elif data_path == "./data/wall-robot-navigation.csv":
         X.drop('Class', axis=1)
         y = X["Class"]
+    elif data_path == "./data/mushrooms.csv":
+        X.drop('Class', axis=1)
+        y = X["Class"]
     print(X.shape)
     selector = SelectKBest(mutual_info_classif, k='all')
     selector.fit(X, y)
     scores = selector.scores_
     indexes = np.argsort(scores)[::-1][:3]
 
-    #print(X.columns[indexes])
-    #print(scores[indexes])
+    print(X.columns[indexes])
+    print(scores[indexes])
     
 
 def compute_associationrules(df, data):
@@ -320,10 +321,6 @@ def compute_associationrules(df, data):
 
 def train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, num_classes, to_view):
     # ONLY USED FOR RANDOM SPLIT
-    """if num_columns == 'categorical':
-        le = preprocessing.LabelEncoder()
-        dataset[target_name] = le.fit_transform(dataset[target_name])"""
-    #print(dataset)
     train_samples = int(len(dataset)*data_cfg.train_split)
     train = dataset.iloc[0:train_samples,]
     test = dataset.iloc[train_samples:,]
@@ -331,7 +328,6 @@ def train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, 
         scaler = StandardScaler()
         train[num_columns] = scaler.fit_transform(train[num_columns])
         test[num_columns] = scaler.transform(test[num_columns])
-    
     x_train = train[features_ohe].to_numpy()
     x_train = np.vstack(x_train).astype(np.float32)
     y_train = train[target_name].to_numpy()
@@ -354,7 +350,7 @@ def train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, 
 
     return train_dataset, test_dataset
 
-def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_ohe, target_name, num_classes):
+def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_ohe, target_name, to_view):
     # ONLY USED FOR ATTRIBUTE SPLIT
     train_samples = int(len(dataset)*data_cfg.train_split)
     train = dataset.iloc[0:train_samples,]
@@ -390,6 +386,10 @@ def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_oh
         train_list = split_by_doors(train)
     elif partitioning == "health":
         train_list = split_by_health(train)
+    elif partitioning == "odor":
+        train_list = split_by_odor(train)
+    elif partitioning == "a1":
+        train_list = split_by_a1(train)
 
     x_train_list = []
     y_train_list = []
@@ -401,12 +401,13 @@ def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_oh
         #print(x_train.shape)
         #print(y_train.shape)
         x_train_tensor = torch.tensor(x_train, dtype=torch.float32)
-        if num_classes <= 2:
+        if to_view ==True:
             y_train_tensor = torch.tensor(y_train, dtype=torch.float32).view(-1, 1)
         else:
             y_train_tensor = torch.tensor(y_train, dtype=torch.float32)
-            #y_train_tensor=y_train_tensor.to(torch.float)
         
+        #print(x_train_tensor.shape)
+        #print(y_train_tensor.shape)
         x_train_list.append(x_train_tensor)
         y_train_list.append(y_train_tensor)
     
@@ -416,14 +417,10 @@ def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_oh
     y_test = np.vstack(y_test).astype(np.float32)
     
     x_test_tensor = torch.tensor(x_test, dtype=torch.float32)
-    if num_classes <= 2:
+    if to_view==True:
         y_test_tensor = torch.tensor(y_test, dtype=torch.float32).view(-1, 1)
     else:
         y_test_tensor = torch.tensor(y_test, dtype=torch.float32)
-        #y_test_tensor=y_test_tensor.to(torch.float)
-
-    """for i, (x_tensor, y_tensor) in enumerate(zip(x_train_list, y_train_list)):
-        print(f"Tensor {i}: x_tensor.shape = {x_tensor.shape}, y_tensor.shape = {y_tensor.shape}")"""
 
     train_datasets = [TensorDataset(x_tensor, y_tensor) for x_tensor, y_tensor in zip(x_train_list, y_train_list)]
     test_dataset = TensorDataset(x_test_tensor, y_test_tensor)
@@ -613,4 +610,27 @@ def split_by_health(df):
 
     subsets = [subset_1, subset_2, subset_3]
     return subsets
+
+def split_by_odor(df):
+    cols = list(df.columns)
     
+    subset_1 = df[df["Odor_foul"] == 1]
+    subset_2 = df[df["Odor_none"] == 1]
+    subset_3 = df[df["Odor_almond"] == 1]
+    subset_4 = df[df["Odor_anise"] == 1]
+    subset_5 = df[df["Odor_spicy"] == 1]
+    subset_6 = df[df["Odor_pungent"] == 1]
+    subset_7 = df[df["Odor_fishy"] == 1]
+    subset_8 = df[df["Odor_creosote"] == 1]
+
+    subsets = [subset_1, subset_2, subset_3, subset_4, subset_5, subset_6, subset_7, subset_8]
+    return subsets
+
+def split_by_a1(df):
+    cols = df.columns
+    subset_1 = df[df['A1'] <= -0.5]
+    subset_2 = df[(df['A1'] > -0.5) & (df['A1'] <= 0.5)]
+    subset_3 = df[df['A1'] > 0.5]
+
+    subsets = [subset_1, subset_2, subset_3]
+    return subsets

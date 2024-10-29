@@ -1,0 +1,44 @@
+[2024-10-28 11:50:53,955][flwr][WARNING] - Both server and strategy were provided, ignoring strategy
+[2024-10-28 11:50:53,956][flwr][INFO] - Starting Flower simulation, config: num_rounds=30, no round_timeout
+[2024-10-28 11:51:02,589][flwr][INFO] - Flower VCE: Ray initialized with resources: {'CPU': 8.0, 'object_store_memory': 444411494.0, 'node:127.0.0.1': 1.0, 'memory': 888822990.0, 'node:__internal_head__': 1.0}
+[2024-10-28 11:51:02,591][flwr][INFO] - Optimize your simulation with Flower VCE: https://flower.ai/docs/framework/how-to-run-simulations.html
+[2024-10-28 11:51:02,591][flwr][INFO] - Flower VCE: Resources for each Virtual Client: {'num_cpus': 4, 'num_gpus': 0.0}
+[2024-10-28 11:51:02,615][flwr][INFO] - Flower VCE: Creating VirtualClientEngineActorPool with 2 actors
+[2024-10-28 11:51:02,618][flwr][INFO] - [INIT]
+[2024-10-28 11:51:02,619][flwr][INFO] - Requesting initial parameters from one random client
+[2024-10-28 11:51:08,131][flwr][INFO] - Received initial parameters from one random client
+[2024-10-28 11:51:08,133][flwr][INFO] - Starting evaluation of initial global parameters
+[2024-10-28 11:51:08,247][flwr][INFO] - initial parameters (loss, other metrics): 1.6085865688912662, {'accuracy': 0.18904320987654322, 'f1-score': 0.12975620536227955}
+[2024-10-28 11:51:08,249][flwr][INFO] - 
+[2024-10-28 11:51:08,249][flwr][INFO] - [ROUND 1]
+[2024-10-28 11:51:08,253][flwr][DEBUG] - fit_round 1: strategy sampled 3 clients (out of 3)
+[2024-10-28 11:51:08,255][flwr][DEBUG] - fit_round 1 received 0 results and 3 failures
+[2024-10-28 11:51:08,256][flwr][ERROR] - list index out of range
+[2024-10-28 11:51:08,259][flwr][ERROR] - Traceback (most recent call last):
+  File "C:\Users\Riccardo\miniconda3\envs\flower\Lib\site-packages\flwr\simulation\app.py", line 339, in start_simulation
+    hist = run_fl(
+           ^^^^^^^
+  File "C:\Users\Riccardo\miniconda3\envs\flower\Lib\site-packages\flwr\server\server.py", line 492, in run_fl
+    hist, elapsed_time = server.fit(
+                         ^^^^^^^^^^^
+  File "C:\Users\Riccardo\miniconda3\envs\flower\Lib\site-packages\flwr\server\server.py", line 115, in fit
+    res_fit = self.fit_round(
+              ^^^^^^^^^^^^^^^
+  File "c:\Users\Riccardo\Desktop\PoliMi\Tesi-Francesco\servers\server_scaffold.py", line 144, in fit_round
+    self.server_cv = [
+                     ^
+  File "c:\Users\Riccardo\Desktop\PoliMi\Tesi-Francesco\servers\server_scaffold.py", line 145, in <listcomp>
+    torch.from_numpy(cv + cv_multiplier * aggregated_cv_update[i])
+                                          ~~~~~~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+[2024-10-28 11:51:08,265][flwr][ERROR] - Your simulation crashed :(. This could be because of several reasons. The most common are: 
+	 > Sometimes, issues in the simulation code itself can cause crashes. It's always a good idea to double-check your code for any potential bugs or inconsistencies that might be contributing to the problem. For example: 
+		 - You might be using a class attribute in your clients that hasn't been defined.
+		 - There could be an incorrect method call to a 3rd party library (e.g., PyTorch).
+		 - The return types of methods in your clients/strategies might be incorrect.
+	 > Your system couldn't fit a single VirtualClient: try lowering `client_resources`.
+	 > All the actors in your pool crashed. This could be because: 
+		 - You clients hit an out-of-memory (OOM) error and actors couldn't recover from it. Try launching your simulation with more generous `client_resources` setting (i.e. it seems {'num_cpus': 4, 'num_gpus': 0.0} is not enough for your run). Use fewer concurrent actors. 
+		 - You were running a multi-node simulation and all worker nodes disconnected. The head node might still be alive but cannot accommodate any actor with resources: {'num_cpus': 4, 'num_gpus': 0.0}.
+Take a look at the Flower simulation examples for guidance <https://flower.ai/docs/framework/how-to-run-simulations.html>.

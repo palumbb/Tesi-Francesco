@@ -116,8 +116,8 @@ class FlowerClientScaffold(fl.client.NumPyClient):
     def evaluate(self, parameters, config: Dict[str, Scalar]):
         """Evaluate using given parameters."""
         self.set_parameters(parameters)
-        loss, acc = test_multi(self.net, self.valloader, self.device)
-        return float(loss), len(self.valloader.dataset), {"accuracy": float(acc)}
+        loss, acc, f1 = test_multi(self.net, self.valloader, self.device)
+        return float(loss), len(self.valloader.dataset), {"accuracy": float(acc), "f1-score": float(f1)}
 
 
 # pylint: disable=too-many-arguments
