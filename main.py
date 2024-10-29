@@ -6,7 +6,7 @@ model is going to be evaluated, etc. At the end, this script saves the results.
 
 import os
 import pickle
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 import flwr as fl
 import hydra
 from flwr.server.client_manager import SimpleClientManager
@@ -25,7 +25,7 @@ from torch.optim import SGD, Optimizer
 import pandas as pd
 
 
-@hydra.main(config_path="conf", config_name="fedprox_base", version_base=None)
+@hydra.main(config_path="conf", config_name="fedavg_base", version_base=None)
 
 def main(cfg: DictConfig) -> None:
 
@@ -43,18 +43,27 @@ def main(cfg: DictConfig) -> None:
     accuracies = []
     run_labels = ["FedAvg", "FedProx", "FedNova", "Scaffold"]
 
-    # Definisci il percorso dove salvare i dati di accuracy
     """if cfg.dataset_path=="./data/consumer.csv":
         accuracy_save_path = 'plot_data/consumer/10clients.pkl'
     elif cfg.dataset_path=="./data/mv.csv":
         accuracy_save_path = 'plot_data/mv/10clients.pkl'
+    elif cfg.dataset_path=="./data/shuttle.csv":
+        accuracy_save_path = 'plot_data/shuttle/10clients.pkl'
+    elif cfg.dataset_path=="./data/nursery.csv":
+        accuracy_save_path = 'plot_data/nursery/10clients.pkl'
+    elif cfg.dataset_path=="./data/mushrooms.csv":
+        accuracy_save_path = 'plot_data/mushrooms/10clients.pkl'
+    elif cfg.dataset_path=="./data/wall-robot-navigation.csv":
+        accuracy_save_path = 'plot_data/wall-robot-navigation/10clients.pkl'
+    elif cfg.dataset_path=="./data/car.csv":
+        accuracy_save_path = 'plot_data/car/10clients.pkl'
 
-    # Variabile temporanea per il nome della run, seleziona dalla lista
-    current_run_idx = len(load_accuracies(accuracy_save_path))  # Indice dell'ultima run salvata
+    current_run_idx = len(load_accuracies(accuracy_save_path))  
     if current_run_idx < len(run_labels):
         run_label = run_labels[current_run_idx]
     else:
-        run_label = f"Run {current_run_idx + 1}"  # Default se finisce la lista"""
+        run_label = f"Run {current_run_idx + 1}" 
+    """
 
     # 2. Prepare your dataset
     if cfg.federated:
@@ -62,13 +71,13 @@ def main(cfg: DictConfig) -> None:
             data_cfg=cfg.dataset,
             num_clients=cfg.num_clients,
             federated=cfg.federated,
-            partitioning=cfg.partitioning
+            partitioning=cfg.partitioning,
+            model=cfg.model
         )
 
         # 3. Define your clients
         client_fn = None
         if cfg.client_fn._target_ == "clients.multiclass.client_scaffold.gen_client_fn":
-            print("siamo in if scaffold")
             save_path = HydraConfig.get().runtime.output_dir
             client_cv_dir = os.path.join(save_path, "client_cvs")
             print("Local cvs for scaffold clients are saved to: ", client_cv_dir)
@@ -130,9 +139,10 @@ def main(cfg: DictConfig) -> None:
         with open(os.path.join(save_path, "history.pkl"), "wb") as f_ptr:
             pickle.dump(history, f_ptr)
 
+        #save_accuracies(accuracies, accuracy_save_path)
+
         # 8. Plot the accuracies for each strategy
-        """save_accuracies(accuracies, accuracy_save_path)
-        all_accuracies = load_accuracies(accuracy_save_path)
+        """all_accuracies = load_accuracies(accuracy_save_path)
 
         plt.figure(figsize=(10, 6))
         for run_idx, run_accuracies in enumerate(all_accuracies):
@@ -182,8 +192,6 @@ def main(cfg: DictConfig) -> None:
         print(f"Test Loss: {test_loss}")
         print(f"Test Accuracy: {test_accuracy}")
         print(f"F1-score: {f1_score}")
-
-
 
 
 def save_accuracies(accuracies, save_path):

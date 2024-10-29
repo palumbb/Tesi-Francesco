@@ -11,16 +11,24 @@ from sklearn.feature_selection import SelectKBest, mutual_info_classif
 from sklearn import preprocessing
 import numpy as np
 
-def load_dataset(data_cfg, num_clients, federated: bool, partitioning):
+def load_dataset(data_cfg, num_clients, federated: bool, partitioning, model):
     data_path = data_cfg.path
     if data_path=="./data/consumer.csv":
-        dataset, features_ohe, target_name, num_columns = load_consumer()
+        if (model == "model.multiclassnet.MulticlassNet"):
+            dataset, features_ohe, target_name, num_columns = load_consumer_binary()
+            to_view = True
+        else:
+            dataset, features_ohe, target_name, num_columns = load_consumer_multi()
+            to_view = False
         num_classes = 2
-        to_view = True
     elif data_path=="./data/mv.csv":
-        dataset, features_ohe, target_name, num_columns = load_mv()
+        if (model == "model.multiclassnet.MulticlassNet"):
+            dataset, features_ohe, target_name, num_columns = load_mv_binary()
+            to_view = True
+        else:
+            dataset, features_ohe, target_name, num_columns = load_mv_multi()
+            to_view = False
         num_classes = 2
-        to_view = True
     elif data_path=="./data/car.csv":
         dataset, features_ohe, target_name, num_columns = load_car()
         num_classes = 4
@@ -44,7 +52,6 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning):
 
     dataset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
 
-    #print(dataset[target_name])
 
     train_dataset, test_dataset = train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, num_classes, to_view)
     if federated:
@@ -127,8 +134,8 @@ def data_loaders(num_partitions: int, batch_size: int, val_ratio: float, train, 
 
     return trainloaders, valloaders, testloader
 
-def load_consumer():
-    # MIXED -> select only numerical columns (int, float)
+def load_consumer_binary():
+    # MIXED
     types = {"ProductID":int, "ProductCategory":str, "ProductBrand":str, "ProductPrice":float,"CustomerAge":float,
             "CustomerGender":str,"PurchaseFrequency":float,"CustomerSatisfaction":float,"PurchaseIntent":int}
     dataset = pd.read_csv("./data/consumer.csv", dtype=types)
@@ -145,8 +152,26 @@ def load_consumer():
     features_ohe.remove(target_name)
     return dataset, features_ohe, target_name, num_columns
 
-def load_mv():
-    # MIXED -> select only numerical columns (int, float)
+def load_consumer_multi():
+    types = {"ProductID":int, "ProductCategory":str, "ProductBrand":str, "ProductPrice":float,"CustomerAge":float,
+            "CustomerGender":str,"PurchaseFrequency":float,"CustomerSatisfaction":float,"PurchaseIntent":int}
+    dataset = pd.read_csv("./data/consumer.csv", dtype=types)
+    features = list(dataset.columns)
+    target_name = ["PurchaseIntent_0", "PurchaseIntent_1"]
+    features.remove("ProductID")
+    target = dataset[target_name]
+    features.remove(target_name)
+    num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
+    profiling(dataset, "./data/consumer.csv")
+    dataset = encoding_categorical_variables(dataset[features])
+    dataset[target_name] = target
+    features_ohe = list(dataset.columns)
+    for t in target_name:
+        features_ohe.remove(t)
+    return dataset, features_ohe, target_name, num_columns
+
+def load_mv_binary():
+    # MIXED
     types = {"x1":float, "x2":float, "x3":str, "x4":float,"x5":float,"x6":float,
                  "x7":str,"x8":str,"x9":float,"x10":float,"binaryClass":str}
     dataset = pd.read_csv("./data/mv.csv", dtype=types)
@@ -157,10 +182,30 @@ def load_mv():
     target = dataset[target_name]
     features.remove(target_name)
     num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
+    profiling(dataset, "./data/mv.csv")
     dataset = encoding_categorical_variables(dataset[features])
     dataset[target_name] = target
     features_ohe = list(dataset.columns)
     features_ohe.remove(target_name)
+    return dataset, features_ohe, target_name, num_columns
+
+def load_mv_multi():
+    types = {"x1":float, "x2":float, "x3":str, "x4":float,"x5":float,"x6":float,
+                 "x7":str,"x8":str,"x9":float,"x10":float,"binaryClass":str}
+    dataset = pd.read_csv("./data/mv.csv", dtype=types)
+    features = list(dataset.columns)
+    target_name = ["binaryClass_0", "binaryClass_1"]
+    dataset.replace('N', 0, inplace=True)
+    dataset.replace('P', 1, inplace=True)
+    target = dataset[target_name]
+    features.remove(target_name)
+    num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
+    #profiling(dataset, "./data/mv.csv")
+    dataset = encoding_categorical_variables(dataset[features])
+    dataset[target_name] = target
+    features_ohe = list(dataset.columns)
+    for t in target_name:
+        features_ohe.remove(t)
     return dataset, features_ohe, target_name, num_columns
 
 def load_car():
@@ -170,14 +215,12 @@ def load_car():
     dataset = pd.read_csv("./data/car.csv", dtype=types)
     features = list(dataset.columns)
     target_name = ['safety_acc',  'safety_good',  'safety_unacc',  'safety_vgood']
-    profiling(dataset, "./data/car.csv")
+    #profiling(dataset, "./data/car.csv")
     dataset = encoding_categorical_variables(dataset[features])
-    #dataset[target_name] = target
     features_ohe = list(dataset.columns)
     num_columns = 'categorical'
     for t in target_name:
         features_ohe.remove(t)
-
     return dataset, features_ohe, target_name, num_columns
 
 def load_nursery():
@@ -187,7 +230,7 @@ def load_nursery():
     dataset = pd.read_csv("./data/nursery.csv", dtype=types)
     features = list(dataset.columns)
     target_name = ["'class'_not_recom", "'class'_priority", "'class'_recommend", "'class'_spec_prior", "'class'_very_recom"]
-    profiling(dataset, "./data/nursery.csv")    
+    #profiling(dataset, "./data/nursery.csv")    
     dataset = encoding_categorical_variables(dataset[features])
     features_ohe = list(dataset.columns)
     num_columns = 'categorical'
@@ -292,7 +335,6 @@ def select_features(df, data_path):
     print(X.columns[indexes])
     print(scores[indexes])
     
-
 def compute_associationrules(df, data):
     if data == "./data/mv.csv":
         association_cols = ['x3_brown',  'x3_green',  'x3_red',  'x7_no',  'x7_yes',  'x8_large',  'x8_normal', 'binaryClass']
@@ -319,7 +361,6 @@ def compute_associationrules(df, data):
         return 0
     print(rules)
     
-
 def train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, num_classes, to_view):
     # ONLY USED FOR RANDOM SPLIT
     train_samples = int(len(dataset)*data_cfg.train_split)
@@ -391,6 +432,10 @@ def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_oh
         train_list = split_by_odor(train)
     elif partitioning == "a1":
         train_list = split_by_a1(train)
+    elif partitioning == "v1":
+        train_list = split_by_v1(train)
+    elif partitioning == "v2":
+        train_list = split_by_v2(train)
 
     x_train_list = []
     y_train_list = []
@@ -407,8 +452,6 @@ def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_oh
         else:
             y_train_tensor = torch.tensor(y_train, dtype=torch.float32)
         
-        #print(x_train_tensor.shape)
-        #print(y_train_tensor.shape)
         x_train_list.append(x_train_tensor)
         y_train_list.append(y_train_tensor)
     
@@ -629,9 +672,26 @@ def split_by_odor(df):
 
 def split_by_a1(df):
     cols = df.columns
+
     subset_1 = df[df['A1'] <= -0.5]
     subset_2 = df[(df['A1'] > -0.5) & (df['A1'] <= 0.5)]
     subset_3 = df[df['A1'] > 0.5]
 
+    subsets = [subset_1, subset_2, subset_3]
+    return subsets
+
+def split_by_v1(df):
+    cols = df.columns
+    subset_1 = df[df['V1'] <= 1.0]
+    subset_2 = df[(df['V1'] > 1.0) & (df['V1'] <= 3.0)]
+    subset_3 = df[df['V1'] > 3.0]
+    subsets = [subset_1, subset_2, subset_3]
+    return subsets
+
+def split_by_v2(df):
+    cols = df.columns
+    subset_1 = df[df['V2'] <= 1.0]
+    subset_2 = df[(df['V2'] > 1.0) & (df['V2'] <= 3.0)]
+    subset_3 = df[df['V2'] > 3.0]
     subsets = [subset_1, subset_2, subset_3]
     return subsets
