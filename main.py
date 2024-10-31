@@ -167,7 +167,8 @@ def main(cfg: DictConfig) -> None:
             data_cfg=cfg.dataset,
             num_clients=cfg.num_clients,
             federated=cfg.federated,
-            partitioning=cfg.partitioning
+            partitioning=cfg.partitioning,
+            model=cfg.model
         )
         
         num_epochs = 50
