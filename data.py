@@ -51,7 +51,7 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning, model):
         to_view = False
 
     dataset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
-
+    print(dataset.shape)
 
     train_dataset, test_dataset = train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, num_classes, to_view)
     if federated:
@@ -157,14 +157,14 @@ def load_consumer_multi():
             "CustomerGender":str,"PurchaseFrequency":float,"CustomerSatisfaction":float,"PurchaseIntent":int}
     dataset = pd.read_csv("./data/consumer.csv", dtype=types)
     features = list(dataset.columns)
-    target_name = ["PurchaseIntent_0", "PurchaseIntent_1"]
+    target_name = ["PurchaseIntent_N", "PurchaseIntent_Y"]
     features.remove("ProductID")
-    target = dataset[target_name]
-    features.remove(target_name)
+    dataset['PurchaseIntent'].replace(0, 'N', inplace=True)
+    dataset['PurchaseIntent'].replace(1, 'Y', inplace=True)
     num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
-    profiling(dataset, "./data/consumer.csv")
+    #profiling(dataset, "./data/consumer.csv")
     dataset = encoding_categorical_variables(dataset[features])
-    dataset[target_name] = target
+    print(dataset.columns)
     features_ohe = list(dataset.columns)
     for t in target_name:
         features_ohe.remove(t)
@@ -194,15 +194,10 @@ def load_mv_multi():
                  "x7":str,"x8":str,"x9":float,"x10":float,"binaryClass":str}
     dataset = pd.read_csv("./data/mv.csv", dtype=types)
     features = list(dataset.columns)
-    target_name = ["binaryClass_0", "binaryClass_1"]
-    dataset.replace('N', 0, inplace=True)
-    dataset.replace('P', 1, inplace=True)
-    target = dataset[target_name]
-    features.remove(target_name)
+    target_name = ["binaryClass_N", "binaryClass_P"]
     num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
     #profiling(dataset, "./data/mv.csv")
     dataset = encoding_categorical_variables(dataset[features])
-    dataset[target_name] = target
     features_ohe = list(dataset.columns)
     for t in target_name:
         features_ohe.remove(t)
@@ -215,7 +210,7 @@ def load_car():
     dataset = pd.read_csv("./data/car.csv", dtype=types)
     features = list(dataset.columns)
     target_name = ['safety_acc',  'safety_good',  'safety_unacc',  'safety_vgood']
-    #profiling(dataset, "./data/car.csv")
+    profiling(dataset, "./data/car.csv")
     dataset = encoding_categorical_variables(dataset[features])
     features_ohe = list(dataset.columns)
     num_columns = 'categorical'
@@ -230,7 +225,7 @@ def load_nursery():
     dataset = pd.read_csv("./data/nursery.csv", dtype=types)
     features = list(dataset.columns)
     target_name = ["'class'_not_recom", "'class'_priority", "'class'_recommend", "'class'_spec_prior", "'class'_very_recom"]
-    #profiling(dataset, "./data/nursery.csv")    
+    profiling(dataset, "./data/nursery.csv")    
     dataset = encoding_categorical_variables(dataset[features])
     features_ohe = list(dataset.columns)
     num_columns = 'categorical'
@@ -247,9 +242,11 @@ def load_mushrooms():
        'RingNumber' : str, 'RingType' : str, 'SporePrintColor' : str, 'Population' : str, 'Habitat' : str,
        'Class' : str}
     dataset = pd.read_csv("./data/mushrooms.csv", dtype=types)
+    print("Edible: " + str(len(dataset[dataset["Class"]=='edible'])))
+    print("Poisonous: " + str(len(dataset[dataset["Class"]=='poisonous'])))
     features = list(dataset.columns)
     target_name = ["Class_poisonous", "Class_edible"]
-    #profiling(dataset, "./data/mushrooms.csv")
+    profiling(dataset, "./data/mushrooms.csv")
     dataset = encoding_categorical_variables(dataset[features])
     features_ohe = list(dataset.columns)
     num_columns = 'categorical'
@@ -265,7 +262,7 @@ def load_shuttle():
     features = list(dataset.columns)
     target_name = ["class_1", "class_2", "class_3", "class_4", "class_5", "class_6", "class_7"]
     num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
-    #profiling(dataset, "./data/shuttle.csv")
+    profiling(dataset, "./data/shuttle.csv")
     dataset = encoding_categorical_variables(dataset[features])
     features_ohe = list(dataset.columns)
     for t in target_name:
