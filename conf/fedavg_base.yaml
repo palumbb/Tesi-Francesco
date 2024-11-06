@@ -14,6 +14,7 @@ num_rounds: 2
 partitioning: "uniform"
 dirty_percentage: 0.10
 quality: completeness
+imputation: mean
 dataset_path: "./datasets/mushrooms.csv" #also change the input dim
 dataset_seed: 42
 alpha: 0.5

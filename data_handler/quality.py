@@ -36,15 +36,15 @@ def check_datatypes(df):
             df[col] = df[col].astype('object')
     return  df
 
-def impute_missing_column(df, method, missing_column):
-    np.random.seed(0)
+def impute_missing_column(df, method):
+    #np.random.seed(0)
     if method == "impute_standard":
         imputator = impute_standard()
         imputated_df = imputator.fit(df)
     elif method == "impute_mean":
         imputator = impute_mean()
         imputated_df = imputator.fit_mode(df)
-
+    return imputated_df
 
 
 class impute_mean:
@@ -74,5 +74,5 @@ class impute_standard:
             if (df[col].dtype != "object"):
                 df[col] = df[col].fillna(0)
             else:
-                df[col] = df[col].fillna("Missing")
+                df[col] = df[col].fillna("missing")
         return df

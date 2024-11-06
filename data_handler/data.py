@@ -12,10 +12,10 @@ from sklearn import preprocessing
 import numpy as np
 from data_handler.quality import impute_missing_column, dirty
 
-def load_dataset(data_cfg, num_clients, federated: bool, partitioning, quality, model, dirty_percentage):
+def load_dataset(data_cfg, num_clients, federated: bool, partitioning, quality, model, dirty_percentage, imputation):
     data_path = data_cfg.path
     if quality=="completeness":
-        trainsets, test_dataset = load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg)
+        trainsets, test_dataset = load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imputation)
         trainloaders, valloaders, testloader = data_loaders(num_partitions=num_clients,
                                                                     batch_size=data_cfg.batch_size,
                                                                     val_ratio=data_cfg.val_split,
@@ -141,7 +141,7 @@ def get_data_info(data_path):
         target = "Class"
     return types, target_encoded, target
         
-def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg):
+def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imputation):
     types, target_encoded, target = get_data_info(data_path)
     df = pd.read_csv(data_path, dtype=types)
     if data_path=="./datasets/consumer.csv":
@@ -172,11 +172,25 @@ def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg):
         client = dirty(seed, s, features, method, dirty_percentage)
         dirty_clients.append(client)
     dirty_clients, test = one_hot_encode_dirty(dirty_clients, test)
-    print(dirty_clients[0].head(20))
+    if imputation == "standard":
+        imputed_clients = []
+        for cl in dirty_clients:
+            imp_client = impute_missing_column(cl, "impute_standard")
+            imputed_clients.append(imp_client)
+        clients = imputed_clients
+    elif imputation == "mean":
+        imputed_clients = []
+        for cl in dirty_clients:
+            imp_client = impute_missing_column(cl, "impute_mean")
+            imputed_clients.append(imp_client)
+        clients = imputed_clients
+    elif imputation == "none":
+        clients = dirty_clients
     features_ohe = list(test.columns)
     for t in target_encoded:
         features_ohe.remove(t)
-    train_datasets, test_dataset = get_train_test(dirty_clients, test, features_ohe, target_encoded, to_view)
+
+    train_datasets, test_dataset = get_train_test(clients, test, features_ohe, target_encoded, to_view)
     return train_datasets, test_dataset
 
 def encoding_categorical_variables(X):
@@ -579,8 +593,8 @@ def get_train_test(train_list, test, features_ohe, target_name, to_view):
 def split_dataframe(df, percentages, num_clients):
     if len(percentages) != num_clients:
         raise ValueError("Il numero di percentuali deve essere uguale a num_clients.")
-    if sum(percentages) != 1:
-        raise ValueError("La somma delle percentuali deve essere pari a 1.")
+    #if sum(percentages) != 1:
+    #    raise ValueError("La somma delle percentuali deve essere pari a 1.")
     subsets = []
     start_idx = 0
     for i in range(num_clients):

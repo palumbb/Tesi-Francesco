@@ -9,6 +9,9 @@ import pickle
 import matplotlib.pyplot as plt
 import flwr as fl
 import hydra
+import random
+import torch
+import numpy as np
 from flwr.server.client_manager import SimpleClientManager
 from flwr.server.server import Server
 from hydra.core.hydra_config import HydraConfig
@@ -24,11 +27,10 @@ from torch.utils.data import DataLoader
 from torch.optim import SGD, Optimizer
 import pandas as pd
 
-
 @hydra.main(config_path="conf", config_name="fedavg_base", version_base=None)
-
 def main(cfg: DictConfig) -> None:
 
+    set_seed(42)
 
     device = cfg.server_device
 
@@ -36,6 +38,7 @@ def main(cfg: DictConfig) -> None:
     print("Dataset: " + str(cfg.dataset_path))
     print("Partitioning: " + str(cfg.partitioning))
     print("Quality: " + str(cfg.quality))
+    print("Imputation: " + str(cfg.imputation))
     print("Clients: " + str(cfg.num_clients))
     print("Local epochs: " + str(cfg.num_epochs))
     print("Sampled clients: " + str(cfg.clients_per_round))
@@ -44,29 +47,7 @@ def main(cfg: DictConfig) -> None:
     accuracies = []
     run_labels = ["FedAvg", "FedProx", "FedNova", "Scaffold"]
 
-    """if cfg.dataset_path=="./data/consumer.csv":
-        accuracy_save_path = 'plot_data/consumer/10clients.pkl'
-    elif cfg.dataset_path=="./data/mv.csv":
-        accuracy_save_path = 'plot_data/mv/10clients.pkl'
-    elif cfg.dataset_path=="./data/shuttle.csv":
-        accuracy_save_path = 'plot_data/shuttle/10clients.pkl'
-    elif cfg.dataset_path=="./data/nursery.csv":
-        accuracy_save_path = 'plot_data/nursery/10clients.pkl'
-    elif cfg.dataset_path=="./data/mushrooms.csv":
-        accuracy_save_path = 'plot_data/mushrooms/10clients.pkl'
-    elif cfg.dataset_path=="./data/wall-robot-navigation.csv":
-        accuracy_save_path = 'plot_data/wall-robot-navigation/10clients.pkl'
-    elif cfg.dataset_path=="./data/car.csv":
-        accuracy_save_path = 'plot_data/car/10clients.pkl'
-
-    current_run_idx = len(load_accuracies(accuracy_save_path))  
-    if current_run_idx < len(run_labels):
-        run_label = run_labels[current_run_idx]
-    else:
-        run_label = f"Run {current_run_idx + 1}" 
-    """
-
-    # 2. Prepare your dataset
+    # 2. Preparazione del dataset
     if cfg.federated:
         trainloaders, valloaders, testloader = load_dataset(
             data_cfg=cfg.dataset,
@@ -75,10 +56,11 @@ def main(cfg: DictConfig) -> None:
             partitioning=cfg.partitioning,
             model=cfg.model,
             dirty_percentage=cfg.dirty_percentage,
-            quality=cfg.quality
+            quality=cfg.quality,
+            imputation=cfg.imputation
         )
 
-        # 3. Define your clients
+        # 3. Definizione dei client
         client_fn = None
         if cfg.client_fn._target_ == "clients.multiclass.client_scaffold.gen_client_fn":
             save_path = HydraConfig.get().runtime.output_dir
@@ -106,13 +88,13 @@ def main(cfg: DictConfig) -> None:
             accuracies=accuracies,
         )
 
-        # 4. Define your strategy
+        # 4. Definizione della strategia
         strategy = instantiate(
             cfg.strategy,
             evaluate_fn=evaluate_fn,
         )
 
-        # 5. Define your server
+        # 5. Definizione del server
         server = Server(strategy=strategy, client_manager=SimpleClientManager())
         if isinstance(strategy, FedNovaStrategy):
             server = FedNovaServer(strategy=strategy, client_manager=SimpleClientManager())
@@ -121,7 +103,7 @@ def main(cfg: DictConfig) -> None:
                 strategy=strategy, model=cfg.model, client_manager=SimpleClientManager()
             )
 
-        # 6. Start Simulation
+        # 6. Avvio della simulazione
         history = fl.simulation.start_simulation(
             server=server,
             client_fn=client_fn,
@@ -138,32 +120,9 @@ def main(cfg: DictConfig) -> None:
         save_path = HydraConfig.get().runtime.output_dir
         print(save_path)
 
-        # 7. Save your results
+        # 7. Salvataggio dei risultati
         with open(os.path.join(save_path, "history.pkl"), "wb") as f_ptr:
             pickle.dump(history, f_ptr)
-
-        #save_accuracies(accuracies, accuracy_save_path)
-
-        # 8. Plot the accuracies for each strategy
-        """all_accuracies = load_accuracies(accuracy_save_path)
-
-        plt.figure(figsize=(10, 6))
-        for run_idx, run_accuracies in enumerate(all_accuracies):
-            # Usa la variabile temporanea come label per l'ultimo plot
-            if run_idx < len(run_labels):
-                label = run_labels[run_idx]  # Prendi la label dalla lista
-            else:
-                label = cfg.name  # Default label per le run oltre la lista
-
-            plt.plot(range(1, len(run_accuracies) + 1), run_accuracies, 
-                     marker='o', linestyle='-', label=label)
-
-        plt.title('RANDOM SPLIT WITH 10 CLIENTS')
-        plt.xlabel('Round')
-        plt.ylabel('Accuracy')
-        plt.legend()
-        plt.grid(True)
-        plt.show()"""
 
     else:
         trainset, testset = load_dataset(
@@ -221,6 +180,15 @@ def load_accuracies(save_path):
         return data
     else:
         return []
+    
+def set_seed(seed: int):
+    random.seed(seed)
+    np.random.seed(seed)
+    torch.manual_seed(seed)
+    if torch.cuda.is_available():
+        torch.cuda.manual_seed_all(seed)
+    torch.backends.cudnn.deterministic = True
+    torch.backends.cudnn.benchmark = False
 
 if __name__ == "__main__":
     main()
