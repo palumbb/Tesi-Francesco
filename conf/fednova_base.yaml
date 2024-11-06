@@ -13,6 +13,8 @@ learning_rate: 0.01
 num_rounds: 30
 alpha: 0.5
 partitioning: "uniform"
+dirty_percentage: 0.10
+quality: completeness
 dataset_path: "./data/mushrooms.csv"
 dataset_seed: 42
 labels_per_client: 2 # only used when partitioning is label quantity
