@@ -12,11 +12,11 @@ clients_per_round: 100
 learning_rate: 0.01
 num_rounds: 30
 mu: 0.01
-partitioning: "uniform"
+partitioning: uniform
 dirty_percentage: 0.10
 quality: completeness
 imputation: standard
-dataset_path: "./data/mushrooms.csv"
+dataset_path: ./datasets/mushrooms.csv
 dataset_seed: 42
 alpha: 0.5
 labels_per_client: 2 # only used when partitioning is label quantity
@@ -47,7 +47,7 @@ model:
    # model config
   _target_: model.multiclassnet.MulticlassNet #change model in the centralized setting
   data: ${dataset_path}
-  partitioning: ${partitioning}
+  quality: ${quality}
 
 strategy:
   _target_: flwr.server.strategy.FedAvg # points to your strategy (either custom or exiting in Flower)
