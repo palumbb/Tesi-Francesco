@@ -16,7 +16,7 @@ from hydra.utils import call, instantiate
 from omegaconf import DictConfig, OmegaConf
 from model.binarynet import BinaryNet, train_centralized_binary, test_binary
 from model.multiclassnet import MulticlassNet, train_centralized_multi, test_multi
-from data import load_dataset
+from data_handler.data import load_dataset
 from servers.server_fednova import FedNovaServer
 from servers.server_scaffold import ScaffoldServer, gen_evaluate_fn
 from strategy import FedNovaStrategy, ScaffoldStrategy
@@ -35,8 +35,9 @@ def main(cfg: DictConfig) -> None:
     print(f"Strategy: {cfg.name}")
     print("Dataset: " + str(cfg.dataset_path))
     print("Partitioning: " + str(cfg.partitioning))
-    print("Clients:" + str(cfg.num_clients))
-    print("Local epochs:" + str(cfg.num_epochs))
+    print("Quality: " + str(cfg.quality))
+    print("Clients: " + str(cfg.num_clients))
+    print("Local epochs: " + str(cfg.num_epochs))
     print("Sampled clients: " + str(cfg.clients_per_round))
     print("Rounds: " + str(cfg.num_rounds))
 
@@ -72,7 +73,9 @@ def main(cfg: DictConfig) -> None:
             num_clients=cfg.num_clients,
             federated=cfg.federated,
             partitioning=cfg.partitioning,
-            model=cfg.model
+            model=cfg.model,
+            dirty_percentage=cfg.dirty_percentage,
+            quality=cfg.quality
         )
 
         # 3. Define your clients

@@ -12,28 +12,49 @@ from sklearn.metrics import accuracy_score, f1_score
 import numpy as np
 
 class MulticlassNet(nn.Module):
-    def __init__(self, data, partitioning):  # Impostiamo num_classes=4
+    def __init__(self, data, quality):  
         super(MulticlassNet, self).__init__()
-        if data == "./data/car.csv":
-            input_dim = 21
+        if data == "./datasets/car.csv":
+            if quality=="completeness":
+                input_dim = 28
+            else:
+                input_dim = 21
             num_classes = 4
-        elif data == "./data/nursery.csv":
-            input_dim = 27
+        elif data == "./datasets/nursery.csv":
+            if quality=="completeness":
+                input_dim = 36
+            else: 
+                input_dim = 27
             num_classes = 5
-        if data=="./data/consumer.csv":
-            input_dim = 16
+        if data=="./datasets/consumer.csv":
+            if quality=="completeness":
+                input_dim = 21
+            else:
+                input_dim = 16
             num_classes = 2
-        elif data == "./data/mv.csv":
-            input_dim = 14
+        elif data == "./datasets/mv.csv":
+            if quality=="completeness":
+                input_dim = 18
+            else:
+                input_dim = 14
             num_classes = 2
-        if data=="./data/shuttle.csv":
-            input_dim = 9
+        if data=="./datasets/shuttle.csv":
+            if quality=="completeness":
+                input_dim = 10
+            else:
+                input_dim = 9
             num_classes = 7
-        elif data == "./data/wall-robot-navigation.csv":
-            input_dim = 4
+        elif data == "./datasets/wall-robot-navigation.csv":
+            if quality=="completeness":
+                input_dim = 5
+            else:
+                input_dim = 4
             num_classes = 4
-        elif data == "./data/mushrooms.csv":
-            input_dim = 115
+        elif data == "./datasets/mushrooms.csv":
+            if quality=="completeness":
+                input_dim = 140
+            else:
+                input_dim = 115
             num_classes = 2
         self.fc1 = nn.Linear(input_dim, 64)
         self.relu = nn.ReLU()
@@ -70,7 +91,7 @@ def train_fedavg(
     momentum: float,
     weight_decay: float,
 ) -> None:
-    criterion = nn.CrossEntropyLoss()  # CrossEntropy per multi-class
+    criterion = nn.CrossEntropyLoss() 
     optimizer = SGD(
         net.parameters(), lr=learning_rate, momentum=momentum, weight_decay=weight_decay
     )

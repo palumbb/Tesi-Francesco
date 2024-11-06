@@ -13,9 +13,9 @@ from sklearn.metrics import f1_score
 class BinaryNet(nn.Module):
     def __init__(self, data, partitioning):
         super(BinaryNet, self).__init__()
-        if data=="./data/consumer.csv":
+        if data=="./datasets/consumer.csv":
             input_dim = 16
-        elif data == "./data/mv.csv":
+        elif data == "./datasets/mv.csv":
             input_dim = 14
         self.fc1 = nn.Linear(input_dim, 64)
         self.fc2 = nn.Linear(64, 32)
