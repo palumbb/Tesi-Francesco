@@ -29,6 +29,20 @@ def uniform(seed, df, features, dirty_percentage):
         # print("saved {}-completeness{}%".format(name, round((1-p)*100)))
     return df_dirt 
 
+def uniform_nan(seed, df, features, dirty_percentage):
+    np.random.seed(seed)
+
+    df_dirt = df.copy()
+    comp = [dirty_percentage,1-dirty_percentage]
+    df_dirt = check_datatypes(df_dirt)
+
+    for col in df_dirt.columns:
+                if col!=features:
+                    rand = np.random.choice([True, False], size=df_dirt.shape[0], p=comp)
+                    df_dirt.loc[rand == True,col]=np.nan
+
+    return df_dirt
+
 def check_datatypes(df):
     for col in df.columns:
         if (df[col].dtype == "bool"):

@@ -10,7 +10,7 @@ from sklearn.datasets import load_digits
 from sklearn.feature_selection import SelectKBest, mutual_info_classif
 from sklearn import preprocessing
 import numpy as np
-from data_handler.quality import impute_missing_column, dirty
+from data_handler.quality import impute_missing_column, dirty, uniform_nan
 
 def load_dataset(data_cfg, num_clients, federated: bool, partitioning, quality, model, dirty_percentage, imputation):
     data_path = data_cfg.path
@@ -169,22 +169,21 @@ def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imput
     subsets = split_dataframe(train, percentages, num_clients)
     dirty_clients = []
     for s in subsets:
-        client = dirty(seed, s, features, method, dirty_percentage)
-        dirty_clients.append(client)
+        if imputation == "standard": # DIRTY WITH NAN -> IMPUTED WITH 0, 'MISSING'
+            client = uniform_nan(seed, s, features, dirty_percentage)
+            imp_client = impute_missing_column(client, "impute_standard")
+            dirty_clients.append(imp_client)
+        else:
+            client = dirty(seed, s, features, method, dirty_percentage) # DIRECLTY DIRTY WITH 0, 'MISSING'
+            dirty_clients.append(client)
     dirty_clients, test = one_hot_encode_dirty(dirty_clients, test)
-    if imputation == "standard":
-        imputed_clients = []
-        for cl in dirty_clients:
-            imp_client = impute_missing_column(cl, "impute_standard")
-            imputed_clients.append(imp_client)
-        clients = imputed_clients
-    elif imputation == "mean":
+    if imputation == "mean":
         imputed_clients = []
         for cl in dirty_clients:
             imp_client = impute_missing_column(cl, "impute_mean")
             imputed_clients.append(imp_client)
         clients = imputed_clients
-    elif imputation == "none":
+    else:
         clients = dirty_clients
     features_ohe = list(test.columns)
     for t in target_encoded:
