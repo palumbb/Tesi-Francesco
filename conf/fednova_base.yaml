@@ -45,7 +45,7 @@ model:
    # model config
   _target_: model.multiclassnet.MulticlassNet #change model in the centralized setting
   data: ${dataset_path}
-  quality: ${quality}
+  imputation: ${imputation}
 
 
 strategy:

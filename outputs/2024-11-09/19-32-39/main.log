@@ -1,0 +1,14 @@
+[2024-11-09 19:32:40,171][flwr][WARNING] - Both server and strategy were provided, ignoring strategy
+[2024-11-09 19:32:40,171][flwr][INFO] - Starting Flower simulation, config: num_rounds=2, no round_timeout
+[2024-11-09 19:32:48,643][flwr][INFO] - Flower VCE: Ray initialized with resources: {'CPU': 8.0, 'node:__internal_head__': 1.0, 'node:127.0.0.1': 1.0, 'memory': 1553023796.0, 'object_store_memory': 776511897.0}
+[2024-11-09 19:32:48,643][flwr][INFO] - Optimize your simulation with Flower VCE: https://flower.ai/docs/framework/how-to-run-simulations.html
+[2024-11-09 19:32:48,643][flwr][INFO] - Flower VCE: Resources for each Virtual Client: {'num_cpus': 4, 'num_gpus': 0.0}
+[2024-11-09 19:32:48,673][flwr][INFO] - Flower VCE: Creating VirtualClientEngineActorPool with 2 actors
+[2024-11-09 19:32:48,673][flwr][INFO] - [INIT]
+[2024-11-09 19:32:48,673][flwr][INFO] - Requesting initial parameters from one random client
+[2024-11-09 19:32:53,458][flwr][INFO] - Received initial parameters from one random client
+[2024-11-09 19:32:53,458][flwr][INFO] - Starting evaluation of initial global parameters
+[2024-11-09 19:32:53,582][flwr][INFO] - initial parameters (loss, other metrics): 1.6096123030156264, {'accuracy': 0.1724537037037037, 'f1-score': 0.21817591015902493}
+[2024-11-09 19:32:53,583][flwr][INFO] - 
+[2024-11-09 19:32:53,585][flwr][INFO] - [ROUND 1]
+[2024-11-09 19:32:53,586][flwr][INFO] - configure_fit: strategy sampled 2 clients (out of 2)

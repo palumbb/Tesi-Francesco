@@ -14,8 +14,8 @@ num_rounds: 2
 partitioning: "uniform"
 dirty_percentage: 0.10
 quality: completeness
-imputation: mean
-dataset_path: "./datasets/mushrooms.csv" #also change the input dim
+imputation: standard
+dataset_path: "./datasets/wall-robot-navigation.csv" #also change the input dim
 dataset_seed: 42
 alpha: 0.5
 labels_per_client: 4 # only used when partitioning is label quantity
@@ -43,7 +43,7 @@ model:
   # model config
   _target_: model.multiclassnet.MulticlassNet #change model in the centralized setting
   data: ${dataset_path}
-  quality: ${quality}
+  imputation: ${imputation}
 
 strategy:
   _target_: flwr.server.strategy.FedAvg # points to your strategy (either custom or exiting in Flower)

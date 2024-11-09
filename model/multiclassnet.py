@@ -12,47 +12,47 @@ from sklearn.metrics import accuracy_score, f1_score
 import numpy as np
 
 class MulticlassNet(nn.Module):
-    def __init__(self, data, quality):  
+    def __init__(self, data, imputation):  
         super(MulticlassNet, self).__init__()
         if data == "./datasets/car.csv":
-            if quality=="completeness":
-                input_dim = 28
+            if imputation=="standard":
+                input_dim = 27
             else:
                 input_dim = 21
             num_classes = 4
         elif data == "./datasets/nursery.csv":
-            if quality=="completeness":
-                input_dim = 36
+            if imputation=="standard":
+                input_dim = 35
             else: 
                 input_dim = 27
             num_classes = 5
         if data=="./datasets/consumer.csv":
-            if quality=="completeness":
-                input_dim = 21
+            if imputation=="standard":
+                input_dim = 20
             else:
                 input_dim = 16
             num_classes = 2
         elif data == "./datasets/mv.csv":
-            if quality=="completeness":
-                input_dim = 18
+            if imputation=="standard":
+                input_dim = 17
             else:
                 input_dim = 14
             num_classes = 2
         if data=="./datasets/shuttle.csv":
-            if quality=="completeness":
-                input_dim = 10
+            if imputation=="standard":
+                input_dim = 9
             else:
                 input_dim = 9
             num_classes = 7
         elif data == "./datasets/wall-robot-navigation.csv":
-            if quality=="completeness":
-                input_dim = 5
+            if imputation=="standard":
+                input_dim = 4
             else:
                 input_dim = 4
             num_classes = 4
         elif data == "./datasets/mushrooms.csv":
-            if quality=="completeness":
-                input_dim = 140
+            if imputation=="standard":
+                input_dim = 139
             else:
                 input_dim = 115
             num_classes = 2

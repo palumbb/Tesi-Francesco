@@ -142,7 +142,7 @@ def main(cfg: DictConfig) -> None:
         train_loader = DataLoader(trainset, batch_size=batch_size, shuffle=True)
         test_loader = DataLoader(testset, batch_size=batch_size, shuffle=False)
 
-        model = MulticlassNet(cfg.dataset_path, partitioning=cfg.partitioning)
+        model = MulticlassNet(cfg.dataset_path, partitioning=cfg.partitioning, imputation=cfg.imputation)
        
         optimizer = SGD(
             model.parameters(), lr=learning_rate, momentum=momentum, weight_decay=weight_decay

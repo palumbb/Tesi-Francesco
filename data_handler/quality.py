@@ -37,7 +37,7 @@ def uniform_nan(seed, df, features, dirty_percentage):
     df_dirt = check_datatypes(df_dirt)
 
     for col in df_dirt.columns:
-                if col!=features:
+                if col in features:
                     rand = np.random.choice([True, False], size=df_dirt.shape[0], p=comp)
                     df_dirt.loc[rand == True,col]=np.nan
 
@@ -51,7 +51,7 @@ def check_datatypes(df):
     return  df
 
 def impute_missing_column(df, method):
-    #np.random.seed(0)
+    np.random.seed(0)
     if method == "impute_standard":
         imputator = impute_standard()
         imputated_df = imputator.fit(df)
@@ -73,10 +73,11 @@ class impute_mean:
 
     def fit_mode(self, df):
         for col in df.columns:
-            if (df[col].dtype != "object"):
-                df[col] = df[col].fillna(df[col].mean())
+            if is_bool_dtype(df[col]) | is_object_dtype(df[col]):
+                df[col] = df[col].replace("missing", df[col].mode()[0])
             else:
-                df[col] = df[col].fillna(df[col].mode()[0])
+                df[col] = df[col].replace(0, df[col].mean())
+                df[col] = df[col].replace(0.0, df[col].mean())
         return df
     
 class impute_standard:
