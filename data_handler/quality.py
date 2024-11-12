@@ -15,7 +15,7 @@ def uniform(seed, df, features, dirty_percentage):
     df_dirt = check_datatypes(df_dirt)
 
     for col in df_dirt.columns:
-        if col!=features:
+        if col in features:
             rand = np.random.choice([True, False], size=df_dirt.shape[0], p=comp)
             if is_bool_dtype(df_dirt[col]) | is_object_dtype(df_dirt[col]):
                 df_dirt.loc[rand == True,col] = "missing"
@@ -74,10 +74,10 @@ class impute_mean:
     def fit_mode(self, df):
         for col in df.columns:
             if is_bool_dtype(df[col]) | is_object_dtype(df[col]):
-                df[col] = df[col].replace("missing", df[col].mode()[0])
+                df[col] = df[col].replace("missing", df[df[col]!="missing"][col].mode()[0])
             else:
-                df[col] = df[col].replace(0, df[col].mean())
-                df[col] = df[col].replace(0.0, df[col].mean())
+                df[col] = df[col].replace(0, df[df[col]!=0][col].mean())
+                df[col] = df[col].replace(0.0, df[df[col]!=0][col].mean())
         return df
     
 class impute_standard:
