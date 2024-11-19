@@ -15,19 +15,23 @@ from data_handler.quality import impute_missing_column, dirty, uniform_nan
 def load_dataset(data_cfg, num_clients, federated: bool, partitioning, quality, model, dirty_percentage, imputation):
     data_path = data_cfg.path
     if quality=="completeness":
-        trainsets, test_dataset = load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imputation)
-        trainloaders, valloaders, testloader = data_loaders(num_partitions=num_clients,
-                                                                    batch_size=data_cfg.batch_size,
-                                                                    val_ratio=data_cfg.val_split,
-                                                                    train = trainsets,
-                                                                    test = test_dataset
-                                                                    )
-        return trainloaders, valloaders, testloader
+        trainsets, test_dataset = load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imputation, federated)
+        if federated:
+            trainloaders, valloaders, testloader = data_loaders(num_partitions=num_clients,
+                                                                        batch_size=data_cfg.batch_size,
+                                                                        val_ratio=data_cfg.val_split,
+                                                                        train = trainsets,
+                                                                        test = test_dataset
+                                                                        )
+            return trainloaders, valloaders, testloader
+        else:
+            #train_dataset, test_dataset = train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, to_view)
+            return trainsets, test_dataset
     elif quality=="normal":
         dataset, features_ohe, target_name, num_columns, num_classes, to_view = load_clean_dataset(data_path, model)
         dataset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
 
-        train_dataset, test_dataset = train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, num_classes, to_view)
+        train_dataset, test_dataset = train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, to_view)
         
         if federated:
             if partitioning=="uniform":
@@ -141,58 +145,68 @@ def get_data_info(data_path):
         target = "Class"
     return types, target_encoded, target
         
-def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imputation):
+def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imputation, federated):
     types, target_encoded, target = get_data_info(data_path)
     df = pd.read_csv(data_path, dtype=types)
     if data_path=="./datasets/consumer.csv":
         df['PurchaseIntent'].replace(0, 'N', inplace=True)
         df['PurchaseIntent'].replace(1, 'Y', inplace=True)
-    train_samples = int(len(df)*data_cfg.train_split)
-    train = df.iloc[0:train_samples,]
-    test = df.iloc[train_samples:,]
     features = list(df.columns)
     features.remove(target)
     to_view = False # True if BinaryNet, False otherwise
     method = "uniform"
-    seed = 0
-    if num_clients == 2:
-        proportions = 0.5
-    elif num_clients == 5:
-        proportions = 0.2
-    elif num_clients == 10:
-        proportions = 0.1
-    elif num_clients == 50:
-        proportions = 0.02
-    elif num_clients == 100:
-        proportions = 0.01
-    percentages = np.ones(num_clients)*proportions
-    subsets = split_dataframe(train, percentages, num_clients)
-    imp_clients = []
-    for s in subsets:
-        if imputation == "standard": # DIRTY WITH NAN -> IMPUTED WITH 0, 'MISSING'
-            client = uniform_nan(seed, s, features, dirty_percentage)
-            imp_client = impute_missing_column(client, "impute_standard")
-            imp_clients.append(imp_client)
-        elif imputation == "mean":
-            client = dirty(seed, s, features, method, dirty_percentage) # DIRECLTY DIRTY WITH 0, 'MISSING'
-            imp_client = impute_missing_column(client, "impute_mean")
-            imp_clients.append(imp_client)
-    print(imp_clients[0].head(20))
-    imp_clients, test = one_hot_encode_dirty(imp_clients, test)
-    """if imputation == "mean":
-        imputed_clients = []
-        for cl in dirty_clients:
-            imp_client = impute_missing_column(cl, "impute_mean")
-            imputed_clients.append(imp_client)
-        clients = imputed_clients
+    seed = 20
+    if federated:
+        train_samples = int(len(df)*data_cfg.train_split)
+        train = df.iloc[0:train_samples,]
+        test = df.iloc[train_samples:,]
+        if num_clients == 2:
+            proportions = 0.5
+        elif num_clients == 5:
+            proportions = 0.2
+        elif num_clients == 10:
+            proportions = 0.1
+        elif num_clients == 50:
+            proportions = 0.02
+        elif num_clients == 100:
+            proportions = 0.01
+        percentages = np.ones(num_clients)*proportions
+        imp_clients = []
+        subsets = split_dataframe(train, percentages, num_clients)
+        for s in subsets:
+            if imputation == "standard": # DIRTY WITH NAN -> IMPUTED WITH 0, 'MISSING'
+                client = uniform_nan(seed, s, features, dirty_percentage)
+                imp_client = impute_missing_column(client, "impute_standard")
+                imp_clients.append(imp_client)
+            elif imputation == "mean":
+                client = dirty(seed, s, features, method, dirty_percentage) # DIRECLTY DIRTY WITH 0, 'MISSING'
+                imp_client = impute_missing_column(client, "impute_mean")
+                imp_clients.append(imp_client)
+        imp_clients, test = one_hot_encode_dirty(imp_clients, test)
+        #print(imp_clients[0].columns)
+        
+        features_ohe = list(test.columns)
+        for t in target_encoded:
+            features_ohe.remove(t)
+        train_datasets, test_dataset = get_train_test(imp_clients, test, features_ohe, target_encoded, to_view)
+        return train_datasets, test_dataset
     else:
-        clients = dirty_clients"""
-    
-    features_ohe = list(test.columns)
-    for t in target_encoded:
-        features_ohe.remove(t)
-    train_datasets, test_dataset = get_train_test(imp_clients, test, features_ohe, target_encoded, to_view)
-    return train_datasets, test_dataset
+        if imputation == "standard": # DIRTY WITH NAN -> IMPUTED WITH 0, 'MISSING'
+            client = uniform_nan(seed, df, features, dirty_percentage)
+            imp_client = impute_missing_column(client, "impute_standard")
+        elif imputation == "mean":
+            client = dirty(seed, df, features, method, dirty_percentage) # DIRECLTY DIRTY WITH 0, 'MISSING'
+            imp_client = impute_missing_column(client, "impute_mean")
+        cat_features = imp_client.select_dtypes(include=['object', 'category']).columns
+        num_columns = list(imp_client[features].select_dtypes(include=[int, float]).columns)
+        if not num_columns:
+            num_columns = "categorical"
+        imp_client = encoding_categorical_variables(imp_client[cat_features])
+        features_ohe = list(imp_client.columns)
+        for t in target_encoded:
+            features_ohe.remove(t)
+        trainset, testset = train_test_split(imp_client, data_cfg, num_columns, features_ohe, target_encoded, to_view)
+        return trainset, testset
 
 def encoding_categorical_variables(X):
     def encode(original_dataframe, feature_to_encode):
@@ -243,7 +257,7 @@ def data_loaders(num_partitions: int, batch_size: int, val_ratio: float, train, 
         num_train = num_total - num_val
 
         for_train, for_val = random_split(
-            trainset_, [num_train, num_val], torch.Generator().manual_seed(2023)
+            trainset_, [num_train, num_val], torch.Generator().manual_seed(20)
         )
 
         trainloaders.append(
@@ -477,7 +491,7 @@ def compute_associationrules(df, data):
         return 0
     print(rules)
     
-def train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, num_classes, to_view):
+def train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, to_view):
     # ONLY USED FOR RANDOM SPLIT
     train_samples = int(len(dataset)*data_cfg.train_split)
     train = dataset.iloc[0:train_samples,]

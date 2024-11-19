@@ -30,7 +30,7 @@ import pandas as pd
 @hydra.main(config_path="conf", config_name="fedavg_base", version_base=None)
 def main(cfg: DictConfig) -> None:
 
-    set_seed(42)
+    set_seed(20)
 
     device = cfg.server_device
 
@@ -130,7 +130,10 @@ def main(cfg: DictConfig) -> None:
             num_clients=cfg.num_clients,
             federated=cfg.federated,
             partitioning=cfg.partitioning,
-            model=cfg.model
+            model=cfg.model,
+            quality=cfg.quality,
+            dirty_percentage=cfg.dirty_percentage,
+            imputation=cfg.imputation
         )
         
         num_epochs = 50
@@ -142,7 +145,7 @@ def main(cfg: DictConfig) -> None:
         train_loader = DataLoader(trainset, batch_size=batch_size, shuffle=True)
         test_loader = DataLoader(testset, batch_size=batch_size, shuffle=False)
 
-        model = MulticlassNet(cfg.dataset_path, partitioning=cfg.partitioning, imputation=cfg.imputation)
+        model = MulticlassNet(cfg.dataset_path, imputation=cfg.imputation)
        
         optimizer = SGD(
             model.parameters(), lr=learning_rate, momentum=momentum, weight_decay=weight_decay
