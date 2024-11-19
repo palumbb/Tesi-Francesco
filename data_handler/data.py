@@ -184,18 +184,20 @@ def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imput
                 imp_clients.append(imp_client)
         imp_clients, test = one_hot_encode_dirty(imp_clients, test)
         #print(imp_clients[0].columns)
-        
         features_ohe = list(test.columns)
         for t in target_encoded:
             features_ohe.remove(t)
-        train_datasets, test_dataset = get_train_test(imp_clients, test, features_ohe, target_encoded, to_view)
+        num_columns = list(imp_clients[0][features].select_dtypes(include=[int, float]).columns)
+        if not num_columns:
+            num_columns = "categorical"
+        train_datasets, test_dataset = get_train_test(imp_clients, test, features_ohe, target_encoded, to_view, num_columns)
         return train_datasets, test_dataset
     else:
         if imputation == "standard": # DIRTY WITH NAN -> IMPUTED WITH 0, 'MISSING'
             client = uniform_nan(seed, df, features, dirty_percentage)
             imp_client = impute_missing_column(client, "impute_standard")
         elif imputation == "mean":
-            client = dirty(seed, df, features, method, dirty_percentage) # DIRECLTY DIRTY WITH 0, 'MISSING'
+            client = uniform_nan(seed, df, features, dirty_percentage) # WITH NAN
             imp_client = impute_missing_column(client, "impute_mean")
         cat_features = imp_client.select_dtypes(include=['object', 'category']).columns
         num_columns = list(imp_client[features].select_dtypes(include=[int, float]).columns)
@@ -571,10 +573,18 @@ def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_oh
     train_datasets, test_dataset = get_train_test(train_list, test, features_ohe, target_name, to_view)
     return train_datasets, test_dataset
 
-def get_train_test(train_list, test, features_ohe, target_name, to_view):
+def get_train_test(train_list, test, features_ohe, target_name, to_view, num_columns):
+    df = pd.DataFrame()
+    for train_df in train_list:
+        df = pd.concat([df, train_df])
+    if (num_columns != 'categorical'):
+        scaler = StandardScaler()
+        df[num_columns] = scaler.fit(df[num_columns])
+
     x_train_list = []
     y_train_list = []
     for train_df in train_list:
+        train_df[num_columns] = scaler.transform(train_df[num_columns])
         x_train = train_df[features_ohe].to_numpy()
         x_train = np.vstack(x_train).astype(np.float32)
         y_train = train_df[target_name].to_numpy()
@@ -589,6 +599,7 @@ def get_train_test(train_list, test, features_ohe, target_name, to_view):
         x_train_list.append(x_train_tensor)
         y_train_list.append(y_train_tensor)
     
+    test[num_columns] = scaler.transform(test[num_columns])
     x_test = test[features_ohe].to_numpy()
     x_test = np.vstack(x_test).astype(np.float32)
     y_test = test[target_name].to_numpy()
