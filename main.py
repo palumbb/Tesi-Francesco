@@ -29,8 +29,9 @@ import pandas as pd
 
 @hydra.main(config_path="conf", config_name="fedavg_base", version_base=None)
 def main(cfg: DictConfig) -> None:
-
-    set_seed(20)
+    
+    seed = 206
+    set_seed(seed)
 
     device = cfg.server_device
 
@@ -39,10 +40,11 @@ def main(cfg: DictConfig) -> None:
     print("Partitioning: " + str(cfg.partitioning))
     print("Quality: " + str(cfg.quality))
     print("Imputation: " + str(cfg.imputation))
-    print("Clients: " + str(cfg.num_clients))
-    print("Local epochs: " + str(cfg.num_epochs))
-    print("Sampled clients: " + str(cfg.clients_per_round))
-    print("Rounds: " + str(cfg.num_rounds))
+    print(f"Dirty Percentage: {cfg.dirty_percentage}")
+    #print("Clients: " + str(cfg.num_clients))
+    #print("Local epochs: " + str(cfg.num_epochs))
+    #print("Sampled clients: " + str(cfg.clients_per_round))
+    #print("Rounds: " + str(cfg.num_rounds))
 
     accuracies = []
     run_labels = ["FedAvg", "FedProx", "FedNova", "Scaffold"]
@@ -57,7 +59,8 @@ def main(cfg: DictConfig) -> None:
             model=cfg.model,
             dirty_percentage=cfg.dirty_percentage,
             quality=cfg.quality,
-            imputation=cfg.imputation
+            imputation=cfg.imputation,
+            seed=seed
         )
 
         # 3. Definizione dei client
@@ -133,7 +136,8 @@ def main(cfg: DictConfig) -> None:
             model=cfg.model,
             quality=cfg.quality,
             dirty_percentage=cfg.dirty_percentage,
-            imputation=cfg.imputation
+            imputation=cfg.imputation,
+            seed=seed
         )
         
         num_epochs = 50

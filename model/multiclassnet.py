@@ -54,7 +54,7 @@ class MulticlassNet(nn.Module):
             if imputation=="standard":
                 input_dim = 139
             else:
-                input_dim = 115
+                input_dim = 117
             num_classes = 2
         self.fc1 = nn.Linear(input_dim, 64)
         self.relu = nn.ReLU()

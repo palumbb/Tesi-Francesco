@@ -12,7 +12,7 @@ from sklearn import preprocessing
 import numpy as np
 from data_handler.quality import impute_missing_column, dirty, uniform_nan
 
-def load_dataset(data_cfg, num_clients, federated: bool, partitioning, quality, model, dirty_percentage, imputation):
+def load_dataset(data_cfg, num_clients, federated: bool, partitioning, quality, model, dirty_percentage, imputation, seed):
     data_path = data_cfg.path
     if quality=="completeness":
         trainsets, test_dataset = load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imputation, federated)
@@ -21,7 +21,8 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning, quality, 
                                                                         batch_size=data_cfg.batch_size,
                                                                         val_ratio=data_cfg.val_split,
                                                                         train = trainsets,
-                                                                        test = test_dataset
+                                                                        test = test_dataset,
+                                                                        seed = seed
                                                                         )
             return trainloaders, valloaders, testloader
         else:
@@ -58,7 +59,8 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning, quality, 
                                                                     batch_size=data_cfg.batch_size,
                                                                     val_ratio=data_cfg.val_split,
                                                                     train = trainsets,
-                                                                    test = test_dataset
+                                                                    test = test_dataset,
+                                                                    seed = seed
                                                                     )
             return trainloaders, valloaders, testloader
         
@@ -183,7 +185,6 @@ def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imput
                 imp_client = impute_missing_column(client, "impute_mean")
                 imp_clients.append(imp_client)
         imp_clients, test = one_hot_encode_dirty(imp_clients, test)
-        #print(imp_clients[0].columns)
         features_ohe = list(test.columns)
         for t in target_encoded:
             features_ohe.remove(t)
@@ -203,7 +204,7 @@ def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imput
         num_columns = list(imp_client[features].select_dtypes(include=[int, float]).columns)
         if not num_columns:
             num_columns = "categorical"
-        imp_client = encoding_categorical_variables(imp_client[cat_features])
+        imp_client = encoding_categorical_variables(imp_client)
         features_ohe = list(imp_client.columns)
         for t in target_encoded:
             features_ohe.remove(t)
@@ -240,7 +241,7 @@ def one_hot_encode_dirty(subsets, test):
     
     return aligned_subsets, aligned_test_set
 
-def data_loaders(num_partitions: int, batch_size: int, val_ratio: float, train, test):
+def data_loaders(num_partitions: int, batch_size: int, val_ratio: float, train, test, seed):
     
     """
     num_instances_per_client = len(train) // num_partitions
@@ -259,7 +260,7 @@ def data_loaders(num_partitions: int, batch_size: int, val_ratio: float, train, 
         num_train = num_total - num_val
 
         for_train, for_val = random_split(
-            trainset_, [num_train, num_val], torch.Generator().manual_seed(20)
+            trainset_, [num_train, num_val], torch.Generator().manual_seed(seed)
         )
 
         trainloaders.append(
@@ -394,6 +395,10 @@ def load_shuttle():
     # NUMERICAL
     types = {'A1': int, 'A2': int, 'A3': int, 'A4': int, 'A5': int, 'A6': int, 'A7': int, 'A8': int, 'A9': int, 'class': str}
     dataset = pd.read_csv("./datasets/shuttle.csv", dtype=types)
+    print("Class 1: " + str(len(dataset[dataset['class']=='1'])))
+    print("Class 2: " + str(len(dataset[dataset['class']=='2'])))
+    print("Class 3: " + str(len(dataset[dataset['class']=='3'])))
+    print("Class 4: " + str(len(dataset[dataset['class']=='4'])))
     features = list(dataset.columns)
     target_name = ["class_1", "class_2", "class_3", "class_4", "class_5", "class_6", "class_7"]
     num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
