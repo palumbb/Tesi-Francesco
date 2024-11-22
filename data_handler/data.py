@@ -157,7 +157,7 @@ def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imput
     features.remove(target)
     to_view = False # True if BinaryNet, False otherwise
     method = "uniform"
-    seed = 20
+    seed = 206
     if federated:
         train_samples = int(len(df)*data_cfg.train_split)
         train = df.iloc[0:train_samples,]
@@ -175,20 +175,39 @@ def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imput
         percentages = np.ones(num_clients)*proportions
         imp_clients = []
         subsets = split_dataframe(train, percentages, num_clients)
-        for s in subsets:
-            if imputation == "standard": # DIRTY WITH NAN -> IMPUTED WITH 0, 'MISSING'
-                client = uniform_nan(seed, s, features, dirty_percentage)
-                imp_client = impute_missing_column(client, "impute_standard")
-                imp_clients.append(imp_client)
-            elif imputation == "mean":
-                client = dirty(seed, s, features, method, dirty_percentage) # DIRECLTY DIRTY WITH 0, 'MISSING'
-                imp_client = impute_missing_column(client, "impute_mean")
-                imp_clients.append(imp_client)
-        imp_clients, test = one_hot_encode_dirty(imp_clients, test)
+        num_dirty_subsets = 6 
+        if num_dirty_subsets<len(subsets):
+            dirty_subsets = subsets[:num_dirty_subsets]
+            clean_subsets = subsets[num_dirty_subsets:]
+            subsets = []
+            for s in dirty_subsets:
+                if imputation == "standard": # DIRTY WITH NAN -> IMPUTED WITH 0, 'MISSING'
+                    client = uniform_nan(seed, s, features, dirty_percentage)
+                    imp_client = impute_missing_column(client, "impute_standard")
+                    imp_clients.append(imp_client)
+                elif imputation == "mean":
+                    client = dirty(seed, s, features, method, dirty_percentage) # DIRECLTY DIRTY WITH 0, 'MISSING'
+                    imp_client = impute_missing_column(client, "impute_mean")
+                    imp_clients.append(imp_client)
+            subsets.extend(imp_clients)
+            subsets.extend(clean_subsets)
+            imp_clients, test = one_hot_encode_dirty(subsets, test)
+        else:
+            for s in subsets:
+                if imputation == "standard": # DIRTY WITH NAN -> IMPUTED WITH 0, 'MISSING'
+                    client = uniform_nan(seed, s, features, dirty_percentage)
+                    imp_client = impute_missing_column(client, "impute_standard")
+                    imp_clients.append(imp_client)
+                elif imputation == "mean":
+                    client = dirty(seed, s, features, method, dirty_percentage) # DIRECLTY DIRTY WITH 0, 'MISSING'
+                    imp_client = impute_missing_column(client, "impute_mean")
+                    imp_clients.append(imp_client)
+            imp_clients, test = one_hot_encode_dirty(imp_clients, test)
         features_ohe = list(test.columns)
         for t in target_encoded:
             features_ohe.remove(t)
-        num_columns = list(imp_clients[0][features].select_dtypes(include=[int, float]).columns)
+        
+        num_columns = list(imp_clients[0][features_ohe].select_dtypes(include=[int, float]).columns)
         if not num_columns:
             num_columns = "categorical"
         train_datasets, test_dataset = get_train_test(imp_clients, test, features_ohe, target_encoded, to_view, num_columns)
@@ -212,6 +231,7 @@ def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imput
         return trainset, testset
 
 def encoding_categorical_variables(X):
+
     def encode(original_dataframe, feature_to_encode):
         dummies = pd.get_dummies(original_dataframe[[feature_to_encode]], dummy_na=False, dtype=int)
         res = pd.concat([original_dataframe, dummies], axis=1)
