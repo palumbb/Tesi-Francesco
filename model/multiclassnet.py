@@ -24,7 +24,7 @@ class MulticlassNet(nn.Module):
             if imputation=="standard":
                 input_dim = 35
             else: 
-                input_dim = 27
+                input_dim = 35
             num_classes = 5
         if data=="./datasets/consumer.csv":
             if imputation=="standard":
@@ -55,6 +55,18 @@ class MulticlassNet(nn.Module):
                 input_dim = 139
             else:
                 input_dim = 117
+            num_classes = 2
+        elif data == "./datasets/cancer.csv":
+            if imputation=="standard":
+                input_dim = 31
+            else:
+                input_dim = 31
+            num_classes = 2
+        elif data == "./datasets/heart.csv":
+            if imputation=="standard" or imputation=="mean":
+                input_dim = 13
+            else:
+                input_dim = 14
             num_classes = 2
         self.fc1 = nn.Linear(input_dim, 64)
         self.relu = nn.ReLU()

@@ -105,6 +105,14 @@ def load_clean_dataset(data_path, model):
         dataset, features_ohe, target_name, num_columns = load_mushrooms()
         num_classes = 2
         to_view = False
+    elif data_path=="./datasets/cancer.csv":
+        dataset, features_ohe, target_name, num_columns = load_cancer()
+        num_classes = 2
+        to_view = False
+    elif data_path=="./datasets/heart.csv":
+        dataset, features_ohe, target_name, num_columns = load_heart()
+        num_classes = 2
+        to_view = False
     return dataset, features_ohe, target_name, num_columns, num_classes, to_view
 
 def get_data_info(data_path):
@@ -145,6 +153,15 @@ def get_data_info(data_path):
         types = {'V1': float, 'V2': float, 'V3': float, 'V4': float, 'Class': str}
         target_encoded = ["Class_1","Class_2","Class_3","Class_4"]
         target = "Class"
+    elif data_path=="./datasets/heart.csv":
+        types = {'diagnosis' : str, 'radius_mean': float, 'texture_mean': float, 'perimeter_mean': float, 'area_mean': float, 'smoothness_mean': float,
+              'compactness_mean': float, 'concavity_mean' : float, 'concave points_mean' : float, 'symmetry_mean' : float, 'fractal_dimension_mean' : float, 
+                'radius_se': float, 'texture_se': float, 'perimeter_se' : float, 'area_se' : float, 'smoothness_se' : float, 'compactness_se' : float,
+                'concavity_se' : float, 'concave points_se' : float, 'symmetry_se' : float, 'fractal_dimension_se' : float, 'radius_worst' : float,
+                'texture_worst' : float, 'perimeter_worst' : float, 'area_worst' : float, 'smoothness_worst' : float, 'compactness_worst' : float,
+                'concavity_worst' : float, 'concave points_worst' : float, 'symmetry_worst' : float, 'fractal_dimension_worst' : float}
+        target_encoded = ["disease_Y", "disease_N"]
+        target = "disease"
     return types, target_encoded, target
         
 def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imputation, federated):
@@ -153,11 +170,15 @@ def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imput
     if data_path=="./datasets/consumer.csv":
         df['PurchaseIntent'].replace(0, 'N', inplace=True)
         df['PurchaseIntent'].replace(1, 'Y', inplace=True)
+    elif data_path=="./datasets/heart.csv":
+        df.rename(columns={"target":"disease"}, inplace=True)
+        df['disease'].replace(0, 'N', inplace=True)
+        df['disease'].replace(1, 'Y', inplace=True)
     features = list(df.columns)
     features.remove(target)
     to_view = False # True if BinaryNet, False otherwise
     method = "uniform"
-    seed = 20
+    seed = 0
     if federated:
         train_samples = int(len(df)*data_cfg.train_split)
         train = df.iloc[0:train_samples,]
@@ -423,6 +444,43 @@ def load_wall():
         features_ohe.remove(t)
     return dataset, features_ohe, target_name, num_columns
 
+def load_cancer():
+    # NUMERICAL
+    types = {'diagnosis' : str, 'radius_mean': float, 'texture_mean': float, 'perimeter_mean': float, 'area_mean': float, 'smoothness_mean': float,
+              'compactness_mean': float, 'concavity_mean' : float, 'concave points_mean' : float, 'symmetry_mean' : float, 'fractal_dimension_mean' : float, 
+     'radius_se': float, 'texture_se': float, 'perimeter_se' : float, 'area_se' : float, 'smoothness_se' : float, 'compactness_se' : float,
+     'concavity_se' : float, 'concave points_se' : float, 'symmetry_se' : float, 'fractal_dimension_se' : float, 'radius_worst' : float,
+     'texture_worst' : float, 'perimeter_worst' : float, 'area_worst' : float, 'smoothness_worst' : float, 'compactness_worst' : float,
+     'concavity_worst' : float, 'concave points_worst' : float, 'symmetry_worst' : float, 'fractal_dimension_worst' : float}
+    dataset = pd.read_csv("./datasets/cancer.csv", dtype=types)
+    dataset.drop("id", axis=1, inplace=True)
+    features = list(dataset.columns)
+    target_name = ["diagnosis_M", "diagnosis_B"]
+    num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
+    profiling(dataset, "./datasets/cancer.csv")
+    dataset = encoding_categorical_variables(dataset[features])
+    features_ohe = list(dataset.columns)
+    for t in target_name:
+        features_ohe.remove(t)
+    return dataset, features_ohe, target_name, num_columns
+
+def load_heart():
+    types = {'age' : int, 'sex' : str, 'cp' : int, 'trestbps' : int, 'chol' : int, 'fbs' : int, 'restecg' : int, 'thalach' : int,
+       'exang' : int, 'oldpeak' : float, 'slope' : int, 'ca' : int, 'thal' : int, 'target' : str}
+    dataset = pd.read_csv("./datasets/heart.csv", dtype=types)
+    dataset.rename(columns={"target" : "disease"}, inplace=True)
+    features = list(dataset.columns)
+    target_name = ["disease_1", "disease_0"]
+    num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
+    profiling(dataset, "./datasets/heart.csv")
+    dataset = encoding_categorical_variables(dataset[features])
+    features_ohe = list(dataset.columns)
+    for t in target_name:
+        features_ohe.remove(t)
+    #print(len(dataset[dataset["disease_1"]==1]))
+    #print(len(dataset[dataset["disease_0"]==1]))
+    return dataset, features_ohe, target_name, num_columns
+
 def profiling(df, data_path):
     data = df.copy()
     le = preprocessing.LabelEncoder()
@@ -463,6 +521,12 @@ def select_features(df, data_path):
     elif data_path == "./datasets/mushrooms.csv":
         X.drop('Class', axis=1)
         y = X["Class"]
+    elif data_path == "./datasets/cancer.csv":
+        X.drop('diagnosis', axis=1)
+        y = X["diagnosis"]
+    elif data_path == "./datasets/heart.csv":
+        X.drop('disease', axis=1)
+        y = X["disease"]
     print(X.shape)
     selector = SelectKBest(mutual_info_classif, k='all')
     selector.fit(X, y)
