@@ -15,7 +15,7 @@ from data_handler.quality import impute_missing_column, dirty, uniform_nan
 def load_dataset(data_cfg, num_clients, federated: bool, partitioning, quality, model, dirty_percentage, imputation, seed):
     data_path = data_cfg.path
     if quality=="completeness":
-        trainsets, test_dataset = load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imputation, federated)
+        trainsets, test_dataset = load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imputation, federated, partitioning)
         if federated:
             trainloaders, valloaders, testloader = data_loaders(num_partitions=num_clients,
                                                                         batch_size=data_cfg.batch_size,
@@ -26,7 +26,6 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning, quality, 
                                                                         )
             return trainloaders, valloaders, testloader
         else:
-            #train_dataset, test_dataset = train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, to_view)
             return trainsets, test_dataset
     elif quality=="normal":
         dataset, features_ohe, target_name, num_columns, num_classes, to_view = load_clean_dataset(data_path, model)
@@ -66,8 +65,7 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning, quality, 
         
         else:
             return train_dataset, test_dataset
-    
-    
+
 def load_clean_dataset(data_path, model):
     if data_path=="./datasets/consumer.csv":
         if (model == "model.multiclassnet.MulticlassNet"):
@@ -164,7 +162,7 @@ def get_data_info(data_path):
         target = "disease"
     return types, target_encoded, target
         
-def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imputation, federated):
+def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imputation, federated, partitioning):
     types, target_encoded, target = get_data_info(data_path)
     df = pd.read_csv(data_path, dtype=types)
     if data_path=="./datasets/consumer.csv":
@@ -178,26 +176,32 @@ def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imput
     features.remove(target)
     to_view = False # True if BinaryNet, False otherwise
     method = "uniform"
-    seed = 0
+    seed = 205
     if federated:
         train_samples = int(len(df)*data_cfg.train_split)
         train = df.iloc[0:train_samples,]
         test = df.iloc[train_samples:,]
-        if num_clients == 2:
-            proportions = 0.5
-        elif num_clients == 5:
-            proportions = 0.2
-        elif num_clients == 10:
-            proportions = 0.1
-        elif num_clients == 50:
-            proportions = 0.02
-        elif num_clients == 100:
-            proportions = 0.01
-        percentages = np.ones(num_clients)*proportions
+        if partitioning=="uniform": 
+            if num_clients == 2:
+                proportions = 0.5
+            elif num_clients == 5:
+                proportions = 0.2
+            elif num_clients == 10:
+                proportions = 0.1
+            elif num_clients == 50:
+                proportions = 0.02
+            elif num_clients == 100:
+                proportions = 0.01
+            percentages = np.ones(num_clients)*proportions
+        elif partitioning=="proportions":
+            if num_clients == 10:
+                percentages = [0.02, 0.08, 0.05, 0.05, 0.10, 0.30, 0.15, 0.05, 0.10, 0.10]
+                subsets = split_dataframe(train, percentages, num_clients)
+        elif partitioning=="balance":
+            subsets = get_unbalanced_subsets(train, target, num_clients)
         imp_clients = []
-        subsets = split_dataframe(train, percentages, num_clients)
-        num_dirty_subsets = 1 
-        if num_dirty_subsets<len(subsets):
+        num_dirty_subsets = 0
+        if num_dirty_subsets<=len(subsets) and num_dirty_subsets!=0:
             dirty_subsets = subsets[:num_dirty_subsets]
             clean_subsets = subsets[num_dirty_subsets:]
             subsets = []
@@ -223,11 +227,14 @@ def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imput
                     client = dirty(seed, s, features, method, dirty_percentage) # DIRECLTY DIRTY WITH 0, 'MISSING'
                     imp_client = impute_missing_column(client, "impute_mean")
                     imp_clients.append(imp_client)
+                else:
+                    imp_clients.append(s)
             imp_clients, test = one_hot_encode_dirty(imp_clients, test)
         features_ohe = list(test.columns)
         for t in target_encoded:
             features_ohe.remove(t)
-        num_columns = list(imp_clients[0][features].select_dtypes(include=[int, float]).columns)
+        #if mushrooms put features_ohe instead of features in next line
+        num_columns = list(imp_clients[0][features_ohe].select_dtypes(include=[int, float]).columns)
         if not num_columns:
             num_columns = "categorical"
         train_datasets, test_dataset = get_train_test(imp_clients, test, features_ohe, target_encoded, to_view, num_columns)
@@ -716,6 +723,55 @@ def split_dataframe(df, percentages, num_clients):
         start_idx = end_idx
     return subsets
 
+def get_unbalanced_subsets(df, target, num_clients):
+    if target == "disease":
+        dataset1 = df[df[target]=="N"]
+        dataset2 = df[df[target]=="Y"]
+
+    if num_clients % 2 != 0:
+        raise ValueError("num_clients deve essere pari per garantire la simmetria.")
+
+    dataset1 = dataset1.sample(frac=1, random_state=42).reset_index(drop=True)
+    dataset2 = dataset2.sample(frac=1, random_state=42).reset_index(drop=True)
+
+    half_subsets = num_clients // 2
+    size1 = len(dataset1)
+    size2 = len(dataset2)
+    
+    target_size1 = size1 // half_subsets
+    target_size2 = size2 // half_subsets
+    leftover1 = size1 % half_subsets
+    leftover2 = size2 % half_subsets
+
+    subsets = []
+    start1, start2 = 0, 0
+
+    for i in range(half_subsets):
+        part1_size = int(0.8 * target_size1) + (1 if i < leftover1 else 0)
+        part2_size = int(0.2 * target_size2) + (1 if i < leftover2 else 0)
+
+        part1 = dataset1.iloc[start1:start1 + part1_size]
+        part2 = dataset2.iloc[start2:start2 + part2_size]
+        subset = pd.concat([part1, part2]).sample(frac=1, random_state=42).reset_index(drop=True)
+        subsets.append(subset)
+        start1 += part1_size
+        start2 += part2_size
+
+    start1, start2 = 0, 0
+    for i in range(half_subsets):
+        part1_size = int(0.2 * target_size1) + (1 if i < leftover1 else 0)
+        part2_size = int(0.8 * target_size2) + (1 if i < leftover2 else 0)
+
+        part1 = dataset1.iloc[start1:start1 + part1_size]
+        part2 = dataset2.iloc[start2:start2 + part2_size]
+        subset = pd.concat([part1, part2]).sample(frac=1, random_state=42).reset_index(drop=True)
+        subsets.append(subset)
+        start1 += part1_size
+        start2 += part2_size
+    """print(len(subsets))
+    print(len(subsets[0][subsets[0]["disease"]=="N"]))
+    print(len(subsets[0][subsets[0]["disease"]=="Y"]))"""
+    return subsets
 
 def split_by_x3(df):
     cols = list(df.columns)
@@ -893,3 +949,4 @@ def split_by_v2(df):
     subset_3 = df[df['V2'] > 3.0]
     subsets = [subset_1, subset_2, subset_3]
     return subsets
+

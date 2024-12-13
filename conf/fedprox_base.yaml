@@ -48,6 +48,7 @@ model:
   _target_: model.multiclassnet.MulticlassNet #change model in the centralized setting
   data: ${dataset_path}
   imputation: ${imputation}
+  quality: ${quality}
 
 strategy:
   _target_: flwr.server.strategy.FedAvg # points to your strategy (either custom or exiting in Flower)

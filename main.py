@@ -30,7 +30,7 @@ import pandas as pd
 @hydra.main(config_path="conf", config_name="fedavg_base", version_base=None)
 def main(cfg: DictConfig) -> None:
     
-    seed = 206
+    seed = 205
     set_seed(seed)
 
     device = cfg.server_device

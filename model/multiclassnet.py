@@ -12,7 +12,7 @@ from sklearn.metrics import accuracy_score, f1_score
 import numpy as np
 
 class MulticlassNet(nn.Module):
-    def __init__(self, data, imputation):  
+    def __init__(self, data, imputation, quality):  
         super(MulticlassNet, self).__init__()
         if data == "./datasets/car.csv":
             if imputation=="standard":
@@ -21,10 +21,10 @@ class MulticlassNet(nn.Module):
                 input_dim = 21
             num_classes = 4
         elif data == "./datasets/nursery.csv":
-            if imputation=="standard":
+            if imputation=="standard" or imputation=="mean":
                 input_dim = 35
             else: 
-                input_dim = 35
+                input_dim = 27
             num_classes = 5
         if data=="./datasets/consumer.csv":
             if imputation=="standard":
@@ -54,7 +54,7 @@ class MulticlassNet(nn.Module):
             if imputation=="standard":
                 input_dim = 139
             else:
-                input_dim = 117
+                input_dim = 139
             num_classes = 2
         elif data == "./datasets/cancer.csv":
             if imputation=="standard":
@@ -63,7 +63,7 @@ class MulticlassNet(nn.Module):
                 input_dim = 31
             num_classes = 2
         elif data == "./datasets/heart.csv":
-            if imputation=="standard" or imputation=="mean":
+            if quality=="completeness":
                 input_dim = 13
             else:
                 input_dim = 14
