@@ -1,22 +1,38 @@
 import matplotlib.pyplot as plt
 
-x_values = [0,1, 2, 3, 4, 5, 6, 7, 8, 9, 10]  # Valori di clients 
+#x_values = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]  # Valori di clients 
+x_values = ["Original", "10%", "20%", "30%", "40%", "50%"] # Valori di dirty percentages
+#x_values = ["Centralized", 10, 50, 100]
 
-y_values = [
-    [0.8242, 0.8388, 0.8324, 0.8351, 0.8360, 0.8379, 0.7527, 0.7554, 0.8287, 0.7527, 0.7554],  
-    [0.8223, 0.7536, 0.8406, 0.8379, 0.7573, 0.8369, 0.7545, 0.8287, 0.7564, 0.7554, 0.8333], 
-    [0.8241, 0.7554, 0.7545, 0.7545, 0.7564, 0.7538, 0.7545, 0.8342, 0.7527, 0.8324, 0.7527], 
-    [0.8214, 0.7811, 0.7545, 0.7666, 0.7545, 0.8379, 0.8232, 0.8245, 0.7564, 0.7426, 0.7500]    # Valori di accuracy per ogni strategia
+"""y_values = [
+    [0.9925, 0.9403, 0.9955, 0.9956, 0.9403, 0.8468, 0.8464, 0.9952, 0.7914, 0.7914, 0.7914],  
+    [0.9925, 0.8191, 0.9956, 0.9637, 0.9403, 0.8468, 0.9933, 0.9883, 0.9954, 0.9954, 0.9392], 
+    [0.9925, 0.8468, 0.9403, 0.8468, 0.9955, 0.9403, 0.9403, 0.8550, 0.7914, 0.7914, 0.7914], 
+    [0.9925, 0.8468, 0.9956, 0.9936, 0.9956, 0.9402, 0.8657, 0.7914, 0.9835, 0.9835, 0.9302]    # Valori di accuracy per ogni strategia
+]"""
+
+y_values = [ 
+    [0.9679, 0.7596, 0.7507, 0.7835, 0.7461, 0.7110],
+    [0.9679, 0.7334, 0.7337, 0.8090, 0.7839, 0.7369]
 ]
 
-labels = ["FedAvg", "FedProx", "FedNova", "Scaffold"] 
+"""y_values = [
+    [0.9170, 0.8463, 0.8024, 0.7990],  
+    [0.9170, 0.8780, 0.7926, 0.7902], 
+    [0.9170, 0.8850, 0.7926, 0.7804], 
+    [0.9170, 0.8524, 0.7877, 0.7170] 
+]"""
+
+#labels = ["FedAvg", "FedProx", "FedNova", "Scaffold"] 
+labels = ["FedAvg Standard", "FedAvg Mean"]
+
 
 for y_series, label in zip(y_values, labels):
     plt.plot(x_values, y_series, marker='o', linestyle='-', label=label)
 
-plt.xlabel('Accuracy')
-plt.ylabel('Number of Dirty Clients')
-plt.title('WALL ROBOT NAVIGATION MEAN IMPUTATION 30%')
+plt.ylabel('Accuracy')
+plt.xlabel('Dirty Percentage')
+plt.title('Nursery - Standard Proportions = [2%, 8%, 5%, 5%, 10%, 30%, 15%, 5%, 10%, 10%]')
 plt.legend()
 plt.grid(True)
 
