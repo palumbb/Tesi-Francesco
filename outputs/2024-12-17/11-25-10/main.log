@@ -1,0 +1,21 @@
+[2024-12-17 11:25:11,000][flwr][WARNING] - Both server and strategy were provided, ignoring strategy
+[2024-12-17 11:25:11,000][flwr][INFO] - Starting Flower simulation, config: num_rounds=2, no round_timeout
+[2024-12-17 11:25:19,951][flwr][INFO] - Flower VCE: Ray initialized with resources: {'CPU': 8.0, 'node:__internal_head__': 1.0, 'node:127.0.0.1': 1.0, 'memory': 1147797504.0, 'object_store_memory': 573898752.0}
+[2024-12-17 11:25:19,951][flwr][INFO] - Optimize your simulation with Flower VCE: https://flower.ai/docs/framework/how-to-run-simulations.html
+[2024-12-17 11:25:19,951][flwr][INFO] - Flower VCE: Resources for each Virtual Client: {'num_cpus': 4, 'num_gpus': 0.0}
+[2024-12-17 11:25:19,989][flwr][INFO] - Flower VCE: Creating VirtualClientEngineActorPool with 2 actors
+[2024-12-17 11:25:19,989][flwr][INFO] - [INIT]
+[2024-12-17 11:25:19,994][flwr][INFO] - Requesting initial parameters from one random client
+[2024-12-17 11:25:24,832][flwr][INFO] - Received initial parameters from one random client
+[2024-12-17 11:25:24,833][flwr][INFO] - Starting evaluation of initial global parameters
+[2024-12-17 11:25:24,880][flwr][INFO] - initial parameters (loss, other metrics): 0.6916021278926304, {'accuracy': 0.5365853658536586, 'f1-score': 0.5207787642729983}
+[2024-12-17 11:25:24,880][flwr][INFO] - 
+[2024-12-17 11:25:24,880][flwr][INFO] - [ROUND 1]
+[2024-12-17 11:25:24,880][flwr][INFO] - configure_fit: strategy sampled 10 clients (out of 10)
+[2024-12-17 11:26:09,751][flwr][INFO] - aggregate_fit: received 10 results and 0 failures
+[2024-12-17 11:26:09,762][flwr][WARNING] - No fit_metrics_aggregation_fn provided
+[2024-12-17 11:26:09,787][flwr][INFO] - fit progress: (1, 0.6801605820655823, {'accuracy': 0.5365853658536586, 'f1-score': 0.44566622223443064}, 44.89827089998289)
+[2024-12-17 11:26:09,788][flwr][INFO] - configure_evaluate: no clients selected, skipping evaluation
+[2024-12-17 11:26:09,789][flwr][INFO] - 
+[2024-12-17 11:26:09,790][flwr][INFO] - [ROUND 2]
+[2024-12-17 11:26:09,790][flwr][INFO] - configure_fit: strategy sampled 10 clients (out of 10)

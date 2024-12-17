@@ -198,7 +198,7 @@ def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imput
                 percentages = [0.02, 0.08, 0.05, 0.05, 0.10, 0.30, 0.15, 0.05, 0.10, 0.10]
                 subsets = split_dataframe(train, percentages, num_clients)
         elif partitioning=="balance":
-            subsets = get_unbalanced_subsets(train, target, num_clients)
+            subsets = get_unbalanced_subsets(train, target, num_clients, data_path)
         imp_clients = []
         num_dirty_subsets = 0
         if num_dirty_subsets<=len(subsets) and num_dirty_subsets!=0:
@@ -723,51 +723,90 @@ def split_dataframe(df, percentages, num_clients):
         start_idx = end_idx
     return subsets
 
-def get_unbalanced_subsets(df, target, num_clients):
-    if target == "disease":
+def get_unbalanced_subsets(df, target, num_clients, data_path):
+
+    """ 
+    print(len(df[df[target] == "recommend"])) # 2
+    print(len(df[df[target] == "very_recom"])) # 328
+    print(len(df[df[target] == "not_recom"])) # 328
+    print(len(df[df[target] == "spec_prior"])) # 3456
+    print(len(df[df[target] == "priority"])) # 4056 
+    """
+    datasets = []
+    sizes = []
+    target_sizes = []
+    leftovers = []
+
+    if data_path=="./datasets/heart.csv":
         dataset1 = df[df[target]=="N"]
         dataset2 = df[df[target]=="Y"]
+        proportions = [0.8, 0.2]
+        proportions_inverse = [0.2, 0.8]
+        datasets.append(dataset1)
+        datasets.append(dataset2)
+    elif data_path=="./datasets/mushrooms.csv":
+        dataset1 = df[df[target]== "poisonous"]
+        dataset2 = df[df[target]== "edible"]
+        proportions = [0.8, 0.2]
+        proportions_inverse = [0.2, 0.8]
+        datasets.append(dataset1)
+        datasets.append(dataset2)
+    elif data_path=="./datasets/nursery.csv":
+        dataset1 = df[df[target]== "recommend"]
+        dataset2 = df[df[target]== "very_recom"]
+        dataset3 = df[df[target]== "not_recom"]
+        dataset4 = df[df[target]== "spec_prior"]
+        dataset5 = df[df[target]== "priority"]
+        proportions = [0.05, 0.10, 0.20, 0.15, 0.50]
+        proportions_inverse = [0.05, 0.10, 0.30, 0.40, 0.15]
+        datasets.append(dataset1)
+        datasets.append(dataset2)
+        datasets.append(dataset3)
+        datasets.append(dataset4)
+        datasets.append(dataset5)
 
     if num_clients % 2 != 0:
         raise ValueError("num_clients deve essere pari per garantire la simmetria.")
-
-    dataset1 = dataset1.sample(frac=1, random_state=42).reset_index(drop=True)
-    dataset2 = dataset2.sample(frac=1, random_state=42).reset_index(drop=True)
-
     half_subsets = num_clients // 2
-    size1 = len(dataset1)
-    size2 = len(dataset2)
-    
-    target_size1 = size1 // half_subsets
-    target_size2 = size2 // half_subsets
-    leftover1 = size1 % half_subsets
-    leftover2 = size2 % half_subsets
+
+    for ds in datasets:
+        ds = ds.sample(frac=1, random_state=42).reset_index(drop=True)
+        size = len(ds)
+        sizes.append(size)
+ 
+    for s in sizes:
+        target_size = s
+        leftover = s % half_subsets
+        target_sizes.append(target_size)
+        leftovers.append(leftover)
 
     subsets = []
-    start1, start2 = 0, 0
+    parts_size = []
+    parts = []
+    starts = np.ones(len(datasets), dtype=int)*0
 
-    for i in range(half_subsets):
-        part1_size = int(0.8 * target_size1) + (1 if i < leftover1 else 0)
-        part2_size = int(0.2 * target_size2) + (1 if i < leftover2 else 0)
-
-        part1 = dataset1.iloc[start1:start1 + part1_size]
-        part2 = dataset2.iloc[start2:start2 + part2_size]
-        subset = pd.concat([part1, part2]).sample(frac=1, random_state=42).reset_index(drop=True)
+    for j in range(half_subsets):
+        for i in range(len(datasets)):
+            part_size = int(proportions[i]*target_sizes[i]) + (1 if i < leftovers[i] else 0)
+            parts_size.append(part_size)
+            part = datasets[i].iloc[starts[i]:starts[i] + parts_size[i]]
+            parts.append(part)
+            starts[i] += parts_size[i]
+        subset = pd.concat(parts).sample(frac=1, random_state=42).reset_index(drop=True)
         subsets.append(subset)
-        start1 += part1_size
-        start2 += part2_size
 
-    start1, start2 = 0, 0
-    for i in range(half_subsets):
-        part1_size = int(0.2 * target_size1) + (1 if i < leftover1 else 0)
-        part2_size = int(0.8 * target_size2) + (1 if i < leftover2 else 0)
-
-        part1 = dataset1.iloc[start1:start1 + part1_size]
-        part2 = dataset2.iloc[start2:start2 + part2_size]
-        subset = pd.concat([part1, part2]).sample(frac=1, random_state=42).reset_index(drop=True)
+    starts = np.ones(len(datasets), dtype=int)*0
+    for j in range(half_subsets):
+        for i in range(len(datasets)):
+            part_size = int(proportions_inverse[i]*target_sizes[i]) + (1 if i < leftovers[i] else 0)
+            parts_size.append(part_size)
+            part = datasets[i].iloc[starts[i]:starts[i] + parts_size[i]]
+            parts.append(part)
+            starts[i] += parts_size[i]
+        subset = pd.concat(parts).sample(frac=1, random_state=42).reset_index(drop=True)
         subsets.append(subset)
-        start1 += part1_size
-        start2 += part2_size
+
+        
     """print(len(subsets))
     print(len(subsets[0][subsets[0]["disease"]=="N"]))
     print(len(subsets[0][subsets[0]["disease"]=="Y"]))"""

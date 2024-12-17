@@ -15,7 +15,7 @@ class MulticlassNet(nn.Module):
     def __init__(self, data, imputation, quality):  
         super(MulticlassNet, self).__init__()
         if data == "./datasets/car.csv":
-            if imputation=="standard":
+            if imputation=="standard" or imputation=="mean":
                 input_dim = 27
             else:
                 input_dim = 21
@@ -27,46 +27,46 @@ class MulticlassNet(nn.Module):
                 input_dim = 27
             num_classes = 5
         if data=="./datasets/consumer.csv":
-            if imputation=="standard":
+            if imputation=="standard" or imputation=="mean":
                 input_dim = 20
             else:
                 input_dim = 16
             num_classes = 2
         elif data == "./datasets/mv.csv":
-            if imputation=="standard":
+            if imputation=="standard" or imputation=="mean":
                 input_dim = 17
             else:
                 input_dim = 14
             num_classes = 2
         if data=="./datasets/shuttle.csv":
-            if imputation=="standard":
+            if imputation=="standard" or imputation=="mean":
                 input_dim = 9
             else:
                 input_dim = 9
             num_classes = 7
         elif data == "./datasets/wall-robot-navigation.csv":
-            if imputation=="standard":
+            if imputation=="standard" or imputation=="mean":
                 input_dim = 4
             else:
                 input_dim = 4
             num_classes = 4
         elif data == "./datasets/mushrooms.csv":
-            if imputation=="standard":
+            if imputation=="standard" or imputation=="mean":
                 input_dim = 139
             else:
-                input_dim = 139
+                input_dim = 116
             num_classes = 2
         elif data == "./datasets/cancer.csv":
-            if imputation=="standard":
+            if imputation=="standard" or imputation=="mean":
                 input_dim = 31
             else:
                 input_dim = 31
             num_classes = 2
         elif data == "./datasets/heart.csv":
-            if quality=="completeness":
+            if imputation=="standard" or imputation=="mean":
                 input_dim = 13
             else:
-                input_dim = 14
+                input_dim = 13
             num_classes = 2
         self.fc1 = nn.Linear(input_dim, 64)
         self.relu = nn.ReLU()
