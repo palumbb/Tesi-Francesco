@@ -1,4 +1,4 @@
-"""FedNova and SCAFFOLD strategies."""
+"""FedNova, SCAFFOLD and FedQual strategies."""
 
 from functools import reduce
 from logging import WARNING
@@ -16,8 +16,7 @@ from flwr.common.logger import log
 from typing import Dict, List, Optional, Tuple, Union
 from flwr.server.client_proxy import ClientProxy
 from flwr.server.strategy import FedAvg
-from flwr.server.strategy.aggregate import aggregate
-
+from flwr.server.strategy.aggregate import aggregate, aggregate_inplace
 
 class FedNovaStrategy(FedAvg):
     """Custom FedAvg strategy with fednova based configuration and aggregation."""
@@ -139,3 +138,44 @@ class ScaffoldStrategy(FedAvg):
             ndarrays_to_parameters(parameters_aggregated + aggregated_cv_update),
             metrics_aggregated,
         )
+    
+class FedQualStrategy(FedAvg):
+    """Custom FedAvg strategy with quality-weighted aggregation."""
+
+    def aggregate_fit(
+        self,
+        server_round: int,
+        results: List[Tuple[ClientProxy, FitRes]],
+        failures: List[Union[Tuple[ClientProxy, FitRes], BaseException]],
+    ) -> Tuple[Optional[Parameters], Dict[str, Scalar]]:
+        """Aggregate fit results using quality-weighted average."""
+        if not results:
+            return None, {}
+        # Do not aggregate if there are failures and failures are not accepted
+        if not self.accept_failures and failures:
+            return None, {}
+        
+        quality_weights = [ fit_res.metrics["quality_weight"] for _, fit_res in results]
+        normalized_quality = [w / sum(quality_weights) for w in quality_weights]
+        if self.inplace:
+            # Does in-place weighted average of results
+            aggregated_ndarrays = aggregate_inplace(results)
+        else:
+            # Convert results
+            weights_results = [
+                (parameters_to_ndarrays(fit_res.parameters), normalized_quality)
+                for _, fit_res in results
+            ]
+            aggregated_ndarrays = aggregate(weights_results)
+
+        parameters_aggregated = ndarrays_to_parameters(aggregated_ndarrays)
+
+        # Aggregate custom metrics if aggregation fn was provided
+        metrics_aggregated = {}
+        if self.fit_metrics_aggregation_fn:
+            fit_metrics = [(res.metrics["quality_weight"], res.metrics) for _, res in results]
+            metrics_aggregated = self.fit_metrics_aggregation_fn(fit_metrics)
+        elif server_round == 1:  # Only log this warning once
+            log(WARNING, "No fit_metrics_aggregation_fn provided")
+
+        return parameters_aggregated, metrics_aggregated
