@@ -1,10 +1,5 @@
----
-# this is the config that will be loaded as default by main.py
-# Please follow the provided structure (this will ensuring all baseline follow
-# a similar configuration structure and hence be easy to customise)
-
 federated: True
-name: FedAvg
+name: FedQual
 num_clients: 10 # change the proportions of each client in the partition_dataset section
 num_epochs: 1
 batch_size: 32
@@ -23,12 +18,15 @@ momentum: 0.9
 weight_decay: 0.00001
 
 client_fn:
-  _target_: clients.multiclass.client_fedavg.gen_client_fn
+  _target_: clients.multiclass.client_fedqual.gen_client_fn
   _recursive_: False
+  _partial_ : True
   num_epochs: ${num_epochs}
   learning_rate: ${learning_rate}
   momentum: ${momentum}
   weight_decay: ${weight_decay}
+  beta: 0.50
+  gamma: 0.50
 
 dataset:
   # dataset config
@@ -47,7 +45,7 @@ model:
   quality: ${quality}
 
 strategy:
-  _target_: flwr.server.strategy.FedAvg # points to your strategy (either custom or exiting in Flower)
+  _target_: strategy.FedQualStrategy # points to your strategy (either custom or exiting in Flower)
   # rest of strategy config
   fraction_fit: 0.00001 # because we want the number of clients to sample on each round to be solely defined by min_fit_clients
   fraction_evaluate: 0.0

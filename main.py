@@ -22,12 +22,12 @@ from model.multiclassnet import MulticlassNet, train_centralized_multi, test_mul
 from data_handler.data import load_dataset
 from servers.server_fednova import FedNovaServer
 from servers.server_scaffold import ScaffoldServer, gen_evaluate_fn
-from strategy import FedNovaStrategy, ScaffoldStrategy
+from strategy import FedNovaStrategy, ScaffoldStrategy, FedQualStrategy
 from torch.utils.data import DataLoader
 from torch.optim import SGD, Optimizer
 import pandas as pd
 
-@hydra.main(config_path="conf", config_name="fedavg_base", version_base=None)
+@hydra.main(config_path="conf", config_name="fedqual_base", version_base=None)
 def main(cfg: DictConfig) -> None:
     
     seed = 205
@@ -51,7 +51,7 @@ def main(cfg: DictConfig) -> None:
 
     # 2. Preparazione del dataset
     if cfg.federated:
-        trainloaders, valloaders, testloader = load_dataset(
+        trainloaders, valloaders, testloader, quality_metrics, N_tot = load_dataset(
             data_cfg=cfg.dataset,
             num_clients=cfg.num_clients,
             federated=cfg.federated,
@@ -76,6 +76,18 @@ def main(cfg: DictConfig) -> None:
                 model=cfg.model,
                 client_cv_dir=client_cv_dir,
             )
+        elif cfg.strategy._target_ == "strategy.FedQualStrategy":
+            target = call(cfg.client_fn)
+            client_fn = target(
+                trainloaders,
+                valloaders,
+                model=cfg.model,
+                quality_metrics=quality_metrics,
+                N_tot=N_tot,
+                beta = cfg.client_fn.beta,
+                gamma = cfg.client_fn.gamma
+            )
+
         else:
             client_fn = call(
                 cfg.client_fn,
