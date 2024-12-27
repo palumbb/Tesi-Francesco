@@ -194,6 +194,7 @@ def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imput
             elif num_clients == 100:
                 proportions = 0.01
             percentages = np.ones(num_clients)*proportions
+            subsets, dirty_percentages, SE_values = split_dataframe(train, percentages, num_clients, target, dirty_percentage)
         elif partitioning=="proportions":
             if num_clients == 10:
                 percentages = [0.02, 0.08, 0.05, 0.05, 0.10, 0.30, 0.15, 0.05, 0.10, 0.10]
