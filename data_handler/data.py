@@ -738,7 +738,13 @@ def split_dataframe(df, percentages, num_clients, target, dirty_percentage):
         SE = -np.sum(np.log([el/n for el in class_elements]))
         subsets.append(subset)
         SE_values.append(SE)
-    return subsets, dirty_percentages, SE_values
+     # normalize SE values
+    sum_SE = sum(SE_values)
+    SE_norm = []
+    for se in SE_values:
+        se = se/sum_SE
+        SE_norm.append(se)
+    return subsets, dirty_percentages, SE_norm
 
 def get_unbalanced_subsets(df, target, num_clients, data_path, dirty_percentage):
 

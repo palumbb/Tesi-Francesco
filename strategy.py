@@ -155,27 +155,30 @@ class FedQualStrategy(FedAvg):
         if not self.accept_failures and failures:
             return None, {}
         
-        quality_weights = [ fit_res.metrics["quality_weight"] for _, fit_res in results]
-        normalized_quality = [w / sum(quality_weights) for w in quality_weights]
-        if self.inplace:
-            # Does in-place weighted average of results
-            aggregated_ndarrays = aggregate_inplace(results)
-        else:
-            # Convert results
-            weights_results = [
-                (parameters_to_ndarrays(fit_res.parameters), normalized_quality)
-                for _, fit_res in results
-            ]
-            aggregated_ndarrays = aggregate(weights_results)
+        # Does in-place weighted average of results
+        aggregated_ndarrays = aggregate_fedqual(results)
 
         parameters_aggregated = ndarrays_to_parameters(aggregated_ndarrays)
 
         # Aggregate custom metrics if aggregation fn was provided
-        metrics_aggregated = {}
+        """metrics_aggregated = {}
         if self.fit_metrics_aggregation_fn:
             fit_metrics = [(res.metrics["quality_weight"], res.metrics) for _, res in results]
             metrics_aggregated = self.fit_metrics_aggregation_fn(fit_metrics)
         elif server_round == 1:  # Only log this warning once
-            log(WARNING, "No fit_metrics_aggregation_fn provided")
+            log(WARNING, "No fit_metrics_aggregation_fn provided")"""
 
-        return parameters_aggregated, metrics_aggregated
+        return parameters_aggregated
+    
+def aggregate_fedqual_inplace(results: list[tuple[NDArrays, int]]) -> NDArrays:
+    """Compute weighted average."""
+
+    quality_weights = [ fit_res.metrics["quality_weight"] for _, fit_res in results]
+    tot_quality = sum(quality_weights)
+
+        
+    final_weights = np.asarray(
+        [ fit_res * (fit_res.metrics["quality_weight"]/tot_quality) for _, fit_res in results]
+    )
+
+    # TO FIX 
