@@ -203,12 +203,9 @@ def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imput
             subsets, dirty_percentages, SE_values = get_unbalanced_subsets(train, target, num_clients, data_path, dirty_percentage)
         imp_clients = []
         quality_metrics = []
-        cids = []
-        for i in range(0,num_clients):
-            cids.append(i)
-        for cid,d,se in zip(cids, dirty_percentages, SE_values):
-            quality_metrics.append([cid, d, se])
-        #print(quality_metrics)
+        for d,se in zip(dirty_percentages, SE_values):
+            quality_metrics.append([d,se])
+        print(quality_metrics)
         num_dirty_subsets = 0
         # DA AGGIUNGERE QUALITY METRICS IN QUESTA PARTE
         if num_dirty_subsets<=len(subsets) and num_dirty_subsets!=0:
@@ -719,8 +716,9 @@ def get_train_test(train_list, test, features_ohe, target_name, to_view, num_col
 
     return train_datasets, test_dataset
 
-def split_dataframe(df, percentages, num_clients, target):
+def split_dataframe(df, percentages, num_clients, target, dirty_percentage):
     SE_values = []
+    dirty_percentages = np.ones(num_clients)*dirty_percentage
     class_elements = []
     classes = list(df[target].unique())
     if len(percentages) != num_clients:
@@ -740,7 +738,7 @@ def split_dataframe(df, percentages, num_clients, target):
         SE = -np.sum(np.log([el/n for el in class_elements]))
         subsets.append(subset)
         SE_values.append(SE)
-    return subsets, SE_values
+    return subsets, dirty_percentages, SE_values
 
 def get_unbalanced_subsets(df, target, num_clients, data_path, dirty_percentage):
 
