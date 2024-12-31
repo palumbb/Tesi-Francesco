@@ -1,29 +1,24 @@
-"""Server class for FedNova."""
-
-from logging import DEBUG, INFO
-
-from flwr.common import parameters_to_ndarrays
-from flwr.common.logger import log
-from flwr.common.typing import Dict, Optional, Parameters, Scalar, Tuple
+from flwr.server.server import Server
 from flwr.server.client_manager import ClientManager
+from flwr.common import Parameters, Scalar
+from typing import Optional, Tuple, Dict
+from strategy import FedQualStrategy
+from flwr.common.logger import log
+from logging import INFO, DEBUG
+from flwr.server.client_proxy import ClientProxy
 from flwr.server.server import FitResultsAndFailures, Server, fit_clients
 
-from strategy import FedNovaStrategy
-
-
-class FedNovaServer(Server):
-    """Implement server for FedNova."""
+class FedQualServer(Server):
+    """Implement server for FedQual."""
 
     def __init__(
         self,
         *,
         client_manager: ClientManager,
-        strategy: Optional[FedNovaStrategy] = None,
+        strategy: Optional[FedQualStrategy] = None,
     ) -> None:
         super().__init__(client_manager=client_manager, strategy=strategy)
-        self.strategy: FedNovaStrategy = (
-            strategy if strategy is not None else FedNovaStrategy()
-        )
+        self.strategy: FedQualStrategy = strategy if strategy is not None else FedQualStrategy()
 
     def fit_round(
         self,
@@ -32,7 +27,8 @@ class FedNovaServer(Server):
     ) -> Optional[
         Tuple[Optional[Parameters], Dict[str, Scalar], FitResultsAndFailures]
     ]:
-        """Perform a single round of federated averaging."""
+        """Perform a single round of federated training using FedQual."""
+
         # Get clients and their respective instructions from strategy
         client_instructions = self.strategy.configure_fit(
             server_round=server_round,
@@ -43,6 +39,7 @@ class FedNovaServer(Server):
         if not client_instructions:
             log(INFO, "fit_round %s: no clients selected, cancel", server_round)
             return None
+
         log(
             DEBUG,
             "fit_round %s: strategy sampled %s clients (out of %s)",
@@ -66,14 +63,24 @@ class FedNovaServer(Server):
             len(failures),
         )
 
-        params_np = parameters_to_ndarrays(self.parameters)
-        # Aggregate training results
+        # Aggregate training results using FedQual's aggregation
         aggregated_result: Tuple[
             Optional[Parameters],
             Dict[str, Scalar],
-        ] = self.strategy.aggregate_fit_custom(
-            server_round, params_np, results, failures
+        ] = self.strategy.aggregate_fit(
+            server_round=server_round, results=results, failures=failures
         )
 
         parameters_aggregated, metrics_aggregated = aggregated_result
         return parameters_aggregated, metrics_aggregated, (results, failures)
+
+    def evaluate_round(
+        self,
+        server_round: int,
+        timeout: Optional[float],
+    ) -> Optional[Tuple[float, Dict[str, Scalar]]]:
+        """Perform evaluation after the training round if needed."""
+        return super().evaluate_round(
+            server_round=server_round,
+            timeout=timeout,
+        )

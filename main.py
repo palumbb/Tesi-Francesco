@@ -21,6 +21,7 @@ from model.binarynet import BinaryNet, train_centralized_binary, test_binary
 from model.multiclassnet import MulticlassNet, train_centralized_multi, test_multi
 from data_handler.data import load_dataset
 from servers.server_fednova import FedNovaServer
+from servers.server_fedqual import FedQualServer
 from servers.server_scaffold import ScaffoldServer, gen_evaluate_fn
 from strategy import FedNovaStrategy, ScaffoldStrategy, FedQualStrategy
 from torch.utils.data import DataLoader
@@ -116,6 +117,10 @@ def main(cfg: DictConfig) -> None:
         elif isinstance(strategy, ScaffoldStrategy):
             server = ScaffoldServer(
                 strategy=strategy, model=cfg.model, client_manager=SimpleClientManager()
+            )
+        elif isinstance(strategy, FedQualStrategy):
+            server = FedQualServer(
+                strategy=strategy, client_manager=SimpleClientManager()
             )
 
         # 6. Avvio della simulazione
