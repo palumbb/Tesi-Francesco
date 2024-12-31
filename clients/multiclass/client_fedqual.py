@@ -143,11 +143,10 @@ def gen_client_fn(
     def client_fn(context: Context) -> FlowerClientFedQual:
         """Create a Flower client representing a single organization."""
         # Access client ID from the context
-        #cid = context.node_id % 10
 
         cid = int(context.node_config["partition-id"])
-        #print("Il numero è" + str(context.node_id))
-        #print("Il numero è " + str(cid))
+
+        print("Il numero è " + str(cid))
 
 
         # Load model
@@ -157,10 +156,14 @@ def gen_client_fn(
         # Load data specific to the client
         trainloader = trainloaders[int(cid)]
         valloader = valloaders[int(cid)]
+
+        #print("Quality metrics: ")
+        #print(quality_metrics)
         dirty_percentage = quality_metrics[int(cid)][0]
         SE = quality_metrics[cid][1]  # Already normalized
+        #print(dirty_percentage)
+        #print(SE)
 
-        #cid += 1
 
         # Create and return the client
         return FlowerClientFedQual(
