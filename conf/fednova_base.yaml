@@ -5,18 +5,18 @@
 
 federated: True
 name: FedNova
-num_clients: 3
+num_clients: 10
 num_epochs: 1
 batch_size: 32
-clients_per_round: 3
+clients_per_round: 10
 learning_rate: 0.01
 num_rounds: 30
 alpha: 0.5
-partitioning: uniform
+partitioning: balance
 dirty_percentage: 0.10
 quality: completeness
 imputation: standard
-dataset_path: ./datasets/mushrooms.csv
+dataset_path: ./datasets/heart.csv
 dataset_seed: 42
 labels_per_client: 2 # only used when partitioning is label quantity
 momentum: 0.9

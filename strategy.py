@@ -188,7 +188,8 @@ class FedQualStrategy(FedAvg):
         # Do not aggregate if there are failures and failures are not accepted
         if not self.accept_failures and failures:
             return None, {}
-
+        
+        self.inplace = False
         if self.inplace:
             # Does in-place weighted average of results
             aggregated_ndarrays = aggregate_inplace(results)
@@ -198,12 +199,12 @@ class FedQualStrategy(FedAvg):
                 (parameters_to_ndarrays(fit_res.parameters), fit_res.metrics.get("quality_weight", 1.0))
                 for _, fit_res in results
             ]
-
             total_quality_weight = sum(weight for _, weight in weights_results)
             aggregated_ndarrays = [
                 sum((weight/total_quality_weight) * param[i] for param, weight in weights_results)
                 for i in range(len(weights_results[0][0]))
             ]
+            print(aggregated_ndarrays)
 
         parameters_aggregated = ndarrays_to_parameters(aggregated_ndarrays)
 
