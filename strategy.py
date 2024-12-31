@@ -142,43 +142,115 @@ class ScaffoldStrategy(FedAvg):
 class FedQualStrategy(FedAvg):
     """Custom FedAvg strategy with quality-weighted aggregation."""
 
-    def aggregate_fit(
+    """def aggregate_fit(
         self,
         server_round: int,
         results: List[Tuple[ClientProxy, FitRes]],
         failures: List[Union[Tuple[ClientProxy, FitRes], BaseException]],
     ) -> Tuple[Optional[Parameters], Dict[str, Scalar]]:
-        """Aggregate fit results using quality-weighted average."""
+        Aggregate fit results using quality-weighted average.
         if not results:
             return None, {}
         # Do not aggregate if there are failures and failures are not accepted
         if not self.accept_failures and failures:
             return None, {}
         
+        weights_results = [
+                (parameters_to_ndarrays(fit_res.parameters), fit_res.metrics["quality_weight"])
+                for _, fit_res in results
+            ]
+
         # Does in-place weighted average of results
-        aggregated_ndarrays = aggregate_fedqual(results)
+        aggregated_ndarrays = aggregate_fedqual(weights_results)
 
         parameters_aggregated = ndarrays_to_parameters(aggregated_ndarrays)
 
         # Aggregate custom metrics if aggregation fn was provided
-        """metrics_aggregated = {}
+        metrics_aggregated = {}
         if self.fit_metrics_aggregation_fn:
             fit_metrics = [(res.metrics["quality_weight"], res.metrics) for _, res in results]
             metrics_aggregated = self.fit_metrics_aggregation_fn(fit_metrics)
         elif server_round == 1:  # Only log this warning once
-            log(WARNING, "No fit_metrics_aggregation_fn provided")"""
+            log(WARNING, "No fit_metrics_aggregation_fn provided")
 
-        return parameters_aggregated
+        return parameters_aggregated, metrics_aggregated"""
     
-def aggregate_fedqual_inplace(results: list[tuple[NDArrays, int]]) -> NDArrays:
-    """Compute weighted average."""
+    def aggregate_fit(
+        self,
+        server_round: int,
+        results: List[Tuple[ClientProxy, FitRes]],
+        failures: List[Union[Tuple[ClientProxy, FitRes], BaseException]],
+    ) -> Tuple[Optional[Parameters], Dict[str, Scalar]]:
+        """Aggregate fit results considering quality weights."""
+        if not results:
+            return None, {}
+
+        # Do not aggregate if there are failures and failures are not accepted
+        if not self.accept_failures and failures:
+            return None, {}
+
+        if self.inplace:
+            # Does in-place weighted average of results
+            aggregated_ndarrays = aggregate_inplace(results)
+        else:
+            # Convert results, aggregate normally without considering num_examples
+            weights_results = [
+                (parameters_to_ndarrays(fit_res.parameters), fit_res.metrics.get("quality_weight", 1.0))
+                for _, fit_res in results
+            ]
+
+            total_quality_weight = sum(weight for _, weight in weights_results)
+            aggregated_ndarrays = [
+                sum((weight/total_quality_weight) * param[i] for param, weight in weights_results)
+                for i in range(len(weights_results[0][0]))
+            ]
+
+        parameters_aggregated = ndarrays_to_parameters(aggregated_ndarrays)
+
+        # Aggregate quality metrics if aggregation fn was provided
+        metrics_aggregated = {}
+        if self.fit_metrics_aggregation_fn:
+            fit_metrics = [(1, res.metrics.get("quality_metrics", [])) for _, res in results]
+            metrics_aggregated = self.fit_metrics_aggregation_fn(fit_metrics)
+        elif server_round == 1:  # Only log this warning once
+            log(WARNING, "No fit_metrics_aggregation_fn provided")
+
+        return parameters_aggregated, metrics_aggregated
+    
+
+"""def aggregate_fedqual(results: list[tuple[NDArrays, int]]) -> NDArrays:
+    Compute weighted average.
 
     quality_weights = [ fit_res.metrics["quality_weight"] for _, fit_res in results]
     tot_quality = sum(quality_weights)
 
         
     final_weights = np.asarray(
-        [ fit_res * (fit_res.metrics["quality_weight"]/tot_quality) for _, fit_res in results]
+        [ parameters_to_ndarrays(param) * (weight/tot_quality) for param, weight in zip(results, quality_weights)]
     )
 
     # TO FIX 
+    return final_weights
+
+    def aggregate_fedqual(results: list[tuple[NDArrays, int]]) -> NDArrays:
+
+    quality_weights = [ w for _, w in results]
+    tot_quality = sum(quality_weights)
+
+    # Create a list of weights, each multiplied by the related number of examples
+    weighted_weights = [
+        [layer * (w/tot_quality) for layer in params] for params, w in results
+    ]
+
+    new_weights_results = [
+            (result[0], w/tot_quality)
+            for result, w in results
+        ]
+
+    # Compute average weights of each layer
+    weights_prime: NDArrays = [
+        reduce(np.add, layer_updates) / 1
+        for layer_updates in zip(*new_weights_results)
+    ]
+
+    return new_weights_results"""
