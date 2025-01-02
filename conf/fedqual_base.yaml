@@ -23,8 +23,6 @@ client_fn:
   _partial_ : True
   num_epochs: ${num_epochs}
   learning_rate: ${learning_rate}
-  momentum: ${momentum}
-  weight_decay: ${weight_decay}
   beta: 0.50
   gamma: 0.50
 
