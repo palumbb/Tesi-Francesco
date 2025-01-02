@@ -63,6 +63,7 @@ class FlowerClientFedQual(fl.client.NumPyClient):
         # Set global model parameters
         self.set_parameters(parameters)
 
+
         # Train the model locally
         train_fedavg(
             self.net,
@@ -111,8 +112,8 @@ def gen_client_fn(
     N_tot: int,
     beta: float,
     gamma: float,
-    momentum: float = 0.9,
-    weight_decay: float = 1e-5,
+    momentum: float,
+    weight_decay: float,
 ) -> Callable[[Context], FlowerClientFedQual]:  # pylint: disable=too-many-arguments
     """Generate the client function that creates the FedQual flower clients.
 
@@ -146,8 +147,6 @@ def gen_client_fn(
 
         cid = int(context.node_config["partition-id"])
 
-        print("Il numero è " + str(cid))
-
 
         # Load model
         device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -157,13 +156,8 @@ def gen_client_fn(
         trainloader = trainloaders[int(cid)]
         valloader = valloaders[int(cid)]
 
-        #print("Quality metrics: ")
-        #print(quality_metrics)
         dirty_percentage = quality_metrics[int(cid)][0]
         SE = quality_metrics[cid][1]  # Already normalized
-        #print(dirty_percentage)
-        #print(SE)
-
 
         # Create and return the client
         return FlowerClientFedQual(
@@ -173,12 +167,12 @@ def gen_client_fn(
             device,
             num_epochs,
             learning_rate,
-            N_tot,
-            dirty_percentage,
-            SE,
-            beta,
-            gamma,
             momentum,
             weight_decay,
+            dirty_percentage,
+            SE,
+            N_tot,
+            beta,
+            gamma,
         )
     return client_fn

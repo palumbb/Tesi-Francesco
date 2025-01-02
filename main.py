@@ -79,9 +79,12 @@ def main(cfg: DictConfig) -> None:
             )
         elif cfg.strategy._target_ == "strategy.FedQualStrategy":
             target = call(cfg.client_fn)
+
             client_fn = target(
                 trainloaders,
                 valloaders,
+                momentum=cfg.momentum,
+                weight_decay=cfg.weight_decay,
                 model=cfg.model,
                 quality_metrics=quality_metrics,
                 N_tot=N_tot,
