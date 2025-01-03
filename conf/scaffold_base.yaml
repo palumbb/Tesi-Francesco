@@ -15,6 +15,7 @@ partitioning: uniform
 dirty_percentage: 0.10
 quality: completeness
 imputation: standard
+num_dirty_subsets: 0
 dataset_path: ./datasets/nursery.csv
 dataset_seed: 42
 alpha: 0.5

@@ -61,7 +61,8 @@ def main(cfg: DictConfig) -> None:
             dirty_percentage=cfg.dirty_percentage,
             quality=cfg.quality,
             imputation=cfg.imputation,
-            seed=seed
+            seed=seed,
+            num_dirty_subsets=cfg.num_dirty_subsets
         )
 
         # 3. Definizione dei client

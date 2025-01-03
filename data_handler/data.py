@@ -12,10 +12,10 @@ from sklearn import preprocessing
 import numpy as np
 from data_handler.quality import impute_missing_column, dirty, uniform_nan
 
-def load_dataset(data_cfg, num_clients, federated: bool, partitioning, quality, model, dirty_percentage, imputation, seed):
+def load_dataset(data_cfg, num_clients, federated: bool, partitioning, quality, model, dirty_percentage, imputation, seed, num_dirty_subsets):
     data_path = data_cfg.path
     if quality=="completeness":
-        trainsets, test_dataset, quality_metrics, N_tot = load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imputation, federated, partitioning)
+        trainsets, test_dataset, quality_metrics, N_tot = load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imputation, federated, partitioning, num_dirty_subsets)
         if federated:
             trainloaders, valloaders, testloader = data_loaders(num_partitions=num_clients,
                                                                         batch_size=data_cfg.batch_size,
@@ -162,7 +162,7 @@ def get_data_info(data_path):
         target = "disease"
     return types, target_encoded, target
         
-def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imputation, federated, partitioning):
+def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imputation, federated, partitioning, num_dirty_subsets):
     types, target_encoded, target = get_data_info(data_path)
     df = pd.read_csv(data_path, dtype=types)
     if data_path=="./datasets/consumer.csv":
@@ -205,8 +205,6 @@ def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imput
         quality_metrics = []
         for d,se in zip(dirty_percentages, SE_values):
             quality_metrics.append([d,se])
-        print(quality_metrics)
-        num_dirty_subsets = 0
         # DA AGGIUNGERE QUALITY METRICS IN QUESTA PARTE
         if num_dirty_subsets<=len(subsets) and num_dirty_subsets!=0:
             dirty_subsets = subsets[:num_dirty_subsets]

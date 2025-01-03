@@ -204,7 +204,6 @@ class FedQualStrategy(FedAvg):
                 sum((weight/total_quality_weight) * param[i] for param, weight in weights_results)
                 for i in range(len(weights_results[0][0]))
             ]
-            print(aggregated_ndarrays)
 
         parameters_aggregated = ndarrays_to_parameters(aggregated_ndarrays)
 
