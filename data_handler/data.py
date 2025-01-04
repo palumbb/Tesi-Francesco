@@ -205,7 +205,6 @@ def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imput
         quality_metrics = []
         for d,se in zip(dirty_percentages, SE_values):
             quality_metrics.append([d,se])
-        # DA AGGIUNGERE QUALITY METRICS IN QUESTA PARTE
         if num_dirty_subsets<=len(subsets) and num_dirty_subsets!=0:
             dirty_subsets = subsets[:num_dirty_subsets]
             clean_subsets = subsets[num_dirty_subsets:]
@@ -785,6 +784,17 @@ def get_unbalanced_subsets(df, target, num_clients, data_path, dirty_percentage)
         datasets.append(dataset3)
         datasets.append(dataset4)
         datasets.append(dataset5)
+    elif data_path=="./datasets/wall-robot-navigation.csv":
+        dataset1 = df[df[target]== "1"]
+        dataset2 = df[df[target]== "2"]
+        dataset3 = df[df[target]== "3"]
+        dataset4 = df[df[target]== "4"]
+        proportions = [0.40, 0.35, 0.15, 0.10]
+        proportions_inverse = [0.20, 0.15, 0.30, 0.35]
+        datasets.append(dataset1)
+        datasets.append(dataset2)
+        datasets.append(dataset3)
+        datasets.append(dataset4)
 
     if num_clients % 2 != 0:
         raise ValueError("num_clients deve essere pari per garantire la simmetria.")
