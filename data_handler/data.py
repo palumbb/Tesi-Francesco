@@ -682,7 +682,8 @@ def get_train_test(train_list, test, features_ohe, target_name, to_view, num_col
     x_train_list = []
     y_train_list = []
     for train_df in train_list:
-        train_df[num_columns] = scaler.transform(train_df[num_columns])
+        if (num_columns != 'categorical'):
+            train_df[num_columns] = scaler.transform(train_df[num_columns])
         x_train = train_df[features_ohe].to_numpy()
         x_train = np.vstack(x_train).astype(np.float32)
         y_train = train_df[target_name].to_numpy()
@@ -697,7 +698,8 @@ def get_train_test(train_list, test, features_ohe, target_name, to_view, num_col
         x_train_list.append(x_train_tensor)
         y_train_list.append(y_train_tensor)
     
-    test[num_columns] = scaler.transform(test[num_columns])
+    if (num_columns != 'categorical'):
+        test[num_columns] = scaler.transform(test[num_columns])
     x_test = test[features_ohe].to_numpy()
     x_test = np.vstack(x_test).astype(np.float32)
     y_test = test[target_name].to_numpy()
