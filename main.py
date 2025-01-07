@@ -124,7 +124,7 @@ def main(cfg: DictConfig) -> None:
             )
         elif isinstance(strategy, FedQualStrategy):
             server = FedQualServer(
-                strategy=strategy, client_manager=SimpleClientManager()
+                strategy=strategy, client_manager=SimpleClientManager(), quality_exclusion=cfg.quality_exclusion
             )
 
         # 6. Avvio della simulazione

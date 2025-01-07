@@ -1,9 +1,10 @@
 federated: True
 name: FedQual
-num_clients: 10 # change the proportions of each client in the partition_dataset section
+num_clients: 4 # change the proportions of each client in the partition_dataset section
 num_epochs: 1
 batch_size: 32
-clients_per_round: 10
+clients_per_round: 4
+quality_exclusion: True
 learning_rate: 0.01
 num_rounds: 2
 partitioning: balance

@@ -1,7 +1,7 @@
 """FedNova, SCAFFOLD and FedQual strategies."""
 
 from functools import reduce
-from logging import WARNING
+from logging import WARNING, INFO, DEBUG
 
 import numpy as np
 from flwr.common import (
@@ -142,46 +142,82 @@ class ScaffoldStrategy(FedAvg):
 class FedQualStrategy(FedAvg):
     """Custom FedAvg strategy with quality-weighted aggregation."""
 
-    """def aggregate_fit(
+    # New version with clients exclusion under a threshold
+    def aggregate_fit_threshold(
         self,
         server_round: int,
         results: List[Tuple[ClientProxy, FitRes]],
         failures: List[Union[Tuple[ClientProxy, FitRes], BaseException]],
     ) -> Tuple[Optional[Parameters], Dict[str, Scalar]]:
-        Aggregate fit results using quality-weighted average.
+        """Aggregate fit results considering quality weights and excluding clients based on quality metric."""
         if not results:
             return None, {}
+
         # Do not aggregate if there are failures and failures are not accepted
         if not self.accept_failures and failures:
             return None, {}
-        
-        weights_results = [
-                (parameters_to_ndarrays(fit_res.parameters), fit_res.metrics["quality_weight"])
-                for _, fit_res in results
-            ]
 
-        # Does in-place weighted average of results
-        aggregated_ndarrays = aggregate_fedqual(weights_results)
+        # Determine the quality threshold
+        threshold = 0.3
+
+        # Filter clients based on the quality metric threshold
+        filtered_results = [
+            (client, fit_res)
+            for client, fit_res in results
+            if fit_res.metrics.get("quality_weight") >= threshold
+        ]
+
+        num_considered = len(filtered_results)
+        num_discarded = len(results) - num_considered
+
+        # Log the number of considered and discarded clients
+        log(INFO, "Round %s: %s clients considered, %s clients discarded", 
+            server_round, num_considered, num_discarded)
+
+        if not filtered_results:
+            log(INFO, "No clients met the quality threshold in round %s", server_round)
+            return None, {}
+
+        # Perform aggregation
+        self.inplace = False
+        if self.inplace:
+            # Does in-place weighted average of results
+            aggregated_ndarrays = aggregate_inplace(filtered_results)
+        else:
+            # Convert results, aggregate normally without considering num_examples
+            weights_results = [
+                (parameters_to_ndarrays(fit_res.parameters), fit_res.metrics.get("quality_weight", 1.0))
+                for _, fit_res in filtered_results
+            ]
+            total_quality_weight = sum(weight for _, weight in weights_results)
+            aggregated_ndarrays = [
+                sum((weight / total_quality_weight) * param[i] for param, weight in weights_results)
+                for i in range(len(weights_results[0][0]))
+            ]
 
         parameters_aggregated = ndarrays_to_parameters(aggregated_ndarrays)
 
-        # Aggregate custom metrics if aggregation fn was provided
+        # Aggregate quality metrics if aggregation function was provided
         metrics_aggregated = {}
         if self.fit_metrics_aggregation_fn:
-            fit_metrics = [(res.metrics["quality_weight"], res.metrics) for _, res in results]
+            fit_metrics = [
+                (1, res.metrics.get("quality_metrics", [])) for _, res in filtered_results
+            ]
             metrics_aggregated = self.fit_metrics_aggregation_fn(fit_metrics)
         elif server_round == 1:  # Only log this warning once
             log(WARNING, "No fit_metrics_aggregation_fn provided")
 
-        return parameters_aggregated, metrics_aggregated"""
-    
+        return parameters_aggregated, metrics_aggregated
+
+
+    # ORIGINAL (NO THRESHOLD FOR CLIENTS EXCLUSION)
     def aggregate_fit(
         self,
         server_round: int,
         results: List[Tuple[ClientProxy, FitRes]],
         failures: List[Union[Tuple[ClientProxy, FitRes], BaseException]],
     ) -> Tuple[Optional[Parameters], Dict[str, Scalar]]:
-        """Aggregate fit results considering quality weights."""
+        #Aggregate fit results considering quality weights.
         if not results:
             return None, {}
 
@@ -216,41 +252,3 @@ class FedQualStrategy(FedAvg):
             log(WARNING, "No fit_metrics_aggregation_fn provided")
 
         return parameters_aggregated, metrics_aggregated
-    
-
-"""def aggregate_fedqual(results: list[tuple[NDArrays, int]]) -> NDArrays:
-    Compute weighted average.
-
-    quality_weights = [ fit_res.metrics["quality_weight"] for _, fit_res in results]
-    tot_quality = sum(quality_weights)
-
-        
-    final_weights = np.asarray(
-        [ parameters_to_ndarrays(param) * (weight/tot_quality) for param, weight in zip(results, quality_weights)]
-    )
-
-    # TO FIX 
-    return final_weights
-
-    def aggregate_fedqual(results: list[tuple[NDArrays, int]]) -> NDArrays:
-
-    quality_weights = [ w for _, w in results]
-    tot_quality = sum(quality_weights)
-
-    # Create a list of weights, each multiplied by the related number of examples
-    weighted_weights = [
-        [layer * (w/tot_quality) for layer in params] for params, w in results
-    ]
-
-    new_weights_results = [
-            (result[0], w/tot_quality)
-            for result, w in results
-        ]
-
-    # Compute average weights of each layer
-    weights_prime: NDArrays = [
-        reduce(np.add, layer_updates) / 1
-        for layer_updates in zip(*new_weights_results)
-    ]
-
-    return new_weights_results"""
