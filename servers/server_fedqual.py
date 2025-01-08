@@ -16,9 +16,11 @@ class FedQualServer(Server):
         *,
         client_manager: ClientManager,
         strategy: Optional[FedQualStrategy] = None,
+        quality_exclusion: bool,
     ) -> None:
         super().__init__(client_manager=client_manager, strategy=strategy)
         self.strategy: FedQualStrategy = strategy if strategy is not None else FedQualStrategy()
+        self.quality_exclusion = quality_exclusion
 
     def fit_round(
         self,
@@ -67,7 +69,9 @@ class FedQualServer(Server):
         aggregated_result: Tuple[
             Optional[Parameters],
             Dict[str, Scalar],
-        ] = self.strategy.aggregate_fit(
+        ] = self.strategy.aggregate_fit_threshold(
+            server_round=server_round, results=results, failures=failures
+        ) if self.quality_exclusion else self.strategy.aggregate_fit(
             server_round=server_round, results=results, failures=failures
         )
 

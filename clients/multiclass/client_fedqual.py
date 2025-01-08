@@ -2,7 +2,6 @@
 
 from typing import Callable, Dict, List, OrderedDict
 
-import flwr as fl
 import numpy as np
 import torch
 from flwr.common import Scalar
@@ -10,11 +9,12 @@ from hydra.utils import instantiate
 from omegaconf import DictConfig
 from torch.utils.data import DataLoader
 from flwr.common import Context
+from flwr.client import NumPyClient
 
 from model.multiclassnet import test_multi, train_fedavg
 
 # pylint: disable=too-many-instance-attributes
-class FlowerClientFedQual(fl.client.NumPyClient):
+class FlowerClientFedQual(NumPyClient):
     """Flower client implementing FedQual."""
 
     # pylint: disable=too-many-arguments
@@ -86,6 +86,7 @@ class FlowerClientFedQual(fl.client.NumPyClient):
 
         # FINAL FORMULA FOR THE QUALITY WEIGHT
         quality_weight =  self.beta*D + self.gamma*self.SE
+        print(f"quality weight: {quality_weight}")
 
         # Return updated model parameters, number of samples, and custom metrics
         return final_p_np, N_i, {"quality_weight": quality_weight}
@@ -160,7 +161,7 @@ def gen_client_fn(
         SE = quality_metrics[cid][1]  # Already normalized
 
         # Create and return the client
-        return FlowerClientFedQual(
+        return NumPyClient.to_client(FlowerClientFedQual(
             net,
             trainloader,
             valloader,
@@ -174,5 +175,5 @@ def gen_client_fn(
             N_tot,
             beta,
             gamma,
-        )
+        ) )
     return client_fn

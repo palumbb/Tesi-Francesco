@@ -12,10 +12,10 @@ from sklearn import preprocessing
 import numpy as np
 from data_handler.quality import impute_missing_column, dirty, uniform_nan
 
-def load_dataset(data_cfg, num_clients, federated: bool, partitioning, quality, model, dirty_percentage, imputation, seed):
+def load_dataset(data_cfg, num_clients, federated: bool, partitioning, quality, model, dirty_percentage, imputation, seed, num_dirty_subsets):
     data_path = data_cfg.path
     if quality=="completeness":
-        trainsets, test_dataset, quality_metrics, N_tot = load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imputation, federated, partitioning)
+        trainsets, test_dataset, quality_metrics, N_tot = load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imputation, federated, partitioning, num_dirty_subsets)
         if federated:
             trainloaders, valloaders, testloader = data_loaders(num_partitions=num_clients,
                                                                         batch_size=data_cfg.batch_size,
@@ -162,7 +162,7 @@ def get_data_info(data_path):
         target = "disease"
     return types, target_encoded, target
         
-def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imputation, federated, partitioning):
+def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imputation, federated, partitioning, num_dirty_subsets):
     types, target_encoded, target = get_data_info(data_path)
     df = pd.read_csv(data_path, dtype=types)
     if data_path=="./datasets/consumer.csv":
@@ -205,9 +205,6 @@ def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imput
         quality_metrics = []
         for d,se in zip(dirty_percentages, SE_values):
             quality_metrics.append([d,se])
-        print(quality_metrics)
-        num_dirty_subsets = 0
-        # DA AGGIUNGERE QUALITY METRICS IN QUESTA PARTE
         if num_dirty_subsets<=len(subsets) and num_dirty_subsets!=0:
             dirty_subsets = subsets[:num_dirty_subsets]
             clean_subsets = subsets[num_dirty_subsets:]
@@ -684,7 +681,8 @@ def get_train_test(train_list, test, features_ohe, target_name, to_view, num_col
     x_train_list = []
     y_train_list = []
     for train_df in train_list:
-        train_df[num_columns] = scaler.transform(train_df[num_columns])
+        if (num_columns != 'categorical'):
+            train_df[num_columns] = scaler.transform(train_df[num_columns])
         x_train = train_df[features_ohe].to_numpy()
         x_train = np.vstack(x_train).astype(np.float32)
         y_train = train_df[target_name].to_numpy()
@@ -699,7 +697,8 @@ def get_train_test(train_list, test, features_ohe, target_name, to_view, num_col
         x_train_list.append(x_train_tensor)
         y_train_list.append(y_train_tensor)
     
-    test[num_columns] = scaler.transform(test[num_columns])
+    if (num_columns != 'categorical'):
+        test[num_columns] = scaler.transform(test[num_columns])
     x_test = test[features_ohe].to_numpy()
     x_test = np.vstack(x_test).astype(np.float32)
     y_test = test[target_name].to_numpy()
@@ -785,6 +784,17 @@ def get_unbalanced_subsets(df, target, num_clients, data_path, dirty_percentage)
         datasets.append(dataset3)
         datasets.append(dataset4)
         datasets.append(dataset5)
+    elif data_path=="./datasets/wall-robot-navigation.csv":
+        dataset1 = df[df[target]== "1"]
+        dataset2 = df[df[target]== "2"]
+        dataset3 = df[df[target]== "3"]
+        dataset4 = df[df[target]== "4"]
+        proportions = [0.40, 0.35, 0.15, 0.10]
+        proportions_inverse = [0.20, 0.15, 0.30, 0.35]
+        datasets.append(dataset1)
+        datasets.append(dataset2)
+        datasets.append(dataset3)
+        datasets.append(dataset4)
 
     if num_clients % 2 != 0:
         raise ValueError("num_clients deve essere pari per garantire la simmetria.")
