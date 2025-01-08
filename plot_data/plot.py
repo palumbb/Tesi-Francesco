@@ -19,11 +19,12 @@ y_values = [
 """
 
 y_values = [
-    [0.8379, 0.6950, 0.5783, 0.6504, 0.5358, 0.6547],  
-    [0.7056, 0.7604, 0.5987, 0.6373, 0.6439, 0.7322], 
-    [0.7808, 0.7569, 0.6628, 0.6732, 0.5690, 0.6797], 
-    [0.6600, 0.6817, 0.6863, 0.6797, 0.6454, 0.6288],
-    [0.7381, 0.7959, 0.6875, 0.5578, 0.6550, 0.6905]
+    [0.8975, 0.8195, 0.8292, 0.7904, 0.7463, 0.7219],  
+    [0.8829, 0.8048, 0.8195, 0.7902, 0.7707, 0.7902], 
+    [0.8878, 0.8439, 0.8048, 0.8000, 0.7463, 0.7853], 
+    [0.8926, 0.8195, 0.7853, 0.7707, 0.7560, 0.7512],
+    [0.8560, 0.8219, 0.7706, 0.7804, 0.7121, 0.6902],
+    [0.8487, 0.8194, 0.7780, 0.7804, 0.7536, 0.7121]
 ]
 
 """
@@ -35,7 +36,7 @@ y_values = [
 ]
 """
 
-labels = ["FedAvg", "FedProx", "FedNova", "Scaffold", "FedQual (β=0.5, γ=0.8)"] 
+labels = ["FedAvg", "FedProx", "FedNova", "Scaffold", "FedQual (β=0.8, γ=0.5)", "FedQual THR = 0.1"] 
 #labels = ["FedAvg Standard", "FedAvg Mean"]
 
 
@@ -44,7 +45,7 @@ for y_series, label in zip(y_values, labels):
 
 plt.ylabel('Accuracy')
 plt.xlabel('Dirty Percentage')
-plt.title('Nursery - Unbalanced Standard Imputation')
+plt.title('Heart - Completeness Standard Imputation')
 plt.legend()
 plt.grid(True)
 

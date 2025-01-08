@@ -86,7 +86,7 @@ class FlowerClientFedQual(NumPyClient):
 
         # FINAL FORMULA FOR THE QUALITY WEIGHT
         quality_weight =  self.beta*D + self.gamma*self.SE
-        print(f"quality weight: {quality_weight}")
+        #print(f"quality weight: {quality_weight}")
 
         # Return updated model parameters, number of samples, and custom metrics
         return final_p_np, N_i, {"quality_weight": quality_weight}

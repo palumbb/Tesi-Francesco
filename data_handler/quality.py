@@ -7,6 +7,7 @@ def dirty(seed, df, features, method, dirty_percentage): # name_class sarebbe il
     if method == "uniform":
         return uniform(seed, df, features, dirty_percentage)
 
+# IMPUTE WITH O, MISSING
 def uniform(seed, df, features, dirty_percentage):
     np.random.seed(seed)
 
@@ -29,6 +30,7 @@ def uniform(seed, df, features, dirty_percentage):
         # print("saved {}-completeness{}%".format(name, round((1-p)*100)))
     return df_dirt 
 
+# IMPUTE WITH NAN
 def uniform_nan(seed, df, features, dirty_percentage):
     np.random.seed(seed)
 
