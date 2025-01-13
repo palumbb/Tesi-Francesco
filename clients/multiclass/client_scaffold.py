@@ -9,6 +9,7 @@ from flwr.common import Scalar
 from hydra.utils import instantiate
 from omegaconf import DictConfig
 from torch.utils.data import DataLoader
+from flwr.client import NumPyClient
 
 from model.multiclassnet import test_multi, train_scaffold
 
@@ -170,7 +171,7 @@ def gen_client_fn(
         trainloader = trainloaders[int(cid)]
         valloader = valloaders[int(cid)]
 
-        return FlowerClientScaffold(
+        return NumPyClient.to_client(FlowerClientScaffold(
             int(cid),
             net,
             trainloader,
@@ -181,6 +182,6 @@ def gen_client_fn(
             momentum,
             weight_decay,
             save_dir=client_cv_dir,
-        )
+        ))
 
     return client_fn

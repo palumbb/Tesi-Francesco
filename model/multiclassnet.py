@@ -24,7 +24,7 @@ class MulticlassNet(nn.Module):
             if imputation=="standard" or imputation=="mean":
                 input_dim = 35
             else: 
-                input_dim = 27
+                input_dim = 35
             num_classes = 5
         if data=="./datasets/consumer.csv":
             if imputation=="standard" or imputation=="mean":
@@ -54,7 +54,7 @@ class MulticlassNet(nn.Module):
             if imputation=="standard" or imputation=="mean":
                 input_dim = 139
             else:
-                input_dim = 116
+                input_dim = 139
             num_classes = 2
         elif data == "./datasets/cancer.csv":
             if imputation=="standard" or imputation=="mean":

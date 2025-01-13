@@ -85,7 +85,6 @@ def aggregate_fednova(results: List[Tuple[NDArrays, float]]) -> NDArrays:
     ]
     return weights_prime
 
-
 class ScaffoldStrategy(FedAvg):
     """Implement custom strategy for SCAFFOLD based on FedAvg class."""
 
@@ -149,7 +148,7 @@ class FedQualStrategy(FedAvg):
         results: List[Tuple[ClientProxy, FitRes]],
         failures: List[Union[Tuple[ClientProxy, FitRes], BaseException]],
     ) -> Tuple[Optional[Parameters], Dict[str, Scalar]]:
-        """Aggregate fit results considering quality weights and excluding clients based on quality metric."""
+        """Aggregate fit results considering normalized quality weights and excluding clients based on quality metric."""
         if not results:
             return None, {}
 
@@ -157,43 +156,40 @@ class FedQualStrategy(FedAvg):
         if not self.accept_failures and failures:
             return None, {}
 
-        # Determine the quality threshold
-        threshold = 0.3
+        # Perform initial extraction of weights and parameters
+        weights_results = [
+            (parameters_to_ndarrays(fit_res.parameters), fit_res.metrics.get("quality_weight", 1.0))
+            for _, fit_res in results
+        ]
+        total_quality_weight = sum(weight for _, weight in weights_results)
 
-        # Filter clients based on the quality metric threshold
+        normalized_weights_results = [
+            (param, weight / total_quality_weight) for param, weight in weights_results
+        ]
+
+        threshold = 0.06
         filtered_results = [
-            (client, fit_res)
-            for client, fit_res in results
-            if fit_res.metrics.get("quality_weight") >= threshold
+            (param, norm_weight)
+            for param, norm_weight in normalized_weights_results
+            if norm_weight >= threshold
         ]
 
         num_considered = len(filtered_results)
-        num_discarded = len(results) - num_considered
+        num_discarded = len(normalized_weights_results) - num_considered
 
         # Log the number of considered and discarded clients
         log(INFO, "Round %s: %s clients considered, %s clients discarded", 
             server_round, num_considered, num_discarded)
 
         if not filtered_results:
-            log(INFO, "No clients met the quality threshold in round %s", server_round)
+            log(INFO, "No clients met the normalized quality threshold in round %s", server_round)
             return None, {}
 
-        # Perform aggregation
-        self.inplace = False
-        if self.inplace:
-            # Does in-place weighted average of results
-            aggregated_ndarrays = aggregate_inplace(filtered_results)
-        else:
-            # Convert results, aggregate normally without considering num_examples
-            weights_results = [
-                (parameters_to_ndarrays(fit_res.parameters), fit_res.metrics.get("quality_weight", 1.0))
-                for _, fit_res in filtered_results
-            ]
-            total_quality_weight = sum(weight for _, weight in weights_results)
-            aggregated_ndarrays = [
-                sum((weight / total_quality_weight) * param[i] for param, weight in weights_results)
-                for i in range(len(weights_results[0][0]))
-            ]
+        # Aggregate parameters using the filtered results
+        aggregated_ndarrays = [
+            sum(norm_weight * param[i] for param, norm_weight in filtered_results)
+            for i in range(len(filtered_results[0][0]))
+        ]
 
         parameters_aggregated = ndarrays_to_parameters(aggregated_ndarrays)
 
@@ -201,13 +197,16 @@ class FedQualStrategy(FedAvg):
         metrics_aggregated = {}
         if self.fit_metrics_aggregation_fn:
             fit_metrics = [
-                (1, res.metrics.get("quality_metrics", [])) for _, res in filtered_results
+                (1, fit_res.metrics.get("quality_metrics", []))
+                for (_, fit_res), (_, norm_weight) in zip(results, normalized_weights_results)
+                if norm_weight >= threshold
             ]
             metrics_aggregated = self.fit_metrics_aggregation_fn(fit_metrics)
         elif server_round == 1:  # Only log this warning once
             log(WARNING, "No fit_metrics_aggregation_fn provided")
 
         return parameters_aggregated, metrics_aggregated
+
 
 
     # ORIGINAL (NO THRESHOLD FOR CLIENTS EXCLUSION)
@@ -236,6 +235,9 @@ class FedQualStrategy(FedAvg):
                 for _, fit_res in results
             ]
             total_quality_weight = sum(weight for _, weight in weights_results)
+
+            print(f"Final normalized weights: { [ weight/total_quality_weight for _, weight in weights_results] }")
+
             aggregated_ndarrays = [
                 sum((weight/total_quality_weight) * param[i] for param, weight in weights_results)
                 for i in range(len(weights_results[0][0]))

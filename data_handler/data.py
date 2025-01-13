@@ -10,6 +10,7 @@ from sklearn.datasets import load_digits
 from sklearn.feature_selection import SelectKBest, mutual_info_classif
 from sklearn import preprocessing
 import numpy as np
+import random as rand
 from data_handler.quality import impute_missing_column, dirty, uniform_nan
 
 def load_dataset(data_cfg, num_clients, federated: bool, partitioning, quality, model, dirty_percentage, imputation, seed, num_dirty_subsets):
@@ -65,6 +66,7 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning, quality, 
         
         else:
             return train_dataset, test_dataset
+    
 
 def load_clean_dataset(data_path, model):
     if data_path=="./datasets/consumer.csv":
@@ -194,46 +196,24 @@ def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imput
             elif num_clients == 100:
                 proportions = 0.01
             percentages = np.ones(num_clients)*proportions
-            subsets, dirty_percentages, SE_values = split_dataframe(train, percentages, num_clients, target, dirty_percentage)
+            subsets, dirty_percentages, SE_values = split_dataframe(train, percentages, num_clients, target, dirty_percentage, None)
+            imp_clients, test = get_dirty(subsets, test, num_dirty_subsets, imputation, seed, features, dirty_percentages, method)
         elif partitioning=="proportions":
             if num_clients == 10:
                 percentages = [0.02, 0.08, 0.05, 0.05, 0.10, 0.30, 0.15, 0.05, 0.10, 0.10]
-                subsets, dirty_percentages, SE_values = split_dataframe(train, percentages, num_clients, target)
+                subsets, dirty_percentages, SE_values = split_dataframe(train, percentages, num_clients, target, dirty_percentage, None)
+                imp_clients, test = get_dirty(subsets, test, num_dirty_subsets, imputation, seed, features, dirty_percentages, method)
         elif partitioning=="balance":
             subsets, dirty_percentages, SE_values = get_unbalanced_subsets(train, target, num_clients, data_path, dirty_percentage)
-        imp_clients = []
+            imp_clients, test = get_dirty(subsets, test, num_dirty_subsets, imputation, seed, features, dirty_percentages, method)
+        elif partitioning=="mixed":
+            imp_clients, dirty_percentages, SE_values, test = get_mixed_subsets(train, test, target, num_clients, seed, features, data_path)
+
         quality_metrics = []
         for d,se in zip(dirty_percentages, SE_values):
             quality_metrics.append([d,se])
-        if num_dirty_subsets<=len(subsets) and num_dirty_subsets!=0:
-            dirty_subsets = subsets[:num_dirty_subsets]
-            clean_subsets = subsets[num_dirty_subsets:]
-            subsets = []
-            for s in dirty_subsets:
-                if imputation == "standard": # DIRTY WITH NAN -> IMPUTED WITH 0, 'MISSING'
-                    client = uniform_nan(seed, s, features, dirty_percentage)
-                    imp_client = impute_missing_column(client, "impute_standard")
-                    imp_clients.append(imp_client)
-                elif imputation == "mean":
-                    client = dirty(seed, s, features, method, dirty_percentage) # DIRECLTY DIRTY WITH 0, 'MISSING'
-                    imp_client = impute_missing_column(client, "impute_mean")
-                    imp_clients.append(imp_client)
-            subsets.extend(imp_clients)
-            subsets.extend(clean_subsets)
-            imp_clients, test = one_hot_encode_dirty(subsets, test)
-        else:
-            for s in subsets:
-                if imputation == "standard": # DIRTY WITH NAN -> IMPUTED WITH 0, 'MISSING'
-                    client = uniform_nan(seed, s, features, dirty_percentage)
-                    imp_client = impute_missing_column(client, "impute_standard")
-                    imp_clients.append(imp_client)
-                elif imputation == "mean":
-                    client = dirty(seed, s, features, method, dirty_percentage) # DIRECLTY DIRTY WITH 0, 'MISSING'
-                    imp_client = impute_missing_column(client, "impute_mean")
-                    imp_clients.append(imp_client)
-                else:
-                    imp_clients.append(s)
-            imp_clients, test = one_hot_encode_dirty(imp_clients, test)
+        print(f"Quality metrics: {quality_metrics}")
+
         features_ohe = list(test.columns)
         for t in target_encoded:
             features_ohe.remove(t)
@@ -260,6 +240,42 @@ def load_dirty_dataset(data_path, num_clients, dirty_percentage, data_cfg, imput
         trainset, testset = train_test_split(imp_client, data_cfg, num_columns, features_ohe, target_encoded, to_view)
         return trainset, testset, quality_metrics, N_tot
 
+
+def get_dirty(subsets, test, num_dirty_subsets, imputation, seed, features, dirty_percentages, method):
+    imp_clients = []
+    
+    if num_dirty_subsets<=len(subsets) and num_dirty_subsets!=0:
+            dirty_subsets = subsets[:num_dirty_subsets]
+            clean_subsets = subsets[num_dirty_subsets:]
+            subsets = []
+            for s,d in zip(dirty_subsets, dirty_percentages):
+                if imputation == "standard": # DIRTY WITH NAN -> IMPUTED WITH 0, 'MISSING'
+                    client = uniform_nan(seed, s, features, d)
+                    imp_client = impute_missing_column(client, "impute_standard")
+                    imp_clients.append(imp_client)
+                elif imputation == "mean":
+                    client = dirty(seed, s, features, method, d) # DIRECTLY DIRTY WITH 0, 'MISSING'
+                    imp_client = impute_missing_column(client, "impute_mean")
+                    imp_clients.append(imp_client)
+            subsets.extend(imp_clients)
+            subsets.extend(clean_subsets)
+            imp_clients, test = one_hot_encode_dirty(subsets, test)
+    else:
+        for s,d in zip(subsets, dirty_percentages):
+            if imputation == "standard": # DIRTY WITH NAN -> IMPUTED WITH 0, 'MISSING'
+                client = uniform_nan(seed, s, features, d)
+                imp_client = impute_missing_column(client, "impute_standard")
+                imp_clients.append(imp_client)
+            elif imputation == "mean":
+                client = dirty(seed, s, features, method, d) # DIRECTLY DIRTY WITH 0, 'MISSING'
+                imp_client = impute_missing_column(client, "impute_mean")
+                imp_clients.append(imp_client)
+            else:
+                imp_clients.append(s)
+        imp_clients, test = one_hot_encode_dirty(imp_clients, test)
+    
+    return imp_clients, test
+    
 def encoding_categorical_variables(X):
     def encode(original_dataframe, feature_to_encode):
         dummies = pd.get_dummies(original_dataframe[[feature_to_encode]], dummy_na=False, dtype=int)
@@ -715,11 +731,13 @@ def get_train_test(train_list, test, features_ohe, target_name, to_view, num_col
 
     return train_datasets, test_dataset
 
-def split_dataframe(df, percentages, num_clients, target, dirty_percentage):
+def split_dataframe(df, percentages, num_clients, target, dirty_percentage, dirty_percentages):
     SE_values = []
-    dirty_percentages = np.ones(num_clients)*dirty_percentage
+    if dirty_percentage is not None:
+        dirty_percentages = np.ones(num_clients)*dirty_percentage
     class_elements = []
     classes = list(df[target].unique())
+
     if len(percentages) != num_clients:
         raise ValueError("Il numero di percentuali deve essere uguale a num_clients.")
 
@@ -735,14 +753,16 @@ def split_dataframe(df, percentages, num_clients, target, dirty_percentage):
             elements = len(subset[subset[target] == c])
             class_elements.append(elements)
         SE = -np.sum(np.log([el/n for el in class_elements]))
-        subsets.append(subset)
+        class_elements.clear()
         SE_values.append(SE)
-     # normalize SE values
+    
+    # normalize SE values
     sum_SE = sum(SE_values)
     SE_norm = []
     for se in SE_values:
         se = se/sum_SE
         SE_norm.append(se)
+
     return subsets, dirty_percentages, SE_norm
 
 def get_unbalanced_subsets(df, target, num_clients, data_path, dirty_percentage):
@@ -751,10 +771,12 @@ def get_unbalanced_subsets(df, target, num_clients, data_path, dirty_percentage)
     sizes = []
     target_sizes = []
     leftovers = []
-    N = len(df)
     class_elements = []
     # Lists of quality metrics for each client
-    dirty_percentages = np.ones(num_clients)*dirty_percentage # per adesso dirty percentages sono uguali per ogni client, prese dal config
+    if dirty_percentage is not None:
+        dirty_percentages = np.ones(num_clients)*dirty_percentage
+    else:
+        dirty_percentages = [0.05, 0.10, 0.20, 0.30, 0.40, 0.50, 0.0, 0.0, 0.0, 0.15, 0.20]
     SE_values = []
     classes = list(df[target].unique())
     if data_path=="./datasets/heart.csv":
@@ -801,7 +823,7 @@ def get_unbalanced_subsets(df, target, num_clients, data_path, dirty_percentage)
     half_subsets = num_clients // 2
 
     for ds in datasets:
-        ds = ds.sample(frac=1, random_state=42).reset_index(drop=True)
+        ds = ds.sample(frac=1, random_state=205).reset_index(drop=True)
         size = len(ds)
         sizes.append(size)
  
@@ -829,6 +851,7 @@ def get_unbalanced_subsets(df, target, num_clients, data_path, dirty_percentage)
             elements = len(subset[subset[target] == c])
             class_elements.append(elements)
         SE = -np.sum(np.log([el/n for el in class_elements]))
+        class_elements.clear()
         subsets.append(subset)
         SE_values.append(SE)
     starts = np.ones(len(datasets), dtype=int)*0
@@ -845,6 +868,7 @@ def get_unbalanced_subsets(df, target, num_clients, data_path, dirty_percentage)
             elements = len(subset[subset[target] == c])
             class_elements.append(elements)
         SE = -np.sum(np.log([el/n for el in class_elements]))
+        class_elements.clear()
         subsets.append(subset)
         SE_values.append(SE)
   
@@ -858,7 +882,156 @@ def get_unbalanced_subsets(df, target, num_clients, data_path, dirty_percentage)
 
     return subsets, dirty_percentages, SE_norm
 
+def get_mixed_subsets(df, test, target, num_clients, seed, features, data_path):
+    method = "uniform"
+    subsets = []
+    imp_clients = []
+    SE_values = []
+
+    random = False
+
+    if random:
+    
+        #rand_dirty = np.random.uniform(0.0, 0.5, num_clients) # DIRTY PERCENTAGES
+        rand_imp = rand.choices(["standard", "mean"], k=num_clients) # IMPUTATION METHODS
+        #rand_per = np.random.uniform(30, 100, num_clients) # SIZE PERCENTAGES
+        
+        rand_dirty = [0.0, 0.10, 0.30, 0.50, 0.0, 0.05, 0.20, 0.10, 0.05, 0.40]
+        rand_per = [5, 5, 20, 10, 10, 30, 5, 50, 15, 30]
+        norm_per = []
+
+        for p in rand_per:
+            p = p/sum(rand_per)
+            norm_per.append(p)
+
+        # FIRST GET DIFFERENT SIZES SUBSETS BASED ON RANDOM PERCENTAGES (INDIRECTLY ALREADY UNBALANCED)
+        subsets, dirty_percentages, SE_values = split_dataframe(df, norm_per, num_clients, target, None, rand_dirty)
+        #print(subsets[0])
+
+        # GET THEM DIRTY WITH DIFFERENT RANDOM PERCENTAGES
+        for imp,d,s in zip(rand_imp, dirty_percentages, subsets):
+            if imp == "standard": # DIRTY WITH NAN -> IMPUTED WITH 0, 'MISSING'
+                client = uniform_nan(seed, s, features, d)
+                imp_client = impute_missing_column(client, "impute_standard")
+                imp_clients.append(imp_client)
+            elif imp == "mean":
+                client = dirty(seed, s, features, method, d) # DIRECTLY DIRTY WITH 0, 'MISSING'
+                imp_client = impute_missing_column(client, "impute_mean")
+                imp_clients.append(imp_client)
+            else:
+                imp_clients.append(s)
+        mixed_subsets, test = one_hot_encode_dirty(imp_clients, test)
+
+
+        return mixed_subsets, rand_dirty, SE_values, test
+    
+    else:
+        datasets = []
+        dirty =   [ 0.5, 0.10, 0.0, 0.0, 0.40, 0.0, 0.20, 0.0, 0.05, 0.50 ]
+        #balance = [ "-", "-", "-", "-", "-", "-", "-", "-", "-", "-" ]
+        size = [ 0.05, 0.15, 0.10, 0.05, 0.10, 0.20, 0.05, 0.05, 0.15, 0.10 ]
+        row_sizes = [int(s * len(df)) for s in size]
+
+        if data_path=="./datasets/heart.csv":
+            dataset1 = df[df[target]=="N"]
+            dataset2 = df[df[target]=="Y"]
+            datasets.append(dataset1)
+            datasets.append(dataset2)
+            balance =  [ (0.9,0.1), (0.5,0.5), (0.5,0.5), (0.8, 0.2), (0.3,0.7), (0.4,0.6), (0.8,0.2), (0.6,0.4), (0.5,0.5) , (0.9, 0.1) ]
+        elif data_path=="./datasets/wall-robot-navigation.csv":
+            dataset1 = df[df[target]== "1"]
+            dataset2 = df[df[target]== "2"]
+            dataset3 = df[df[target]== "3"]
+            dataset4 = df[df[target]== "4"]
+            datasets.append(dataset1)
+            datasets.append(dataset2)
+            datasets.append(dataset3)
+            datasets.append(dataset4)
+            balance = [ "-", "-", "-", "-", "-", "-", "-", "-", "-", "-" ]
+        elif data_path=="./datasets/mushrooms.csv":
+            dataset1 = df[df[target]== "poisonous"]
+            dataset2 = df[df[target]== "edible"]
+            datasets.append(dataset1)
+            datasets.append(dataset2)
+            balance = [ "-", "-", "-", "-", "-", "-", "-", "-", "-", "-" ]
+        elif data_path=="./datasets/nursery.csv":
+            dataset1 = df[df[target]== "recommend"]
+            dataset2 = df[df[target]== "very_recom"]
+            dataset3 = df[df[target]== "not_recom"]
+            dataset4 = df[df[target]== "spec_prior"]
+            dataset5 = df[df[target]== "priority"]
+            datasets.append(dataset1)
+            datasets.append(dataset2)
+            datasets.append(dataset3)
+            datasets.append(dataset4)
+            datasets.append(dataset5)
+            balance = [ "-", "-", "-", "-", "-", "-", "-", "-", "-", "-" ]
+
+        classes = list(df[target].unique())
+        class_elements = []
+        start_idx = 0
+        target_subsets = []
+        subsets = []
+        for b,s in zip(balance,row_sizes):
+            rand_seed = np.random.randint(low=0, high=210)
+            if b!="-":
+                if data_path=="./datasets/heart.csv" or data_path=="./datasets/mushrooms.csv":
+                    subset_1 = dataset1.sample(n=int(b[0]*s), random_state=rand_seed)
+                    subset_2 = dataset2.sample(n=s-int(b[0]*s), random_state=rand_seed)
+                    target_subsets.append(subset_1)
+                    target_subsets.append(subset_2)
+                elif data_path=="./datasets/wall-robot-navigation.csv":
+                    subset_1 = dataset1.sample(n=int(b[0]*s), random_state=rand_seed)
+                    subset_2 = dataset2.sample(n=int(b[1]*s), random_state=rand_seed)
+                    subset_3 = dataset3.sample(n=int(b[2]*s), random_state=rand_seed)
+                    subset_4 = dataset4.sample(n=int(b[3]*s), random_state=rand_seed)
+                    target_subsets.append(subset_1)
+                    target_subsets.append(subset_2)
+                    target_subsets.append(subset_3)
+                    target_subsets.append(subset_4)
+                elif data_path=="./datasets/nursery.csv":
+                    subset_1 = dataset1.sample(n=int(b[0]*s), random_state=rand_seed)
+                    subset_2 = dataset2.sample(n=int(b[1]*s), random_state=rand_seed)
+                    subset_3 = dataset3.sample(n=int(b[2]*s), random_state=rand_seed)
+                    subset_4 = dataset4.sample(n=int(b[3]*s), random_state=rand_seed)
+                    subset_5 = dataset5.sample(n=int(b[4]*s), random_state=rand_seed)
+                    target_subsets.append(subset_1)
+                    target_subsets.append(subset_2)
+                    target_subsets.append(subset_3)
+                    target_subsets.append(subset_4)
+                    target_subsets.append(subset_5)
+                client = pd.concat([t for t in target_subsets]).sample(frac=1, random_state=rand_seed).reset_index(drop=True)
+            else:
+                end_idx = start_idx + int(s)
+                client = df.iloc[start_idx:end_idx]
+                start_idx = end_idx
+            n = len(client)
+            for c in classes:
+                elements = len(client[client[target] == c])
+                if elements==0:
+                    elements+=1
+                class_elements.append(elements)
+            SE = -np.sum(np.log([el/n for el in class_elements]))
+            class_elements.clear()
+            SE_values.append(SE)
+            subsets.append(client)
+        
+        # normalize SE values
+        sum_SE = sum(SE_values)
+        SE_norm = []
+        for se in SE_values:
+            se = se/sum_SE
+            SE_norm.append(se)
+        
+        imp_clients, test = get_dirty(subsets, test, num_dirty_subsets=0, 
+                                imputation="mean", seed=seed, features=features, dirty_percentages=dirty, method=method)
+
+
+        return imp_clients, dirty, SE_values, test
+
+
 def split_by_x3(df):
+
     cols = list(df.columns)
     subset_brown = df[df['x3_brown'] == 1][cols]
     subset_red = df[df['x3_red'] == 1][cols]
@@ -1034,4 +1207,3 @@ def split_by_v2(df):
     subset_3 = df[df['V2'] > 3.0]
     subsets = [subset_1, subset_2, subset_3]
     return subsets
-

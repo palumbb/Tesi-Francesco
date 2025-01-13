@@ -8,6 +8,7 @@ from flwr.common import Scalar
 from hydra.utils import instantiate
 from omegaconf import DictConfig
 from torch.utils.data import DataLoader
+from flwr.client import NumPyClient
 
 from model.multiclassnet import test_multi, train_fedavg
 
@@ -119,7 +120,7 @@ def gen_client_fn(
         trainloader = trainloaders[int(cid)]
         valloader = valloaders[int(cid)]
 
-        return FlowerClientFedAvg(
+        return NumPyClient.to_client(FlowerClientFedAvg(
             net,
             trainloader,
             valloader,
@@ -128,6 +129,6 @@ def gen_client_fn(
             learning_rate,
             momentum,
             weight_decay,
-        )
+        ))
 
     return client_fn
