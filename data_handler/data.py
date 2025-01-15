@@ -1029,7 +1029,7 @@ def get_mixed_subsets(df, test, target, num_clients, seed, features, data_path):
                                 imputation="mean", seed=seed, features=features, dirty_percentages=dirty, method=method)
 
 
-        return imp_clients, dirty, SE_values, test
+        return imp_clients, dirty, SE_norm, test
 
 
 def split_by_x3(df):
