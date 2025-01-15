@@ -931,7 +931,9 @@ def get_mixed_subsets(df, test, target, num_clients, seed, features, data_path):
         #balance = [ "-", "-", "-", "-", "-", "-", "-", "-", "-", "-" ]
         size = [ 0.05, 0.15, 0.10, 0.05, 0.10, 0.20, 0.05, 0.05, 0.15, 0.10 ]
         row_sizes = [int(s * len(df)) for s in size]
-
+        for s in size:
+            s = s/sum(size)
+            
         if data_path=="./datasets/heart.csv":
             dataset1 = df[df[target]=="N"]
             dataset2 = df[df[target]=="Y"]

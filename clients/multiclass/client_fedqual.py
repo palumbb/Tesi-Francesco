@@ -89,7 +89,7 @@ class FlowerClientFedQual(NumPyClient):
                                                             #to the most unbalanced clients (it learns better a specific class)
         
         #quality_weight = (N_i/self.N_tot)*(self.beta*C + self.gamma*self.SE)
-        quality_weight = 1.0*N_i/self.N_tot + self.beta*C + self.gamma*self.SE
+        quality_weight = 0*N_i/self.N_tot + self.beta*C + self.gamma*self.SE
         #print(f"quality weight: {quality_weight} ")
 
         # Return updated model parameters, number of samples, and custom metrics
