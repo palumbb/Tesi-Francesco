@@ -927,19 +927,17 @@ def get_mixed_subsets(df, test, target, num_clients, seed, features, data_path):
     
     else:
         datasets = []
-        dirty =   [ 0.5, 0.10, 0.0, 0.0, 0.40, 0.0, 0.20, 0.0, 0.05, 0.50 ]
-        #balance = [ "-", "-", "-", "-", "-", "-", "-", "-", "-", "-" ]
-        size = [ 0.05, 0.15, 0.10, 0.05, 0.10, 0.20, 0.05, 0.05, 0.15, 0.10 ]
+        dirty = [ 0.8, 0.7, 0.0, 0.0, 0.50, 0.0, 0.50, 0.0, 0.30, 0.50 ]
+        balance = [ "-", "-", "-", "-", "-", "-", "-", "-", "-", "-" ]
+        size = [ 0.05, 0.10, 0.10, 0.05, 0.05, 0.20, 0.025, 0.20, 0.175, 0.05 ]
         row_sizes = [int(s * len(df)) for s in size]
-        for s in size:
-            s = s/sum(size)
-            
+
         if data_path=="./datasets/heart.csv":
             dataset1 = df[df[target]=="N"]
             dataset2 = df[df[target]=="Y"]
             datasets.append(dataset1)
             datasets.append(dataset2)
-            balance =  [ (0.9,0.1), (0.5,0.5), (0.5,0.5), (0.8, 0.2), (0.3,0.7), (0.4,0.6), (0.8,0.2), (0.6,0.4), (0.5,0.5) , (0.9, 0.1) ]
+            #balance = [ (0.4,0.6), (0.2,0.8), (0.9,0.1), (0.5,0.5), (0.6,0.4), (0.5,0.5), (0.7,0.3),(0.1,0.9),(0.5,0.5),(0.0,1.0) ]
         elif data_path=="./datasets/wall-robot-navigation.csv":
             dataset1 = df[df[target]== "1"]
             dataset2 = df[df[target]== "2"]
@@ -949,7 +947,7 @@ def get_mixed_subsets(df, test, target, num_clients, seed, features, data_path):
             datasets.append(dataset2)
             datasets.append(dataset3)
             datasets.append(dataset4)
-            balance = [ "-", "-", "-", "-", "-", "-", "-", "-", "-", "-" ]
+            #balance = [ (0.6,0.1,0.1,0.2), (0.2,0.5,0.2,0.1), (0.3,0.2,0.2,0.3), (0.25,0.25,0.25,0.25), (0.6,0.1,0.1,0.2), (0.2,0.2,0.3,0.3), (0.0,0.2,0.7,0.1), (0.2,0.3,0.3,0.2), (0.7,0.1,0.1,0.1) , (0.8,0.1,0.0,0.1) ]
         elif data_path=="./datasets/mushrooms.csv":
             dataset1 = df[df[target]== "poisonous"]
             dataset2 = df[df[target]== "edible"]
@@ -978,19 +976,25 @@ def get_mixed_subsets(df, test, target, num_clients, seed, features, data_path):
             rand_seed = np.random.randint(low=0, high=210)
             if b!="-":
                 if data_path=="./datasets/heart.csv" or data_path=="./datasets/mushrooms.csv":
-                    subset_1 = dataset1.sample(n=int(b[0]*s), random_state=rand_seed)
-                    subset_2 = dataset2.sample(n=s-int(b[0]*s), random_state=rand_seed)
+                    subset_1 = dataset1.sample(n=int(b[0]*s), replace=True, random_state=rand_seed)
+                    subset_2 = dataset2.sample(n=s-int(b[0]*s), replace=True, random_state=rand_seed)
                     target_subsets.append(subset_1)
                     target_subsets.append(subset_2)
+                    dataset1 = dataset1[~ dataset1.index.isin(subset_1.index)]
+                    dataset2 = dataset2[~ dataset2.index.isin(subset_2.index)]
                 elif data_path=="./datasets/wall-robot-navigation.csv":
-                    subset_1 = dataset1.sample(n=int(b[0]*s), random_state=rand_seed)
-                    subset_2 = dataset2.sample(n=int(b[1]*s), random_state=rand_seed)
-                    subset_3 = dataset3.sample(n=int(b[2]*s), random_state=rand_seed)
-                    subset_4 = dataset4.sample(n=int(b[3]*s), random_state=rand_seed)
+                    subset_1 = dataset1.sample(n=int(b[0]*s), replace=True, random_state=rand_seed)
+                    subset_2 = dataset2.sample(n=int(b[1]*s), replace=True, random_state=rand_seed)
+                    subset_3 = dataset3.sample(n=int(b[2]*s), replace=True, random_state=rand_seed)
+                    subset_4 = dataset4.sample(n=int(b[3]*s), replace=True, random_state=rand_seed)
                     target_subsets.append(subset_1)
                     target_subsets.append(subset_2)
                     target_subsets.append(subset_3)
                     target_subsets.append(subset_4)
+                    dataset1 = dataset1[~ dataset1.index.isin(subset_1.index)]
+                    dataset2 = dataset2[~ dataset2.index.isin(subset_2.index)]
+                    dataset3 = dataset3[~ dataset3.index.isin(subset_3.index)]
+                    dataset4 = dataset4[~ dataset4.index.isin(subset_4.index)]
                 elif data_path=="./datasets/nursery.csv":
                     subset_1 = dataset1.sample(n=int(b[0]*s), random_state=rand_seed)
                     subset_2 = dataset2.sample(n=int(b[1]*s), random_state=rand_seed)
@@ -1002,6 +1006,11 @@ def get_mixed_subsets(df, test, target, num_clients, seed, features, data_path):
                     target_subsets.append(subset_3)
                     target_subsets.append(subset_4)
                     target_subsets.append(subset_5)
+                    dataset1 = dataset1[~ dataset1.index.isin(subset_1.index)]
+                    dataset2 = dataset2[~ dataset2.index.isin(subset_2.index)]
+                    dataset3 = dataset3[~ dataset3.index.isin(subset_3.index)]
+                    dataset4 = dataset4[~ dataset4.index.isin(subset_4.index)]
+                    dataset5 = dataset5[~ dataset5.index.isin(subset_5.index)]
                 client = pd.concat([t for t in target_subsets]).sample(frac=1, random_state=rand_seed).reset_index(drop=True)
             else:
                 end_idx = start_idx + int(s)
