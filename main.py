@@ -90,7 +90,8 @@ def main(cfg: DictConfig) -> None:
                 quality_metrics=quality_metrics,
                 N_tot=N_tot,
                 beta = cfg.client_fn.beta,
-                gamma = cfg.client_fn.gamma
+                gamma = cfg.client_fn.gamma,
+                delta = cfg.client_fn.delta
             )
 
         else:

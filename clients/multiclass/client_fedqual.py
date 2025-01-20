@@ -32,7 +32,8 @@ class FlowerClientFedQual(NumPyClient):
         SE: float,
         N_tot: int,
         beta: float,
-        gamma: float
+        gamma: float,
+        delta: float
     ) -> None:
         self.net = net
         self.trainloader = trainloader
@@ -47,6 +48,7 @@ class FlowerClientFedQual(NumPyClient):
         self.N_tot = N_tot
         self.beta = beta
         self.gamma = gamma
+        self.delta = delta
 
     def get_parameters(self, config: Dict[str, Scalar]):
         """Return the current local model parameters."""
@@ -81,15 +83,22 @@ class FlowerClientFedQual(NumPyClient):
         # COMPUTE QUALITY METRICS THAT WE WANT TO TAKE INTO ACCOUNT
         C = 1 - self.dirty_percentage # COMPLETENESS
         N_i = len(self.trainloader.dataset) # DIMENSIONALITY
-        #D = N_i*C/self.N_tot # COMPLETENESS AND DIMENSIONALITY
-        #D = C
+        D = N_i*C/self.N_tot # COMPLETENESS AND DIMENSIONALITY
 
         # FINAL FORMULA FOR THE QUALITY WEIGHT
-        #quality_weight =  self.beta*D + self.gamma*self.SE #high gamma means giving high importance
-                                                            #to the most unbalanced clients (it learns better a specific class)
-        
-        #quality_weight = (N_i/self.N_tot)*(self.beta*C + self.gamma*self.SE)
-        quality_weight = 0*N_i/self.N_tot + self.beta*C + self.gamma*self.SE
+
+
+        # 1 
+        # quality_weight =  self.beta*D + self.gamma*self.SE 
+
+        # 2
+        quality_weight = (N_i/self.N_tot)*(self.beta*C + self.gamma*self.SE)
+
+        # 3
+        quality_weight = self.delta*N_i/self.N_tot + self.beta*C + self.gamma*self.SE
+
+
+
         #print(f"quality weight: {quality_weight} ")
 
         # Return updated model parameters, number of samples, and custom metrics
@@ -117,6 +126,7 @@ def gen_client_fn(
     N_tot: int,
     beta: float,
     gamma: float,
+    delta: float,
     momentum: float,
     weight_decay: float,
 ) -> Callable[[Context], FlowerClientFedQual]:  # pylint: disable=too-many-arguments
@@ -179,5 +189,6 @@ def gen_client_fn(
             N_tot,
             beta,
             gamma,
+            delta,
         ) )
     return client_fn

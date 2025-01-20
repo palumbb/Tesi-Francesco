@@ -27,6 +27,7 @@ client_fn:
   learning_rate: ${learning_rate}
   beta: 0.50
   gamma: 0.50
+  delta: 0.50
 
 dataset:
   # dataset config
