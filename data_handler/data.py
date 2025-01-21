@@ -754,7 +754,7 @@ def split_dataframe(df, percentages, num_clients, target, dirty_percentage, dirt
             class_elements.append(elements)
         SE = -np.sum(np.log([el/n for el in class_elements]))
         class_elements.clear()
-        SE_values.append(SE)
+        SE_values.append(1/SE)
     
     # normalize SE values
     sum_SE = sum(SE_values)
@@ -853,7 +853,7 @@ def get_unbalanced_subsets(df, target, num_clients, data_path, dirty_percentage)
         SE = -np.sum(np.log([el/n for el in class_elements]))
         class_elements.clear()
         subsets.append(subset)
-        SE_values.append(SE)
+        SE_values.append(1/SE)
     starts = np.ones(len(datasets), dtype=int)*0
     for j in range(half_subsets):
         for i in range(len(datasets)):
@@ -870,7 +870,7 @@ def get_unbalanced_subsets(df, target, num_clients, data_path, dirty_percentage)
         SE = -np.sum(np.log([el/n for el in class_elements]))
         class_elements.clear()
         subsets.append(subset)
-        SE_values.append(SE)
+        SE_values.append(1/SE)
   
         subsets.append(subset)
     # normalize SE values
@@ -1024,7 +1024,7 @@ def get_mixed_subsets(df, test, target, num_clients, seed, features, data_path):
                 class_elements.append(elements)
             SE = -np.sum(np.log([el/n for el in class_elements]))
             class_elements.clear()
-            SE_values.append(SE)
+            SE_values.append(1/SE)
             subsets.append(client)
         
         # normalize SE values
