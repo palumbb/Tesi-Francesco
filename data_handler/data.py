@@ -31,9 +31,7 @@ def load_dataset(data_cfg, num_clients, federated: bool, partitioning, quality, 
     elif quality=="normal":
         dataset, features_ohe, target_name, num_columns, num_classes, to_view = load_clean_dataset(data_path, model)
         dataset = dataset.sample(frac=1, random_state=0).reset_index(drop=True)
-
         train_dataset, test_dataset = train_test_split(dataset, data_cfg, num_columns, features_ohe, target_name, to_view)
-        
         if federated:
             if partitioning=="uniform":
                 if num_clients == 2:
@@ -682,8 +680,14 @@ def split_by_attribute(dataset, num_columns, data_cfg, partitioning, features_oh
         train_list = split_by_v1(train)
     elif partitioning == "v2":
         train_list = split_by_v2(train)
+    elif partitioning == "social":
+        train_list = split_by_social(train)
+    elif partitioning == "habitat":
+        train_list = split_by_habitat(train)
+    elif partitioning == "chol":
+        train_list = split_by_chol(train)
     
-    train_datasets, test_dataset = get_train_test(train_list, test, features_ohe, target_name, to_view)
+    train_datasets, test_dataset = get_train_test(train_list, test, features_ohe, target_name, to_view, num_columns)
     return train_datasets, test_dataset
 
 def get_train_test(train_list, test, features_ohe, target_name, to_view, num_columns):
@@ -1217,4 +1221,35 @@ def split_by_v2(df):
     subset_2 = df[(df['V2'] > 1.0) & (df['V2'] <= 3.0)]
     subset_3 = df[df['V2'] > 3.0]
     subsets = [subset_1, subset_2, subset_3]
+    return subsets
+
+
+def split_by_social(df):
+    cols = df.columns
+    subset_1 = df[df["'social'_nonprob"] == 1]
+    subset_2 = df[df["'social'_problematic"] == 1]
+    subset_3 = df[df["'social'_slightly_prob"] == 1]
+    subsets = [subset_1, subset_2, subset_3]
+    return subsets
+
+def split_by_habitat(df):
+    cols = df.columns
+    subset_1 = df[df["Habitat_grasses"] == 1]
+    subset_2 = df[df["Habitat_paths"] == 1]
+    subset_3 = df[df["Habitat_urban"] == 1]
+    subset_4 = df[df["Habitat_waste"] == 1]
+    subset_5 = df[df["Habitat_woods"] == 1]
+    subset_6 = df[df["Habitat_leaves"] == 1]
+    subset_7 = df[df["Habitat_meadows"] == 1]
+    subsets = [subset_1, subset_2, subset_3, subset_4, subset_5, subset_6, subset_7]
+    return subsets
+
+def split_by_chol(df):
+    cols = df.columns
+    subset_1 = df[df["chol"] >= 1.0]
+    subset_2 = df[(df["chol"] < 1.0) & (df["chol"] >= 0.0)]
+    subset_3 = df[(df["chol"] < 0.0) & (df["chol"] > -1.0)]
+    subset_4 = df[df["chol"] <= -1.0]
+
+    subsets = [subset_1, subset_2, subset_3, subset_4]
     return subsets

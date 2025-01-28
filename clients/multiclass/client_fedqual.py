@@ -108,6 +108,7 @@ class FlowerClientFedQual(NumPyClient):
     def evaluate(self, parameters, config: Dict[str, Scalar]):
         self.set_parameters(parameters)
         loss, acc, f1 = test_multi(self.net, self.valloader, self.device)  # Usa test_multiclass
+        print(f"Accuracy client: {acc}")
         return float(loss), len(self.valloader.dataset), {
             "accuracy": float(acc),
             "f1-score": float(f1),  # Aggiungi F1-score per valutazioni più dettagliate
