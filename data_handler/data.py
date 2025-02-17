@@ -254,6 +254,7 @@ def get_dirty(subsets, test, num_dirty_subsets, imputation, seed, features, dirt
                 elif imputation == "mean":
                     client = dirty(seed, s, features, method, d) # DIRECTLY DIRTY WITH 0, 'MISSING'
                     imp_client = impute_missing_column(client, "impute_mean")
+                    print(imp_client)
                     imp_clients.append(imp_client)
             subsets.extend(imp_clients)
             subsets.extend(clean_subsets)
@@ -444,6 +445,8 @@ def load_mushrooms():
        'RingNumber' : str, 'RingType' : str, 'SporePrintColor' : str, 'Population' : str, 'Habitat' : str,
        'Class' : str}
     dataset = pd.read_csv("./datasets/mushrooms.csv", dtype=types)
+    print("Class Poisonous: " + str(len(dataset[dataset["Class"] == "poisonous"])))
+    print("Class Edible: " + str(len(dataset[dataset["Class"] == "edible"])))
     features = list(dataset.columns)
     target_name = ["Class_poisonous", "Class_edible"]
     profiling(dataset, "./datasets/mushrooms.csv")
@@ -510,6 +513,10 @@ def load_heart():
     types = {'age' : int, 'sex' : str, 'cp' : int, 'trestbps' : int, 'chol' : int, 'fbs' : int, 'restecg' : int, 'thalach' : int,
        'exang' : int, 'oldpeak' : float, 'slope' : int, 'ca' : int, 'thal' : int, 'target' : str}
     dataset = pd.read_csv("./datasets/heart.csv", dtype=types)
+    print("Disease 1: ")
+    print(len(dataset[dataset["target"]=='1']))
+    print("Disease 0: ")
+    print(len(dataset[dataset["target"]=='0']))
     dataset.rename(columns={"target" : "disease"}, inplace=True)
     features = list(dataset.columns)
     target_name = ["disease_1", "disease_0"]
@@ -577,6 +584,7 @@ def select_features(df, data_path):
 
     print(X.columns[indexes])
     print(scores[indexes])
+
     
 def compute_associationrules(df, data):
     if data == "./datasets/mv.csv":
@@ -758,7 +766,7 @@ def split_dataframe(df, percentages, num_clients, target, dirty_percentage, dirt
             class_elements.append(elements)
         SE = -np.sum(np.log([el/n for el in class_elements]))
         class_elements.clear()
-        SE_values.append(1/SE)
+        SE_values.append(SE)
     
     # normalize SE values
     sum_SE = sum(SE_values)
@@ -815,8 +823,8 @@ def get_unbalanced_subsets(df, target, num_clients, data_path, dirty_percentage)
         dataset2 = df[df[target]== "2"]
         dataset3 = df[df[target]== "3"]
         dataset4 = df[df[target]== "4"]
-        proportions = [0.40, 0.35, 0.15, 0.10]
-        proportions_inverse = [0.20, 0.15, 0.30, 0.35]
+        proportions = [0.50, 0.50, 0.0, 0.0]
+        proportions_inverse = [0.05, 0.05, 0.2, 0.7]
         datasets.append(dataset1)
         datasets.append(dataset2)
         datasets.append(dataset3)
@@ -857,7 +865,7 @@ def get_unbalanced_subsets(df, target, num_clients, data_path, dirty_percentage)
         SE = -np.sum(np.log([el/n for el in class_elements]))
         class_elements.clear()
         subsets.append(subset)
-        SE_values.append(1/SE)
+        SE_values.append(SE)
     starts = np.ones(len(datasets), dtype=int)*0
     for j in range(half_subsets):
         for i in range(len(datasets)):
@@ -874,7 +882,7 @@ def get_unbalanced_subsets(df, target, num_clients, data_path, dirty_percentage)
         SE = -np.sum(np.log([el/n for el in class_elements]))
         class_elements.clear()
         subsets.append(subset)
-        SE_values.append(1/SE)
+        SE_values.append(SE)
   
         subsets.append(subset)
     # normalize SE values
@@ -1028,7 +1036,7 @@ def get_mixed_subsets(df, test, target, num_clients, seed, features, data_path):
                 class_elements.append(elements)
             SE = -np.sum(np.log([el/n for el in class_elements]))
             class_elements.clear()
-            SE_values.append(1/SE)
+            SE_values.append(SE)
             subsets.append(client)
         
         # normalize SE values
@@ -1184,7 +1192,6 @@ def split_by_health(df):
 
 def split_by_odor(df):
     cols = list(df.columns)
-    
     subset_1 = df[df["Odor_foul"] == 1]
     subset_2 = df[df["Odor_none"] == 1]
     subset_3 = df[df["Odor_almond"] == 1]
@@ -1209,6 +1216,7 @@ def split_by_a1(df):
 
 def split_by_v1(df):
     cols = df.columns
+
     subset_1 = df[df['V1'] <= 1.0]
     subset_2 = df[(df['V1'] > 1.0) & (df['V1'] <= 3.0)]
     subset_3 = df[df['V1'] > 3.0]
