@@ -254,7 +254,6 @@ def get_dirty(subsets, test, num_dirty_subsets, imputation, seed, features, dirt
                 elif imputation == "mean":
                     client = dirty(seed, s, features, method, d) # DIRECTLY DIRTY WITH 0, 'MISSING'
                     imp_client = impute_missing_column(client, "impute_mean")
-                    print(imp_client)
                     imp_clients.append(imp_client)
             subsets.extend(imp_clients)
             subsets.extend(clean_subsets)
@@ -445,8 +444,6 @@ def load_mushrooms():
        'RingNumber' : str, 'RingType' : str, 'SporePrintColor' : str, 'Population' : str, 'Habitat' : str,
        'Class' : str}
     dataset = pd.read_csv("./datasets/mushrooms.csv", dtype=types)
-    print("Class Poisonous: " + str(len(dataset[dataset["Class"] == "poisonous"])))
-    print("Class Edible: " + str(len(dataset[dataset["Class"] == "edible"])))
     features = list(dataset.columns)
     target_name = ["Class_poisonous", "Class_edible"]
     profiling(dataset, "./datasets/mushrooms.csv")
@@ -461,10 +458,6 @@ def load_shuttle():
     # NUMERICAL
     types = {'A1': int, 'A2': int, 'A3': int, 'A4': int, 'A5': int, 'A6': int, 'A7': int, 'A8': int, 'A9': int, 'class': str}
     dataset = pd.read_csv("./datasets/shuttle.csv", dtype=types)
-    print("Class 1: " + str(len(dataset[dataset['class']=='1'])))
-    print("Class 2: " + str(len(dataset[dataset['class']=='2'])))
-    print("Class 3: " + str(len(dataset[dataset['class']=='3'])))
-    print("Class 4: " + str(len(dataset[dataset['class']=='4'])))
     features = list(dataset.columns)
     target_name = ["class_1", "class_2", "class_3", "class_4", "class_5", "class_6", "class_7"]
     num_columns = list(dataset[features].select_dtypes(include=[int, float]).columns)
@@ -513,10 +506,6 @@ def load_heart():
     types = {'age' : int, 'sex' : str, 'cp' : int, 'trestbps' : int, 'chol' : int, 'fbs' : int, 'restecg' : int, 'thalach' : int,
        'exang' : int, 'oldpeak' : float, 'slope' : int, 'ca' : int, 'thal' : int, 'target' : str}
     dataset = pd.read_csv("./datasets/heart.csv", dtype=types)
-    print("Disease 1: ")
-    print(len(dataset[dataset["target"]=='1']))
-    print("Disease 0: ")
-    print(len(dataset[dataset["target"]=='0']))
     dataset.rename(columns={"target" : "disease"}, inplace=True)
     features = list(dataset.columns)
     target_name = ["disease_1", "disease_0"]
@@ -526,8 +515,6 @@ def load_heart():
     features_ohe = list(dataset.columns)
     for t in target_name:
         features_ohe.remove(t)
-    #print(len(dataset[dataset["disease_1"]==1]))
-    #print(len(dataset[dataset["disease_0"]==1]))
     return dataset, features_ohe, target_name, num_columns
 
 def profiling(df, data_path):
@@ -918,7 +905,6 @@ def get_mixed_subsets(df, test, target, num_clients, seed, features, data_path):
 
         # FIRST GET DIFFERENT SIZES SUBSETS BASED ON RANDOM PERCENTAGES (INDIRECTLY ALREADY UNBALANCED)
         subsets, dirty_percentages, SE_values = split_dataframe(df, norm_per, num_clients, target, None, rand_dirty)
-        #print(subsets[0])
 
         # GET THEM DIRTY WITH DIFFERENT RANDOM PERCENTAGES
         for imp,d,s in zip(rand_imp, dirty_percentages, subsets):

@@ -42,10 +42,10 @@ def main(cfg: DictConfig) -> None:
     print("Quality: " + str(cfg.quality))
     print("Imputation: " + str(cfg.imputation))
     print(f"Dirty Percentage: {cfg.dirty_percentage}")
-    #print("Clients: " + str(cfg.num_clients))
-    #print("Local epochs: " + str(cfg.num_epochs))
-    #print("Sampled clients: " + str(cfg.clients_per_round))
-    #print("Rounds: " + str(cfg.num_rounds))
+    print("Clients: " + str(cfg.num_clients))
+    print("Local epochs: " + str(cfg.num_epochs))
+    print("Sampled clients: " + str(cfg.clients_per_round))
+    print("Rounds: " + str(cfg.num_rounds))
 
     accuracies = []
     run_labels = ["FedAvg", "FedProx", "FedNova", "Scaffold"]
