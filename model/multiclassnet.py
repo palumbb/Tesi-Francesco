@@ -21,10 +21,10 @@ class MulticlassNet(nn.Module):
                 input_dim = 21
             num_classes = 4
         elif data == "./datasets/nursery.csv":
-            if imputation=="standard" or imputation=="mean":
+            if quality=="completeness":
                 input_dim = 35
-            else: 
-                input_dim = 35
+            elif quality=="normal": 
+                input_dim = 27
             num_classes = 5
         if data=="./datasets/consumer.csv":
             if imputation=="standard" or imputation=="mean":
@@ -45,16 +45,16 @@ class MulticlassNet(nn.Module):
                 input_dim = 9
             num_classes = 7
         elif data == "./datasets/wall-robot-navigation.csv":
-            if imputation=="standard" or imputation=="mean":
+            if quality=="completeness":
                 input_dim = 4
-            else:
+            elif quality=="normal": 
                 input_dim = 4
             num_classes = 4
         elif data == "./datasets/mushrooms.csv":
-            if imputation=="standard" or imputation=="mean":
+            if quality=="completeness":
                 input_dim = 139
-            else:
-                input_dim = 139
+            elif quality=="normal": 
+                input_dim = 115
             num_classes = 2
         elif data == "./datasets/cancer.csv":
             if imputation=="standard" or imputation=="mean":
@@ -63,10 +63,10 @@ class MulticlassNet(nn.Module):
                 input_dim = 31
             num_classes = 2
         elif data == "./datasets/heart.csv":
-            if imputation=="standard" or imputation=="mean":
+            if quality=="completeness":
                 input_dim = 13
-            else:
-                input_dim = 13
+            elif quality=="normal": 
+                input_dim = 14
             num_classes = 2
         self.fc1 = nn.Linear(input_dim, 64)
         self.relu = nn.ReLU()

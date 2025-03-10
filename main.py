@@ -28,7 +28,7 @@ from torch.utils.data import DataLoader
 from torch.optim import SGD, Optimizer
 import pandas as pd
 
-@hydra.main(config_path="conf", config_name="fedqual_base", version_base=None)
+@hydra.main(config_path="conf", config_name="fedavg_base", version_base=None)
 def main(cfg: DictConfig) -> None:
     
     seed = 205
@@ -42,17 +42,18 @@ def main(cfg: DictConfig) -> None:
     print("Quality: " + str(cfg.quality))
     print("Imputation: " + str(cfg.imputation))
     print(f"Dirty Percentage: {cfg.dirty_percentage}")
-    #print("Clients: " + str(cfg.num_clients))
-    #print("Local epochs: " + str(cfg.num_epochs))
-    #print("Sampled clients: " + str(cfg.clients_per_round))
-    #print("Rounds: " + str(cfg.num_rounds))
+    print("Clients: " + str(cfg.num_clients))
+    print("Local epochs: " + str(cfg.num_epochs))
+    print("Sampled clients: " + str(cfg.clients_per_round))
+    print("Rounds: " + str(cfg.num_rounds))
 
     accuracies = []
     run_labels = ["FedAvg", "FedProx", "FedNova", "Scaffold"]
 
     # 2. Preparazione del dataset
     if cfg.federated:
-        trainloaders, valloaders, testloader, quality_metrics, N_tot = load_dataset(
+        if cfg.quality=="normal":
+            trainloaders, valloaders, testloader = load_dataset(
             data_cfg=cfg.dataset,
             num_clients=cfg.num_clients,
             federated=cfg.federated,
@@ -64,6 +65,19 @@ def main(cfg: DictConfig) -> None:
             seed=seed,
             num_dirty_subsets=cfg.num_dirty_subsets
         )
+        else:
+            trainloaders, valloaders, testloader, quality_metrics, N_tot = load_dataset(
+                data_cfg=cfg.dataset,
+                num_clients=cfg.num_clients,
+                federated=cfg.federated,
+                partitioning=cfg.partitioning,
+                model=cfg.model,
+                dirty_percentage=cfg.dirty_percentage,
+                quality=cfg.quality,
+                imputation=cfg.imputation,
+                seed=seed,
+                num_dirty_subsets=cfg.num_dirty_subsets
+            )
 
         # 3. Definizione dei client
         client_fn = None
@@ -90,7 +104,8 @@ def main(cfg: DictConfig) -> None:
                 quality_metrics=quality_metrics,
                 N_tot=N_tot,
                 beta = cfg.client_fn.beta,
-                gamma = cfg.client_fn.gamma
+                gamma = cfg.client_fn.gamma,
+                delta = cfg.client_fn.delta
             )
 
         else:

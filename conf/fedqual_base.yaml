@@ -25,8 +25,9 @@ client_fn:
   _partial_ : True
   num_epochs: ${num_epochs}
   learning_rate: ${learning_rate}
-  beta: 0.50
-  gamma: 0.50
+  beta: 0.50 # completeness
+  gamma: 0.50 # class balance
+  delta: 0.50 # dimensionality
 
 dataset:
   # dataset config
