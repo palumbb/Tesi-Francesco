@@ -15,7 +15,7 @@ Le variabili di interesse che possono essere personalizzate nei vari files sono:
       3. "balance" se si vuole dividere il dataset in clients con percentuali di class balance diverse, per cui cambiare il valore delle percentuali per ogni classe nella lista "proportions", all'interno della funzione           "get_unbalanced_subsets";
       4. "mixed" se si vogliono generare clients sia sporchi che sbilanciati, assegnando le dirty percentages nella lista "dirty" e quelle di bilanciamento delle classi nella lista "balance", all'interno della funzione           "get_mixed_subsets";
   - dirty_percentage: percentuale di sporcizia che si vuole assegnare ai clients, indicata in decimale;
-  - imputation: "standard" se si vuole imputare i missing values con 0 per numerical features e "missing" per categorical, altrimenti "mean" se si vuole fare imputation con media o moda delle features;
+  - imputation: "standard" se si vuole imputare i missing values con 0 per le numerical features e missing per le categorical, altrimenti "mean" se si vuole fare imputation con media o moda delle features;
   - num_dirty_subsets: indicare il numero di clients sul totale che si vogliono sporcare, se si vogliono sporcare tutti si può settare a 0;
   - dataset_path: indicare il percorso del dataset che si vuole utilizzare;
 
