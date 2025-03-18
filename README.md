@@ -10,10 +10,10 @@ Le variabili di interesse che possono essere personalizzate nei vari files sono:
   - num_rounds: deve essere uguale a 30;
   - quality: "normal" se si vogliono generare clients dal dataset originale, "completeness" se si vogliono sporcare o sbilanciare i clients
   - partitioning: in base all'esperimento, indicare se il partitioning viene fatto in modalità
-      (a) "uniform" se tutti i clients hanno la stessa size,
-      (b) "split_by" seguito dal nome dell'attributo se si vuole dividere i clients in base ad una feature (le features per cui esistono le funzioni di split sono indicate dalle funzioni "split_by_xxxx" alla fine del               file data.py)
-      (c) "balance" se si vuole dividere il dataset in clients con percentuali di class balance diverse, per cui cambiare il valore delle percentuali per ogni classe nella lista "proportions", all'interno della funzione           "get_unbalanced_subsets";
-      (d) "mixed" se si vogliono generare clients sia sporchi che sbilanciati, assegnando le dirty percentages nella lista "dirty" e quelle di bilanciamento delle classi nella lista "balance", all'interno della funzione           "get_mixed_subsets";
+      1. "uniform" se tutti i clients hanno la stessa size,
+      2. "split_by" seguito dal nome dell'attributo se si vuole dividere i clients in base ad una feature (le features per cui esistono le funzioni di split sono indicate dalle funzioni "split_by_xxxx" alla fine del               file data.py)
+      3. "balance" se si vuole dividere il dataset in clients con percentuali di class balance diverse, per cui cambiare il valore delle percentuali per ogni classe nella lista "proportions", all'interno della funzione           "get_unbalanced_subsets";
+      4. "mixed" se si vogliono generare clients sia sporchi che sbilanciati, assegnando le dirty percentages nella lista "dirty" e quelle di bilanciamento delle classi nella lista "balance", all'interno della funzione           "get_mixed_subsets";
   - dirty_percentage: percentuale di sporcizia che si vuole assegnare ai clients, indicata in decimale;
   - imputation: "standard" se si vuole imputare i missing values con 0 per numerical features e "missing" per categorical, altrimenti "mean" se si vuole fare imputation con media o moda delle features;
   - num_dirty_subsets: indicare il numero di clients sul totale che si vogliono sporcare, se si vogliono sporcare tutti si può settare a 0;
