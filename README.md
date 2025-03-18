@@ -23,6 +23,7 @@ In fedqual_base.yaml le variabili aggiuntive in "client_fn" beta, gamma e delta 
   - beta: 0.50;
   - gamma: 0.50;
   - delta: 0
+    
 Per FedQual, invece:
   - beta: 0.33;
   - gamma: 0.33;
